@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<odoo>
+    <menuitem id='menu_parking_management_root' name='Quản lý bãi xe' sequence='10' />
+    <menuitem id='menu_parking_management_operations' name='Hoạt động' parent='menu_parking_management_root' sequence='10' />
+    <menuitem id='menu_parking_management_master_data' name='Master Data' parent='menu_parking_management_root' sequence='10' />
+
+</odoo>
