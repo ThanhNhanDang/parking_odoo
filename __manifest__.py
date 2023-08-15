@@ -20,18 +20,13 @@
     'version': '0.1',
 
     # any module necessary for this one to work correctly
-    'depends': ['base'],
+    'depends': ['stock'],
     "application": True,
 
     # always loaded
     'data': [
-        'security/ir.model.access.csv',
-        'views/menu.xml',
-        'views/locations.xml',
-        'views/car.xml',
+        'views/state_location.xml'
     ],
     # only loaded in demonstration mode
-    'demo': [
-        'demo/demo.xml',
-    ],
+   
 }

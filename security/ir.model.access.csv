@@ -1,4 +1,1 @@
-id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
-parking.access_parking_management_car,access_parking_management_car,parking.model_parking_management_car,base.group_user,1,1,1,1
-parking.access_parking_management_locations,access_parking_management_locations,parking.model_parking_management_locations,base.group_user,1,1,1,1
 

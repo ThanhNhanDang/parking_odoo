@@ -1,3 +1,2 @@
 # -*- coding: utf-8 -*-
-from . import car
-from . import locations
+from . import state_locations

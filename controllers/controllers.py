@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
-from odoo import http
+# from odoo import http
 
 
-class Parking(http.Controller):
-    @http.route('/parking/car', website=True,auth='public')
-    def parking_car(self, **kw):
-        return "Hello, world"
+# class Parking(http.Controller):
+#     @http.route('/parking/car', website=True,auth='public')
+#     def parking_car(self, **kw):
+#         return "Hello, world"
 
     # @http.route('/parking/parking/objects', auth='public')
     # def list(self, **kw):
