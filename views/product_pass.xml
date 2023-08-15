@@ -1,0 +1,22 @@
+<?xml version='1.0' encoding='utf-8'?>
+<odoo>
+    <record id="view_form_product_extend" model="ir.ui.view">
+        <field name="name">Mật khẩu</field>
+        <field name="model">product.template</field>
+        <field name="inherit_id" ref="product.template.product.form" />
+        <field name="arch" type="xml">
+            <field name="name" position="after">
+                <field name="password" />
+            </field>
+        </field>
+    </record>
+    <record id='view_product_tree' model='ir.ui.view'>
+        <field name='name'>product.template.tree</field>
+        <field name='model'>product.template</field>
+        <field name='arch' type='xml'>
+            <tree>
+                <field name="password" />
+            </tree>
+        </field>
+    </record>
+</odoo>

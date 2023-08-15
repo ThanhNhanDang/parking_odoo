@@ -20,12 +20,13 @@
     'version': '0.1',
 
     # any module necessary for this one to work correctly
-    'depends': ['stock'],
+    'depends': ['stock','product'],
     "application": True,
 
     # always loaded
     'data': [
-        'views/state_location.xml'
+        'views/state_location.xml',
+        'views/product_pass.xml'
     ],
     # only loaded in demonstration mode
    
