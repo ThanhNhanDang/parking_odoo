@@ -71,9 +71,8 @@ class ControllerProduct(http.Controller):
                     location_empty.write({'state': 'full'})
                     create_product_move_history(
                         "BX/IN", product.id, 4, location_empty.id, kw['sEPC'])
-                    password_tag += "\0"
+                    password_tag += "s"
                     return password_tag
-                    
             return "-1"
         else:
             return serial_ids.product_id.password
