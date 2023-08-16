@@ -42,7 +42,7 @@ class ControllerProduct(http.Controller):
             [('name', '=', kw['sEPC'])])
 
         if not serial_ids:
-            password_tag = uuid.uuid4().hex[:8] + "\0"
+            password_tag = uuid.uuid4().hex[:8]
             product = http.request.env["product.product"].sudo().create({
                 'name': "xe_["+kw['sEPC']+"]",
                 'tracking': 'serial',
@@ -57,6 +57,8 @@ class ControllerProduct(http.Controller):
             locations_empty = http.request.env["stock.location"].sudo().search([
                 ('state', '=', 'empty')])
 
+            
+
             # Tìm danh vị trí trống đầu tiên trong danh sách
             for location_empty in locations_empty:
                # Có nhiều bãi xe nên tìm bãi xe của mình
@@ -69,9 +71,10 @@ class ControllerProduct(http.Controller):
                     location_empty.write({'state': 'full'})
                     create_product_move_history(
                         "BX/IN", product.id, 4, location_empty.id, kw['sEPC'])
-                    break
-
-            return password_tag
+                    password_tag += "\0"
+                    return password_tag
+                    
+            return "-1"
         else:
             return serial_ids.product_id.password
 
