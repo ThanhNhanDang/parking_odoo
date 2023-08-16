@@ -32,7 +32,7 @@ def find_location_empty():
             # Cập nhật vị trí đã đầy
             location_empty.write({'state': 'full'})
             return location_empty.id
-
+    return -1
 
 class ControllerProduct(http.Controller):
 
@@ -87,8 +87,11 @@ class ControllerProduct(http.Controller):
         # kiểm tra ra hay vào nếu ra thì thêm vào và ngược lại
 
         if 'OUT' in max_object.reference:
+            location_empty_id = find_location_empty()
+            if location_empty_id == -1:
+                return "BAI XE FULL"
             create_product_move_history(
-                "BX/IN", max_object.product_id.id, 4, find_location_empty(), kw['sEPC'])
+                "BX/IN", max_object.product_id.id, 4, location_empty_id(), kw['sEPC'])
             return "Da Vao"
         else:
             location = http.request.env["stock.location"].sudo().search(
@@ -111,8 +114,11 @@ class ControllerProduct(http.Controller):
         # kiểm tra ra hay vào nếu ra thì thêm vào và ngược lại
 
         if 'OUT' in max_object.reference:
+            location_empty_id = find_location_empty()
+            if location_empty_id == -1:
+                return "BAI XE FULL"
             create_product_move_history(
-                "BX/IN", max_object.product_id.id, 4, find_location_empty(), kw['sEPC'])
+                "BX/IN", max_object.product_id.id, 4, location_empty_id, kw['sEPC'])
             return "Da Vao"
         else:
             return "Xe da vao roi"
