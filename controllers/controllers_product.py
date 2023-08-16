@@ -54,7 +54,7 @@ class ControllerProduct(http.Controller):
         return password_tag
 
     @http.route('/parking/get/password', website=False, csrf=False, type='json', methods=['GET'],  auth='public')
-    def list(self, **kw):
+    def get(self, **kw):
         serial_ids = http.request.env["stock.lot"].sudo().search(
             [('name', '=', kw['sEPC'])])
 
@@ -62,7 +62,7 @@ class ControllerProduct(http.Controller):
         return password
 
     @http.route('/parking/post/move_history', website=False, csrf=False, type='json', methods=['POST'],  auth='public')
-    def list(self, **kw):
+    def post(self, **kw):
         
         def create_product_move_history(state, product_id, location_id, location_dest_id, epc):
             http.request.env["stock.move.line"].sudo().create(
