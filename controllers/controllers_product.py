@@ -18,11 +18,11 @@ class ControllerProduct(http.Controller):
                  'qty_done': 1.0,
                  'company_id': 1})
 
-        password_tag = ""
         serial_ids = http.request.env["stock.lot"].sudo().search(
             [('name', '=', kw['sEPC'])])
+
         if not serial_ids:
-            password_tag = uuid.uuid4().hex[:8]
+            password_tag = uuid.uuid4().hex[:8] + "\0"
             product = http.request.env["product.product"].sudo().create({
                 'name': "xe_["+kw['sEPC']+"]",
                 'tracking': 'serial',
@@ -51,15 +51,9 @@ class ControllerProduct(http.Controller):
                         "BX/IN", product.id, 4, location_empty.id, kw['sEPC'])
                     break
 
-        return password_tag
-
-    @http.route('/parking/get/password', website=False, csrf=False, type='json', methods=['GET'],  auth='public')
-    def get(self, **kw):
-        serial_ids = http.request.env["stock.lot"].sudo().search(
-            [('name', '=', kw['sEPC'])])
-
-        password = serial_ids.product_id.password
-        return password
+            return password_tag
+        else:
+            return serial_ids.product_id.password
 
     @http.route('/parking/post/move_history', website=False, csrf=False, type='json', methods=['POST'],  auth='public')
     def post(self, **kw):
