@@ -89,14 +89,19 @@ class ControllerProduct(http.Controller):
         # lấy danh sách ID của thẻ trong kho move history
         product_move_list = http.request.env["stock.move.line"].sudo().search(
             [('lot_name', '=', kw['sEPC'])])
-
+        if not product_move_list:
+            serial_ids = http.request.env["stock.lot"].sudo().search(
+                [('name', '=', kw['sEPC'])])
+            create_product_move_history(
+                "BX/IN", serial_ids.product_id.id, 4, location_empty_id, kw['sEPC'])
+            return "Da Vao"
         # tìm ID lớn nhất (thời gian đi vào gần nhất)
         max_object = max(product_move_list, key=lambda x: x['id'])
         # lấy thông tin của ID lớn nhất
         # kiểm tra ra hay vào nếu ra thì thêm vào và ngược lại
 
         if 'OUT' in max_object.reference:
-           
+
             create_product_move_history(
                 "BX/IN", max_object.product_id.id, 4, location_empty_id, kw['sEPC'])
             return "Da Vao"
@@ -117,7 +122,12 @@ class ControllerProduct(http.Controller):
         # lấy danh sách ID của thẻ trong kho move history
         product_move_list = http.request.env["stock.move.line"].sudo().search(
             [('lot_name', '=', kw['sEPC'])])
-
+        if not product_move_list:
+            serial_ids = http.request.env["stock.lot"].sudo().search(
+                [('name', '=', kw['sEPC'])])
+            create_product_move_history(
+                "BX/IN", serial_ids.product_id.id, 4, location_empty_id, kw['sEPC'])
+            return "Da Vao"
         # tìm ID lớn nhất (thời gian đi vào gần nhất)
         max_object = max(product_move_list, key=lambda x: x['id'])
         # lấy thông tin của ID lớn nhất
@@ -127,15 +137,14 @@ class ControllerProduct(http.Controller):
             create_product_move_history(
                 "BX/IN", max_object.product_id.id, 4, location_empty_id, kw['sEPC'])
             return "Da Vao"
-        else:
-            return "Xe da vao roi"
 
     @http.route('/parking/post/out/move_history', website=False, csrf=False, type='json', methods=['POST'],  auth='public')
     def post_out_move_history(self, **kw):
         # lấy danh sách ID của thẻ trong kho move history
         product_move_list = http.request.env["stock.move.line"].sudo().search(
             [('lot_name', '=', kw['sEPC'])])
-
+        if not product_move_list
+        return "Xe da Ra roi"
         # tìm ID lớn nhất (thời gian đi vào gần nhất)
         max_object = max(product_move_list, key=lambda x: x['id'])
         # lấy thông tin của ID lớn nhất
@@ -149,5 +158,3 @@ class ControllerProduct(http.Controller):
             create_product_move_history(
                 "BX/OUT", max_object.product_id.id, max_object.location_dest_id.id, 5, kw['sEPC'])
             return "Da Ra"
-        else:
-            return "Xe da Ra roi"
