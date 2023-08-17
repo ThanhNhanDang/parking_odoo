@@ -36,7 +36,6 @@ def find_location_empty():
 
 
 class ControllerProduct(http.Controller):
-
     @http.route('/parking/get/check_product', website=False, csrf=False, type='json', methods=['GET'], auth='public')
     def parking_create_product(self, **kw):
         serial_ids = http.request.env["stock.lot"].sudo().search(
