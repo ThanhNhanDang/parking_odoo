@@ -143,8 +143,8 @@ class ControllerProduct(http.Controller):
         # lấy danh sách ID của thẻ trong kho move history
         product_move_list = http.request.env["stock.move.line"].sudo().search(
             [('lot_name', '=', kw['sEPC'])])
-        if not product_move_list
-        return "Xe da Ra roi"
+        if not product_move_list:
+            return "Xe da Ra roi"
         # tìm ID lớn nhất (thời gian đi vào gần nhất)
         max_object = max(product_move_list, key=lambda x: x['id'])
         # lấy thông tin của ID lớn nhất
