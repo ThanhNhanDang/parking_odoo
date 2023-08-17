@@ -75,12 +75,15 @@ class ControllerProduct(http.Controller):
             "company_id": 1
         })
         location_empty_id = find_location_empty()
+        if location_empty_id == -1:
+            return "-1"
         locations_empty = http.request.env["stock.location"].sudo().search([
             ('id', '=', location_empty_id)])
         # Cập nhật vị trí đã đầy
         location_empty.write({'state': 'full'})
         create_product_move_history(
         "BX/IN", product.id, 4, location_empty.id, kw['sEPC'])
+        return "Da Vao"
       
     @http.route('/parking/post/move_history', website=False, csrf=False, type='json', methods=['POST'],  auth='public')
     def post(self, **kw):
