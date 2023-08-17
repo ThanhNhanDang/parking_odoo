@@ -34,31 +34,17 @@ def find_location_empty():
             return location_empty.id
     return -1
 
+
 class ControllerProduct(http.Controller):
 
-    @http.route('/parking/post/check_product', website=False, csrf=False, type='json', methods=['POST'], auth='public')
+    @http.route('/parking/post/check_product', website=False, csrf=False, type='json', methods=['GET'], auth='public')
     def parking_create_product(self, **kw):
         serial_ids = http.request.env["stock.lot"].sudo().search(
             [('name', '=', kw['sEPC'])])
-
         if not serial_ids:
-            password_tag = uuid.uuid4().hex[:8]
-            product = http.request.env["product.product"].sudo().create({
-                'name': "xe_["+kw['sEPC']+"]",
-                'tracking': 'serial',
-                'password': password_tag,
-            })
-            http.request.env["stock.lot"].sudo().create({
-                'name': kw['sEPC'],
-                'product_id': product.id,
-                "company_id": 1
-            })
             # Tìm danh sách vị trí trống trong bãi lấy danh sách tên của bãi
             locations_empty = http.request.env["stock.location"].sudo().search([
-                ('state', '=', 'empty')])
-
-            
-
+            ('state', '=', 'empty')])
             # Tìm danh vị trí trống đầu tiên trong danh sách
             for location_empty in locations_empty:
                # Có nhiều bãi xe nên tìm bãi xe của mình
@@ -67,16 +53,35 @@ class ControllerProduct(http.Controller):
                 # Tìm BX của mình và tìm Bãi nào có định dạng là 3 phần tử
                 # BX\A\A1 or BX\B\B2
                 if 'BX' in location and len(location) > 2:
-                   # Cập nhật vị trí đã đầy
-                    location_empty.write({'state': 'full'})
-                    create_product_move_history(
-                        "BX/IN", product.id, 4, location_empty.id, kw['sEPC'])
+                    password_tag = uuid.uuid4().hex[:8]
                     password_tag += "s"
                     return password_tag
             return "-1"
         else:
             return serial_ids.product_id.password
 
+    @http.route('/parking/post/product_first_time', website=False, csrf=False, type='json', methods=['POST'], auth='public')
+    def post_product_first_time(self, **kw):
+
+        product = http.request.env["product.product"].sudo().create({
+            'name': "xe_["+kw['sEPC']+"]",
+            'tracking': 'serial',
+            'password': kw['password']
+        })
+
+        http.request.env["stock.lot"].sudo().create({
+            'name': kw['sEPC'],
+            'product_id': product.id,
+            "company_id": 1
+        })
+        location_empty_id = find_location_empty()
+        locations_empty = http.request.env["stock.location"].sudo().search([
+            ('id', '=', location_empty_id)])
+        # Cập nhật vị trí đã đầy
+        location_empty.write({'state': 'full'})
+        create_product_move_history(
+        "BX/IN", product.id, 4, location_empty.id, kw['sEPC'])
+      
     @http.route('/parking/post/move_history', website=False, csrf=False, type='json', methods=['POST'],  auth='public')
     def post(self, **kw):
         # lấy danh sách ID của thẻ trong kho move history
@@ -93,7 +98,7 @@ class ControllerProduct(http.Controller):
             if location_empty_id == -1:
                 return "BAI XE FULL"
             create_product_move_history(
-                "BX/IN", max_object.product_id.id, 4, location_empty_id(), kw['sEPC'])
+                "BX/IN", max_object.product_id.id, 4, location_empty_id, kw['sEPC'])
             return "Da Vao"
         else:
             location = http.request.env["stock.location"].sudo().search(
