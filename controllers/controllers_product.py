@@ -79,8 +79,6 @@ class ControllerProduct(http.Controller):
             return "-1"
         locations_empty = http.request.env["stock.location"].sudo().search([
             ('id', '=', location_empty_id)])
-        # Cập nhật vị trí đã đầy
-        location_empty.write({'state': 'full'})
         create_product_move_history(
         "BX/IN", product.id, 4, location_empty_id, kw['sEPC'])
         return "Da Vao"
