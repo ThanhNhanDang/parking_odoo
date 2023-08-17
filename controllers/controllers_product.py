@@ -77,8 +77,6 @@ class ControllerProduct(http.Controller):
         location_empty_id = find_location_empty()
         if location_empty_id == -1:
             return "-1"
-        locations_empty = http.request.env["stock.location"].sudo().search([
-            ('id', '=', location_empty_id)])
         create_product_move_history(
         "BX/IN", product.id, 4, location_empty_id, kw['sEPC'])
         return "Da Vao"
@@ -105,7 +103,7 @@ class ControllerProduct(http.Controller):
             location = http.request.env["stock.location"].sudo().search(
                 [('id', '=', max_object.location_dest_id.id)])
             location.write({'state': 'empty'})
-
+            
             create_product_move_history(
                 "BX/OUT", max_object.product_id.id, max_object.location_dest_id.id, 5, kw['sEPC'])
             return "Da Ra"
