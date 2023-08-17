@@ -82,7 +82,7 @@ class ControllerProduct(http.Controller):
         # Cập nhật vị trí đã đầy
         location_empty.write({'state': 'full'})
         create_product_move_history(
-        "BX/IN", product.id, 4, location_empty.id, kw['sEPC'])
+        "BX/IN", product.id, 4, location_empty_id, kw['sEPC'])
         return "Da Vao"
       
     @http.route('/parking/post/move_history', website=False, csrf=False, type='json', methods=['POST'],  auth='public')
