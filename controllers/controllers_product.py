@@ -44,7 +44,7 @@ class ControllerProduct(http.Controller):
         if not serial_ids:
             # Tìm danh sách vị trí trống trong bãi lấy danh sách tên của bãi
             locations_empty = http.request.env["stock.location"].sudo().search([
-            ('state', '=', 'empty')])
+                ('state', '=', 'empty')])
             # Tìm danh vị trí trống đầu tiên trong danh sách
             for location_empty in locations_empty:
                # Có nhiều bãi xe nên tìm bãi xe của mình
@@ -78,11 +78,14 @@ class ControllerProduct(http.Controller):
         if location_empty_id == -1:
             return "-1"
         create_product_move_history(
-        "BX/IN", product.id, 4, location_empty_id, kw['sEPC'])
+            "BX/IN", product.id, 4, location_empty_id, kw['sEPC'])
         return "Da Vao"
-      
+
     @http.route('/parking/post/move_history', website=False, csrf=False, type='json', methods=['POST'],  auth='public')
     def post(self, **kw):
+        location_empty_id = find_location_empty()
+        if location_empty_id == -1:
+            return "BAI XE FULL"
         # lấy danh sách ID của thẻ trong kho move history
         product_move_list = http.request.env["stock.move.line"].sudo().search(
             [('lot_name', '=', kw['sEPC'])])
@@ -93,9 +96,7 @@ class ControllerProduct(http.Controller):
         # kiểm tra ra hay vào nếu ra thì thêm vào và ngược lại
 
         if 'OUT' in max_object.reference:
-            location_empty_id = find_location_empty()
-            if location_empty_id == -1:
-                return "BAI XE FULL"
+           
             create_product_move_history(
                 "BX/IN", max_object.product_id.id, 4, location_empty_id, kw['sEPC'])
             return "Da Vao"
@@ -103,13 +104,16 @@ class ControllerProduct(http.Controller):
             location = http.request.env["stock.location"].sudo().search(
                 [('id', '=', max_object.location_dest_id.id)])
             location.write({'state': 'empty'})
-            
+
             create_product_move_history(
                 "BX/OUT", max_object.product_id.id, max_object.location_dest_id.id, 5, kw['sEPC'])
             return "Da Ra"
 
     @http.route('/parking/post/in/move_history', website=False, csrf=False, type='json', methods=['POST'],  auth='public')
     def post_in_move_history(self, **kw):
+        location_empty_id = find_location_empty()
+        if location_empty_id == -1:
+            return "BAI XE FULL"
         # lấy danh sách ID của thẻ trong kho move history
         product_move_list = http.request.env["stock.move.line"].sudo().search(
             [('lot_name', '=', kw['sEPC'])])
@@ -120,9 +124,6 @@ class ControllerProduct(http.Controller):
         # kiểm tra ra hay vào nếu ra thì thêm vào và ngược lại
 
         if 'OUT' in max_object.reference:
-            location_empty_id = find_location_empty()
-            if location_empty_id == -1:
-                return "BAI XE FULL"
             create_product_move_history(
                 "BX/IN", max_object.product_id.id, 4, location_empty_id, kw['sEPC'])
             return "Da Vao"
