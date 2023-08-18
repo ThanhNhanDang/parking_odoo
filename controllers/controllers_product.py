@@ -28,9 +28,7 @@ def find_location_empty():
         # Tìm BX của mình và tìm Bãi nào có định dạng là 3 phần tử
         # BX\A\A1 or BX\B\B2
         if 'BX' in location and len(location) > 2:
-            # Cập nhật vị trí đã đầy
-            # Cập nhật vị trí đã đầy
-            location_empty.write({'state': 'full'})
+         
             return location_empty.id
     return -1
 
@@ -74,6 +72,10 @@ class ControllerProduct(http.Controller):
             "company_id": 1
         })
         location_empty_id = find_location_empty()
+        # Cập nhật vị trí đã đầy
+        locations_empty = http.request.env["stock.location"].sudo().search([
+            ('id', '=', location_empty_id)])
+        locations_empty.write({'state': 'full'})
         if location_empty_id == -1:
             return "-1"
         create_product_move_history(
@@ -124,6 +126,10 @@ class ControllerProduct(http.Controller):
         if not product_move_list:
             serial_ids = http.request.env["stock.lot"].sudo().search(
                 [('name', '=', kw['sEPC'])])
+            # Cập nhật vị trí đã đầy
+            locations_empty = http.request.env["stock.location"].sudo().search([
+            ('id', '=', location_empty_id)])
+            locations_empty.write({'state': 'full'})
             create_product_move_history(
                 "BX/IN", serial_ids.product_id.id, 4, location_empty_id, kw['sEPC'])
             return "Da Vao"
@@ -133,6 +139,10 @@ class ControllerProduct(http.Controller):
         # kiểm tra ra hay vào nếu ra thì thêm vào và ngược lại
 
         if 'OUT' in max_object.reference:
+              # Cập nhật vị trí đã đầy
+            locations_empty = http.request.env["stock.location"].sudo().search([
+            ('id', '=', location_empty_id)])
+            locations_empty.write({'state': 'full'})
             create_product_move_history(
                 "BX/IN", max_object.product_id.id, 4, location_empty_id, kw['sEPC'])
             return "Da Vao"
