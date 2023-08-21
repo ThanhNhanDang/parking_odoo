@@ -190,8 +190,8 @@ class ControllerProduct(http.Controller):
         
         return "-2" # Da ra roi
 
-    @http.route('/parking/get/all/move_history', website=False, csrf=False, type='json', methods=['GET'],  auth='public')
-    def post_out_move_history(self, **kw):
+    @http.route('/parking/get/all/move_history', website=False, csrf=False, type='json', methods=['POST'],  auth='public')
+    def post_all_move_history(self, **kw):
 
         move_histories = http.request.env['stock.move.line'].sudo().search_read(
         fields=['date','lot_name', 'reference','location_id','location_dest_id'],
