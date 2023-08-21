@@ -33,7 +33,7 @@ def find_location_empty():
             return location_empty.id
     return -1
 
-def get_all_move_history_by_day(self, **kw):
+def get_all_move_history_by_day(**kw):
     move_histories = http.request.env['stock.move.line'].sudo().search_read(
         domain=[('lot_name', '=', kw['sEPC'])],
         fields=['date','lot_name', 'reference','location_id','location_dest_id'],
@@ -94,7 +94,7 @@ class ControllerProduct(http.Controller):
             return "-1"
         create_product_move_history(
             "BX/IN", product.id, 4, location_empty_id, kw['sEPC'])
-        return get_all_move_history_by_day()
+        return get_all_move_history_by_day(kw)
 
     @http.route('/parking/post/move_history', website=False, csrf=False, type='json', methods=['POST'],  auth='public')
     def post(self, **kw):
@@ -109,7 +109,7 @@ class ControllerProduct(http.Controller):
                 [('name', '=', kw['sEPC'])])
             create_product_move_history(
                 "BX/IN", serial_ids.product_id.id, 4, location_empty_id, kw['sEPC'])
-            return get_all_move_history_by_day()
+            return get_all_move_history_by_day(kw)
         # tìm ID lớn nhất (thời gian đi vào gần nhất)
         max_object = max(product_move_list, key=lambda x: x['id'])
         # lấy thông tin của ID lớn nhất
@@ -118,7 +118,7 @@ class ControllerProduct(http.Controller):
         if 'OUT' in max_object.reference:
             create_product_move_history(
                 "BX/IN", max_object.product_id.id, 4, location_empty_id, kw['sEPC'])
-            return get_all_move_history_by_day()
+            return get_all_move_history_by_day(kw)
             
         else:
             location = http.request.env["stock.location"].sudo().search(
@@ -127,7 +127,7 @@ class ControllerProduct(http.Controller):
 
             create_product_move_history(
                 "BX/OUT", max_object.product_id.id, max_object.location_dest_id.id, 5, kw['sEPC'])
-            return get_all_move_history_by_day()
+            return get_all_move_history_by_day(kw)
 
     @http.route('/parking/post/in/move_history', website=False, csrf=False, type='json', methods=['POST'],  auth='public')
     def post_in_move_history(self, **kw):
@@ -148,7 +148,7 @@ class ControllerProduct(http.Controller):
                 "BX/IN", serial_ids.product_id.id, 4, location_empty_id, kw['sEPC'])
             
             
-            return get_all_move_history_by_day()
+            return get_all_move_history_by_day(kw)
         # tìm ID lớn nhất (thời gian đi vào gần nhất)
         max_object = max(product_move_list, key=lambda x: x['id'])
         # lấy thông tin của ID lớn nhất
@@ -161,7 +161,7 @@ class ControllerProduct(http.Controller):
             locations_empty.write({'state': 'full'})
             create_product_move_history(
                 "BX/IN", max_object.product_id.id, 4, location_empty_id, kw['sEPC'])
-            return get_all_move_history_by_day()
+            return get_all_move_history_by_day(kw)
         
         return "-3" # Da vao roi
         
@@ -185,7 +185,7 @@ class ControllerProduct(http.Controller):
 
             create_product_move_history(
                 "BX/OUT", max_object.product_id.id, max_object.location_dest_id.id, 5, kw['sEPC'])
-            return get_all_move_history_by_day()
+            return get_all_move_history_by_day(kw)
         
         return "-2" # Da ra roi
         
