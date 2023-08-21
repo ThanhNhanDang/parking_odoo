@@ -14,7 +14,7 @@ class ControllerMoveHistory(http.Controller):
         )
         today = date.today()
         for move_history in move_histories: 
-            if move_history.date.split(" ")[0] != today:
+            if move_history['date'].split(" ")[0] != today:
                 move_histories.pop(move_history)
                 
         return move_histories
