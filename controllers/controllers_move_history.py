@@ -14,7 +14,7 @@ class ControllerMoveHistory(http.Controller):
         )
         today = date.today()
 
-        res = [move_history for move_history in move_histories if move_history['date'].today() != today]
+        res = [move_history for move_history in move_histories if move_history['date'].date() == today]
         return res
 
    
