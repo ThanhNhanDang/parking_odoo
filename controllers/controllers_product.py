@@ -13,7 +13,7 @@ def create_product_move_history(state, product_id, location_id, location_dest_id
          'location_dest_id': location_dest_id,
          'qty_done': 1.0,
          'company_id': 1})
-
+ 
 
 def find_location_empty():
     # Tìm danh sách vị trí trống trong bãi lấy danh sách tên của bãi
@@ -56,6 +56,8 @@ class ControllerProduct(http.Controller):
             return "-1"
         else:
             return serial_ids.product_id.password
+
+            
 
     @http.route('/parking/post/product_first_time', website=False, csrf=False, type='json', methods=['POST'], auth='public')
     def post_product_first_time(self, **kw):
