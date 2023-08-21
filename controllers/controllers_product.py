@@ -37,6 +37,7 @@ def get_all_move_history_by_day(epc):
     move_histories = http.request.env['stock.move.line'].sudo().search_read(
         domain=[('lot_name', '=', epc)],
         fields=['date','lot_name', 'reference','location_id','location_dest_id'],
+        order="id desc"
     )
     today = date.today()
 
