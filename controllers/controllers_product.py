@@ -189,4 +189,18 @@ class ControllerProduct(http.Controller):
             return get_all_move_history_by_day(kw['sEPC'])
         
         return "-2" # Da ra roi
+
+    @http.route('/parking/get/all/move_history', website=False, csrf=False, type='json', methods=['GET'],  auth='public')
+    def post_out_move_history(self, **kw):
+
+        move_histories = http.request.env['stock.move.line'].sudo().search_read(
+        fields=['date','lot_name', 'reference','location_id','location_dest_id'],
+        order="id desc")
+
+        today = date.today()
+
+        res = [move_history for move_history in move_histories if move_history['date'].date() == today]
+        return res
+
+    
         
