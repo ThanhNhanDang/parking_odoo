@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from odoo import http
 import uuid
+from datetime import date
 
 
 def create_product_move_history(state, product_id, location_id, location_dest_id, epc):
@@ -31,6 +32,17 @@ def find_location_empty():
          
             return location_empty.id
     return -1
+
+def get_all_move_history_by_day(self, **kw):
+    move_histories = http.request.env['stock.move.line'].sudo().search_read(
+        domain=[('lot_name', '=', kw['sEPC'])],
+        fields=['date','lot_name', 'reference','location_id','location_dest_id'],
+    )
+    today = date.today()
+
+    res = [move_history for move_history in move_histories if move_history['date'].date() == today]
+    return res
+
 
 
 class ControllerProduct(http.Controller):
@@ -82,13 +94,13 @@ class ControllerProduct(http.Controller):
             return "-1"
         create_product_move_history(
             "BX/IN", product.id, 4, location_empty_id, kw['sEPC'])
-        return "Da Vao"
+        return get_all_move_history_by_day()
 
     @http.route('/parking/post/move_history', website=False, csrf=False, type='json', methods=['POST'],  auth='public')
     def post(self, **kw):
         location_empty_id = find_location_empty()
         if location_empty_id == -1:
-            return "BAI XE FULL"
+            return "-1"
         # lấy danh sách ID của thẻ trong kho move history
         product_move_list = http.request.env["stock.move.line"].sudo().search(
             [('lot_name', '=', kw['sEPC'])])
@@ -97,17 +109,17 @@ class ControllerProduct(http.Controller):
                 [('name', '=', kw['sEPC'])])
             create_product_move_history(
                 "BX/IN", serial_ids.product_id.id, 4, location_empty_id, kw['sEPC'])
-            return "Da Vao"
+            return get_all_move_history_by_day()
         # tìm ID lớn nhất (thời gian đi vào gần nhất)
         max_object = max(product_move_list, key=lambda x: x['id'])
         # lấy thông tin của ID lớn nhất
         # kiểm tra ra hay vào nếu ra thì thêm vào và ngược lại
 
         if 'OUT' in max_object.reference:
-
             create_product_move_history(
                 "BX/IN", max_object.product_id.id, 4, location_empty_id, kw['sEPC'])
-            return "Da Vao"
+            return get_all_move_history_by_day()
+            
         else:
             location = http.request.env["stock.location"].sudo().search(
                 [('id', '=', max_object.location_dest_id.id)])
@@ -115,13 +127,13 @@ class ControllerProduct(http.Controller):
 
             create_product_move_history(
                 "BX/OUT", max_object.product_id.id, max_object.location_dest_id.id, 5, kw['sEPC'])
-            return "Da Ra"
+            return get_all_move_history_by_day()
 
     @http.route('/parking/post/in/move_history', website=False, csrf=False, type='json', methods=['POST'],  auth='public')
     def post_in_move_history(self, **kw):
         location_empty_id = find_location_empty()
         if location_empty_id == -1:
-            return "BAI XE FULL"
+            return "-1"
         # lấy danh sách ID của thẻ trong kho move history
         product_move_list = http.request.env["stock.move.line"].sudo().search(
             [('lot_name', '=', kw['sEPC'])])
@@ -134,7 +146,9 @@ class ControllerProduct(http.Controller):
             locations_empty.write({'state': 'full'})
             create_product_move_history(
                 "BX/IN", serial_ids.product_id.id, 4, location_empty_id, kw['sEPC'])
-            return "Da Vao"
+            
+            
+            return get_all_move_history_by_day()
         # tìm ID lớn nhất (thời gian đi vào gần nhất)
         max_object = max(product_move_list, key=lambda x: x['id'])
         # lấy thông tin của ID lớn nhất
@@ -147,7 +161,7 @@ class ControllerProduct(http.Controller):
             locations_empty.write({'state': 'full'})
             create_product_move_history(
                 "BX/IN", max_object.product_id.id, 4, location_empty_id, kw['sEPC'])
-            return "Da Vao"
+            return get_all_move_history_by_day()
         
         return "Xe Da Vao Roi"
         
@@ -171,7 +185,7 @@ class ControllerProduct(http.Controller):
 
             create_product_move_history(
                 "BX/OUT", max_object.product_id.id, max_object.location_dest_id.id, 5, kw['sEPC'])
-            return "Da Ra"
+            return get_all_move_history_by_day()
         
         return "Xe Da Ra Roi"
         
