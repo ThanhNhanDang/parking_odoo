@@ -13,10 +13,8 @@ class ControllerMoveHistory(http.Controller):
             fields=['date','lot_name', 'reference','location_id','location_dest_id'],
         )
         today = date.today()
-        for  i in range(len(move_histories)):
-            if move_histories[i]['date'].today() != today:
-               del move_histories[i]
-                
-        return move_histories
+
+        res = [move_history for move_history in move_histories if move_history['date'].today() != today]
+        return res
 
    
