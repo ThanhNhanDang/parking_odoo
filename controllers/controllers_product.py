@@ -163,7 +163,7 @@ class ControllerProduct(http.Controller):
                 "BX/IN", max_object.product_id.id, 4, location_empty_id, kw['sEPC'])
             return get_all_move_history_by_day()
         
-        return "Xe Da Vao Roi"
+        return "-3" # Da vao roi
         
 
     @http.route('/parking/post/out/move_history', website=False, csrf=False, type='json', methods=['POST'],  auth='public')
@@ -187,5 +187,5 @@ class ControllerProduct(http.Controller):
                 "BX/OUT", max_object.product_id.id, max_object.location_dest_id.id, 5, kw['sEPC'])
             return get_all_move_history_by_day()
         
-        return "Xe Da Ra Roi"
+        return "-2" # Da ra roi
         
