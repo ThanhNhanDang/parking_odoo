@@ -27,6 +27,8 @@
     'data': [
         'views/state_location.xml',
         'views/product_pass.xml'
+        'views/product_lot_serial.xml',
+
     ],
     # only loaded in demonstration mode
    

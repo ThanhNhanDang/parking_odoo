@@ -8,6 +8,12 @@
             <field name="name" position="after">
                 <field name="state" />
             </field>
+            <field name="name" position="after">
+                <field name="product_id" />
+            </field>
+            <field name="name" position="after">
+                <field name="lot_id" />
+            </field>
         </field>
     </record>
   
@@ -18,8 +24,8 @@
         <field name='arch' type='xml'>
             <tree>
                 <field name="state" />
-                <field name="product_id_name" />
-                <field name="lot_name" />
+                <field name="product_id" />
+                <field name="lot_id" />
 
             </tree>
         </field>
