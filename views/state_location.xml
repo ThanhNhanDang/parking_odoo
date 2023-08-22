@@ -12,30 +12,6 @@
         </field>
     </record>
 
-    <record id="view_product_id_extend" model="ir.ui.view">
-        <field name="name">Biển số</field>
-        <field name="model">stock.location</field>
-        <field name="inherit_id" ref="stock.view_location_form" />
-        <field name="arch" type="xml">
-            <field name="name" position="after">
-                <field name="product_id_name" />
-            </field>
-           
-        </field>
-    </record>
-
-    <record id="view_lot_id_extend" model="ir.ui.view">
-        <field name="name">Mã định danh</field>
-        <field name="model">stock.location</field>
-        <field name="inherit_id" ref="stock.view_location_form" />
-        <field name="arch" type="xml">
-            <field name="name" position="after">
-                <field name="lot_name" />
-            </field>
-           
-        </field>
-    </record>
-  
    
     <record id='view_state_locations_tree' model='ir.ui.view'>
         <field name='name'>stock.location.tree</field>
