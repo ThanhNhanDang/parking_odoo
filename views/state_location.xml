@@ -10,12 +10,17 @@
             </field>
         </field>
     </record>
+  
+   
     <record id='view_state_locations_tree' model='ir.ui.view'>
         <field name='name'>stock.location.tree</field>
         <field name='model'>stock.location</field>
         <field name='arch' type='xml'>
             <tree>
                 <field name="state" />
+                <field name="product_id_name" />
+                <field name="lot_name" />
+
             </tree>
         </field>
     </record>

@@ -1,0 +1,14 @@
+<?xml version='1.0' encoding='utf-8'?>
+<odoo>
+   
+    <record id='view_product_lot_serial_tree' model='ir.ui.view'>
+        <field name='name'>stock.lot.tree</field>
+        <field name='model'>stock.lot</field>
+        <field name='arch' type='xml'>
+            <tree>
+                <field name="state" />
+                <field name="location_id_name" />
+            </tree>
+        </field>
+    </record>
+</odoo>
