@@ -151,7 +151,7 @@ class ControllerProduct(http.Controller):
         else:
             update_stock_lot(kw['sEPC'], "BX/OUT", 55) #Không có
             update_location(
-                'empty', max_object.location_dest_id.id, 221, 63) # Không có
+                'empty', max_object.location_dest_id.id, 211, 63) # Không có
 
             create_product_move_history(
                 "BX/OUT", max_object.product_id.id, max_object.location_dest_id.id, 5, kw['sEPC'])
@@ -211,7 +211,7 @@ class ControllerProduct(http.Controller):
             update_stock_lot(kw['sEPC'], "BX/OUT", 55)# Không có
 
             update_location(
-                'empty', max_object.location_dest_id.id, 221, 63) # Không có
+                'empty', max_object.location_dest_id.id, 211, 63) # Không có
 
             create_product_move_history(
                 "BX/OUT", max_object.product_id.id, max_object.location_dest_id.id, 5, kw['sEPC'])
