@@ -202,5 +202,18 @@ class ControllerProduct(http.Controller):
         res = [move_history for move_history in move_histories if move_history['date'].date() == today]
         return res
 
+
+    @http.route('/parking/get/all/move_history', website=False, csrf=False, type='json', methods=['POST'],  auth='public')
+    def post_all_move_history(self, **kw):
+
+        move_histories = http.request.env['product.product'].sudo().search_read(
+        fields=['date','lot_name', 'reference','location_id','location_dest_id'],
+        order="id desc")
+
+        today = date.today()
+
+        res = [move_history for move_history in move_histories if move_history['date'].date() == today]
+        return res
+
     
         
