@@ -237,15 +237,19 @@ class ControllerProduct(http.Controller):
     def post_all_stock_lot(self, **kw):
 
         stock_lot = http.request.env['stock.lot'].sudo().search_read(
+            domain=[('state', '!', False), ('location_id', '!', False)],
             fields=['name', 'state',
                     'location_id'],
             order="id desc")
+        
+
 
         return stock_lot
 
     @http.route('/parking/get/all/stock/location', website=False, csrf=False, type='json', methods=['POST'],  auth='public')
     def post_all_stock_location(self, **kw):
         stock_location = http.request.env['stock.location'].sudo().search_read(
+            domain=[('lot_name', '!', False)],
             fields=['complete_name', 'lot_name', 'state'
                     ],
             order="id desc")
