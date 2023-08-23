@@ -15,6 +15,7 @@ class ControllerMoveHistory(http.Controller):
 
     #     res = [move_history for move_history in move_histories if move_history['date'].date() == today]
     #     return res
-
+    @http.route('/parking/test', website=False,csrf=False, type='json', methods=['POST'], auth='public')
     def test():
-        print ("test")
+        print ("test\n")
+        return "hello"
