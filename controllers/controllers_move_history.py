@@ -17,5 +17,10 @@ class ControllerMoveHistory(http.Controller):
     #     return res
     @http.route('/parking/test', website=False,csrf=False, type='json', methods=['POST'], auth='public')
     def test(self, **kw):
-        print ("test\n")
-        return "hello"
+        stock_location = http.request.env['stock.location'].sudo().search_read(
+            domain=[('lot_name', '!=', False)],
+            fields=['complete_name', 'lot_name', 'state'
+                    ],
+            order="id desc")
+
+        return stock_location
