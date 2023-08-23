@@ -15,12 +15,6 @@ class ControllerMoveHistory(http.Controller):
 
     #     res = [move_history for move_history in move_histories if move_history['date'].date() == today]
     #     return res
-    @http.route('/parking/test', website=False,csrf=False, type='json', methods=['POST'], auth='public')
+    @http.route('/parking/keep/alive', website=False,csrf=False, type='json', methods=['POST'], auth='public')
     def test(self, **kw):
-        stock_location = http.request.env['stock.location'].sudo().search_read(
-            domain=[('lot_name', '!=', False)],
-            fields=['complete_name', 'lot_name', 'state'
-                    ],
-            order="id desc")
-
-        return stock_location
+        return "Keep-Alive"
