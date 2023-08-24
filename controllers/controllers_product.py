@@ -94,16 +94,23 @@ class ControllerProduct(http.Controller):
             'tracking': 'serial',
             'password': kw['password']
         })
-
-        location_empty_id = find_location_empty()
-        if location_empty_id == -1:
-            return "-1"
         product_lot = http.request.env["stock.lot"].sudo().create({
             'name': kw['sEPC'],
             'product_id': product.id,
             "company_id": 1,
-            'location_id': location_empty_id,
-            'state': "BX/IN"
+           
+          
+        })
+        location_empty_id = find_location_empty()
+        if location_empty_id == -1:
+            product_lot.write({
+                'location_id': 55,
+                'state': "BX/OUT"
+            })
+            return "-1"
+        product_lot.write({
+                'location_id': location_empty_id,
+                'state': "BX/IN"
         })
         # Cập nhật vị trí đã đầy
         update_location('full', location_empty_id, product.id, product_lot.id)
