@@ -15,7 +15,6 @@ def create_product_move_history(state, product_id, location_id, location_dest_id
          'qty_done': 1.0,
          'company_id': 1})
 
-
 def find_location_empty():
     # Tìm danh sách vị trí trống trong bãi lấy danh sách tên của bãi
     locations_empty = http.request.env["stock.location"].sudo().search([
@@ -248,9 +247,6 @@ class ControllerProduct(http.Controller):
             fields=['name', 'state',
                     'location_id'],
             order="id desc")
-        
-
-
         return stock_lot
 
     @http.route('/parking/get/all/stock/location', website=False, csrf=False, type='json', methods=['POST'],  auth='public')
