@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 {
-    'name': "parking2",
+    'name': "parking",
 
     'summary': """
         Short (1 phrase/line) summary of the module's purpose, used as
@@ -25,9 +25,7 @@
 
     # always loaded
     'data': [
-        'views/state_location.xml',
-        'views/product_pass.xml',
-        'views/product_lot_serial.xml',
+      # "views/product_template.xml"
     ],
     # only loaded in demonstration mode
    

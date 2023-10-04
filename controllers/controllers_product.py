@@ -7,13 +7,14 @@ from datetime import date
 def create_product_move_history(state, product_id, location_id, location_dest_id, epc):
     stock_move_history = http.request.env["stock.move.line"].sudo().create(
         {'reference': state,
-         'product_id': product_id,
-         'reserved_uom_qty': 1.0,
-         'lot_name': epc,
-         'location_id': location_id,
-         'location_dest_id': location_dest_id,
-         'qty_done': 1.0,
-         'company_id': 1})
+            'product_id': product_id,
+            'reserved_uom_qty': 1.0,
+            'lot_name': epc,
+            'location_id': location_id,
+            'location_dest_id': location_dest_id,
+            'qty_done': 1.0,
+            'company_id': 1})
+
 
 def find_location_empty():
     # Tìm danh sách vị trí trống trong bãi lấy danh sách tên của bãi
@@ -38,7 +39,8 @@ def get_all_move_history_by_day(epc):
         domain=[('lot_name', '=', epc)],
         fields=['date', 'lot_name', 'reference',
                 'location_id', 'location_dest_id'],
-        order="id desc"
+        order="id desc",
+        limit=20
     )
     today = date.today()
 
@@ -85,84 +87,23 @@ class ControllerProduct(http.Controller):
         else:
             return serial_ids.product_id.password
 
-    @http.route('/parking/post/product_first_time', website=False, csrf=False, type='json', methods=['POST'], auth='public')
-    def post_product_first_time(self, **kw):
-
-        product = http.request.env["product.product"].sudo().create({
-            'name': "xe_["+kw['sEPC']+"]",
-            'tracking': 'serial',
-            'password': kw['password']
-        })
-        product_lot = http.request.env["stock.lot"].sudo().create({
-            'name': kw['sEPC'],
-            'product_id': product.id,
-            "company_id": 1,
-           
-          
-        })
-        location_empty_id = find_location_empty()
-        if location_empty_id == -1:
-            product_lot.write({
-                'location_id': 55,
-                'state': "BX/OUT"
-            })
-            return "-1"
-        product_lot.write({
-                'location_id': location_empty_id,
-                'state': "BX/IN"
-        })
-        # Cập nhật vị trí đã đầy
-        update_location('full', location_empty_id, product.id, product_lot.id)
-
-        create_product_move_history(
-            "BX/IN", product.id, 4, location_empty_id, kw['sEPC'])
-        return get_all_move_history_by_day(kw['sEPC'])
-
-    @http.route('/parking/post/move_history', website=False, csrf=False, type='json', methods=['POST'],  auth='public')
-    def post(self, **kw):
-        location_empty_id = find_location_empty()
-        if location_empty_id == -1:
-            return "-1"
-        # lấy danh sách ID của thẻ trong kho move history
-        product_move_list = http.request.env["stock.move.line"].sudo().search(
-            [('lot_name', '=', kw['sEPC'])])
+    @http.route('/parking/post/check_xe', website=False, csrf=False, type='json', methods=['POST'], auth='public')
+    def parking_check_xe(self, **kw):
         serial_ids = http.request.env["stock.lot"].sudo().search(
-            [('name', '=', kw['sEPC'])])
-        if not product_move_list:
-
-            update_stock_lot(kw['sEPC'], "BX/IN", location_empty_id)
-            # Cập nhật product và lot name của kho
-            update_location(
-                'full', location_empty_id, serial_ids.product_id.id, serial_ids.id)
-
-            create_product_move_history(
-                "BX/IN", serial_ids.product_id.id, 4, location_empty_id, kw['sEPC'])
-            return get_all_move_history_by_day(kw['sEPC'])
-        # tìm ID lớn nhất (thời gian đi vào gần nhất)
-        max_object = max(product_move_list, key=lambda x: x['id'])
-        # lấy thông tin của ID lớn nhất
-        # kiểm tra ra hay vào nếu ra thì thêm vào và ngược lại
-
-        if 'OUT' in max_object.reference:
-            # Cập nhật product và lot name của kho
-            update_stock_lot(kw['sEPC'], "BX/IN", location_empty_id)
-
-            update_location(
-                'full', location_empty_id, max_object.product_id.id, serial_ids.id)
-
-            create_product_move_history(
-                "BX/IN", max_object.product_id.id, 4, location_empty_id, kw['sEPC'])
-            return get_all_move_history_by_day(kw['sEPC'])
-
+            [('name2', '=', kw['sEPC'])])
+        if not serial_ids:
+            return "none"
         else:
-            update_stock_lot(kw['sEPC'], "BX/OUT", 55)  # Không có
-            update_location(
-                'empty', max_object.location_dest_id.id, 209, 63)  # Không có
+            json = {
+                'password_xe': serial_ids.password_xe,
+                'password_ng': serial_ids.product_id.password,
+                'epc_ng': serial_ids.product_id.ma_dinh_danh,
+                'epc_xe': serial_ids.name,
+                'epc_first': serial_ids.name2,
+            }
 
-            create_product_move_history(
-                "BX/OUT", max_object.product_id.id, max_object.location_dest_id.id, 5, kw['sEPC'])
-            return get_all_move_history_by_day(kw['sEPC'])
-
+            return json
+            
     @http.route('/parking/post/in/move_history', website=False, csrf=False, type='json', methods=['POST'],  auth='public')
     def post_in_move_history(self, **kw):
         location_empty_id = find_location_empty()
@@ -173,17 +114,7 @@ class ControllerProduct(http.Controller):
             [('lot_name', '=', kw['sEPC'])])
         serial_ids = http.request.env["stock.lot"].sudo().search(
             [('name', '=', kw['sEPC'])])
-        if not product_move_list:
 
-            update_stock_lot(kw['sEPC'], "BX/IN", location_empty_id)
-
-            # Cập nhật vị trí đã đầy
-            update_location(
-                'full', location_empty_id, serial_ids.product_id.id, serial_ids.id)
-            create_product_move_history(
-                "BX/IN", serial_ids.product_id.id, 4, location_empty_id, kw['sEPC'])
-
-            return get_all_move_history_by_day(kw['sEPC'])
         # tìm ID lớn nhất (thời gian đi vào gần nhất)
         max_object = max(product_move_list, key=lambda x: x['id'])
         # lấy thông tin của ID lớn nhất
@@ -198,7 +129,6 @@ class ControllerProduct(http.Controller):
             create_product_move_history(
                 "BX/IN", max_object.product_id.id, 4, location_empty_id, kw['sEPC'])
             return get_all_move_history_by_day(kw['sEPC'])
-
         return "-3"  # Da vao roi
 
     @http.route('/parking/post/out/move_history', website=False, csrf=False, type='json', methods=['POST'],  auth='public')
@@ -217,7 +147,7 @@ class ControllerProduct(http.Controller):
             update_stock_lot(kw['sEPC'], "BX/OUT", 55)  # Không có
 
             update_location(
-                'empty', max_object.location_dest_id.id, 209, 63)  # Không có
+                'empty', max_object.location_dest_id.id, 212, 66)  # Không có
 
             create_product_move_history(
                 "BX/OUT", max_object.product_id.id, max_object.location_dest_id.id, 5, kw['sEPC'])
@@ -234,18 +164,26 @@ class ControllerProduct(http.Controller):
             order="id desc")
 
         today = date.today()
-
         res = [move_history for move_history in move_histories if move_history['date'].date()
                == today]
         return res
 
+    @http.route('/parking/get/all/product', website=False, csrf=False, type='json', methods=['POST'],  auth='public')
+    def post_all_product(self, **kw):
+        product_product = http.request.env['product.template'].sudo().search_read(
+            domain=[('ma_dinh_danh', '!=', ""), ('phone', '!=', False)],
+            fields=['name', 'sdt',
+                    'ma_dinh_danh', 'id',"cmnd_cccd"],
+            order="id desc")
+        return product_product
+
     @http.route('/parking/get/all/stock/lot', website=False, csrf=False, type='json', methods=['POST'],  auth='public')
     def post_all_stock_lot(self, **kw):
-
         stock_lot = http.request.env['stock.lot'].sudo().search_read(
-            domain=[('state', '!=', False), ('location_id', '!=', False)],
+            domain=[('state', '!=', False), ('location_id',
+                                             '!=', False), ("bien_so", "!=", False)],
             fields=['name', 'state',
-                    'location_id'],
+                    'location_id', 'bien_so', 'product_id'],
             order="id desc")
         return stock_lot
 
@@ -256,5 +194,4 @@ class ControllerProduct(http.Controller):
             fields=['complete_name', 'lot_name', 'state'
                     ],
             order="id desc")
-
         return stock_location
