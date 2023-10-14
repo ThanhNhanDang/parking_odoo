@@ -139,13 +139,14 @@ class Contact(models.Model):
         s = socket.socket()
         s.connect((HOST, PORT)) #lắng nghe ở cổng 12536
         #Nhập vào tên file 
-
+        
         #Gửi tên file cho server
         message = "HelloNhan"
         s.send(message.encode())
 
         #Nhận được dữ liệu từ server gửi tới
         content = s.recv(1024)
+        s.close()
         raise exceptions.UserError(content.decode())
         # global jsonLoad
         # hex_arr = uuid.uuid4().hex
