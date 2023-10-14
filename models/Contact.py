@@ -135,6 +135,7 @@ class Contact(models.Model):
         ip_address = http.request.httprequest.environ['REMOTE_ADDR']
         _logger.info("ip_address  %s", ip_address)
         _logger.debug("ip_address  %s", ip_address)
+        print("ip_address ", ip_address)
         # global jsonLoad
         # hex_arr = uuid.uuid4().hex
         # if check_epc_user("0" + hex_arr[1:24]):
