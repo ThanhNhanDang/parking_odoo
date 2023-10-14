@@ -138,22 +138,26 @@ class Contact(models.Model):
         REMOTE_PORT = http.request.httprequest.environ['REMOTE_PORT']
         PORT = 12536  # The port used by the server
         _logger.info(HOST+':'+str(REMOTE_PORT) + "  ===  " + HTTP_X_REAL_IP)
-        s = socket.socket()
-        try:
-            s.connect((HTTP_X_REAL_IP, PORT)) #lắng nghe ở cổng 12536
-        except:
-            raise exceptions.UserError("CHƯA CÀI ĐẶT PLUGIN!!")
+        _logger.info(http.request.httprequest.environ)
+        raise exceptions.UserError(http.request.httprequest.environ)
+        # s = socket.socket()
+        # try:
+        #     s.connect((HOST, PORT)) #lắng nghe ở cổng 12536
+        # except:
+        #     raise exceptions.UserError("CHƯA CÀI ĐẶT PLUGIN!!")
         
-        #Nhập vào tên file 
+        # #Nhập vào tên file 
         
-        #Gửi tên file cho server
-        message = "HelloNhan"
-        s.send(message.encode())
+        # #Gửi tên file cho server
+        # message = "HelloNhan"
+        # s.send(message.encode())
 
-        #Nhận được dữ liệu từ server gửi tới
-        content = s.recv(1024)
-        s.close()
-        raise exceptions.UserError(content.decode())
+        # #Nhận được dữ liệu từ server gửi tới
+        # content = s.recv(1024)
+        # s.close()
+        # raise exceptions.UserError(content.decode())
+
+        
         # global jsonLoad
         # hex_arr = uuid.uuid4().hex
         # if check_epc_user("0" + hex_arr[1:24]):
