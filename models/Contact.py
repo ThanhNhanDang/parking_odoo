@@ -133,12 +133,13 @@ class Contact(models.Model):
 
     def quet_the(self):
 
-        HOST = http.request.httprequest.environ.get('HTTP_X_REAL_IP')
+        HOST = http.request.httprequest.environ['REMOTE_ADDR']
+        REMOTE_PORT = http.request.httprequest.environ['REMOTE_PORT']
         PORT = 12536  # The port used by the server
-        _logger.info(HOST)
+        _logger.info(HOST + ":"+ str(REMOTE_PORT))
         s = socket.socket()
         try:
-            s.connect((str(HOST), PORT)) #lắng nghe ở cổng 12536
+            s.connect(HOST + ":"+ str(REMOTE_PORT), PORT) #lắng nghe ở cổng 12536
         except:
             raise exceptions.UserError("CHƯA CÀI ĐẶT PLUGIN!!")
 
