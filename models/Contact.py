@@ -134,15 +134,15 @@ class Contact(models.Model):
     def quet_the(self):
 
         HOST = http.request.httprequest.environ['REMOTE_ADDR']
+        HTTP_X_REAL_IP = http.request.httprequest.environ.get('HTTP_X_REAL_IP',HOST)
         REMOTE_PORT = http.request.httprequest.environ['REMOTE_PORT']
         PORT = 12536  # The port used by the server
-        _logger.info(HOST+':'+str(REMOTE_PORT))
+        _logger.info(HOST+':'+str(REMOTE_PORT) + "  ===  " + HTTP_X_REAL_IP)
         s = socket.socket()
-        #try:
-        s.connect((HOST, PORT)) #lắng nghe ở cổng 12536
-        #except:
-            #raise exceptions.UserError("CHƯA CÀI ĐẶT PLUGIN!!")
-
+        try:
+            s.connect((HTTP_X_REAL_IP, PORT)) #lắng nghe ở cổng 12536
+        except:
+            raise exceptions.UserError("CHƯA CÀI ĐẶT PLUGIN!!")
         
         #Nhập vào tên file 
         
