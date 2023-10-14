@@ -4,6 +4,7 @@ import uuid
 import time
 import json
 import os
+import socket
 
 _logger = logging.getLogger(__name__)
 
@@ -132,11 +133,20 @@ class Contact(models.Model):
 
     def quet_the(self):
 
-        ip_address = http.request.httprequest.environ['REMOTE_ADDR']
-        _logger.info("ip_address  %s", ip_address)
-        _logger.debug("ip_address  %s", ip_address)
-        print("ip_address ", ip_address)
-        raise exceptions.UserError(ip_address)
+        HOST = http.request.httprequest.environ['REMOTE_ADDR']
+        PORT = 12536  # The port used by the server
+
+        s = socket.socket()
+        s.connect((HOST, PORT)) #lắng nghe ở cổng 12536
+        #Nhập vào tên file 
+
+        #Gửi tên file cho server
+        message = "HelloNhan"
+        s.send(message.encode())
+
+        #Nhận được dữ liệu từ server gửi tới
+        content = s.recv(1024)
+        raise exceptions.UserError(content.decode())
         # global jsonLoad
         # hex_arr = uuid.uuid4().hex
         # if check_epc_user("0" + hex_arr[1:24]):
