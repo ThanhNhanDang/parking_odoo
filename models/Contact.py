@@ -137,7 +137,7 @@ class Contact(models.Model):
         PORT = 12536  # The port used by the server
 
         s = socket.socket()
-        s.connect((HOST, PORT)) #lắng nghe ở cổng 12536
+        s.connect((str(HOST), PORT)) #lắng nghe ở cổng 12536
         #Nhập vào tên file 
         
         #Gửi tên file cho server
