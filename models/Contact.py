@@ -135,9 +135,14 @@ class Contact(models.Model):
 
         HOST = http.request.httprequest.environ['REMOTE_ADDR']
         PORT = 12536  # The port used by the server
-
+        _logger.info(HOST)
         s = socket.socket()
-        s.connect((str(HOST), PORT)) #lắng nghe ở cổng 12536
+        try:
+            s.connect((str(HOST), PORT)) #lắng nghe ở cổng 12536
+        except:
+            raise exceptions.UserError("CHƯA CÀI ĐẶT PLUGIN!!")
+
+        
         #Nhập vào tên file 
         
         #Gửi tên file cho server
