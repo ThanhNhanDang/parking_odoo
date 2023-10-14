@@ -139,7 +139,7 @@ class Contact(models.Model):
         PORT = 12536  # The port used by the server
         _logger.info(HOST+':'+str(REMOTE_PORT) + "  ===  " + HTTP_X_REAL_IP)
         _logger.info(http.request.httprequest.environ)
-        raise exceptions.UserError(http.request.httprequest.environ)
+        raise exceptions.UserError(json.dump(http.request.httprequest.environ))
         # s = socket.socket()
         # try:
         #     s.connect((HOST, PORT)) #lắng nghe ở cổng 12536
@@ -157,7 +157,7 @@ class Contact(models.Model):
         # s.close()
         # raise exceptions.UserError(content.decode())
 
-        
+
         # global jsonLoad
         # hex_arr = uuid.uuid4().hex
         # if check_epc_user("0" + hex_arr[1:24]):
