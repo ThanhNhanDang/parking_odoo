@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <data>
+        <record id="product_template_tree_inherit" model="ir.ui.view">
+            <field name="name">product.template.tree</field>
+            <field name="model">product.template</field>
+            <field name="inherit_id" ref="product.product_template_tree_view" />
+            <field name="arch" type="xml">
+                <xpath expr="//tree/field[@name='product_tag_ids']" position="replace"></xpath>
+                <xpath expr="//tree/field[@name='standard_price']" position="replace" />
+                <xpath expr="//tree/field[@name='list_price']" position="replace" />
+                <xpath expr="//tree/field[@name='qty_available']" position="replace" />
+                <xpath expr="//tree/field[@name='virtual_available']" position="replace" />
+                <xpath expr="//tree/field[@name='responsible_id']" position="replace" />
+                <xpath expr="//tree/field[@name='priority']" position="replace" />
+
+                <xpath expr="//tree/field[@name='name']" position="attributes">
+                    <attribute name="string">Biển Số</attribute>
+                </xpath>
+
+                <xpath expr="//tree/field[@name='default_code']" position="after">
+                    <field name="barcode" string="Mật khẩu" />
+                </xpath>
+                <xpath expr="//tree/field[@name='barcode']" position="after">
+                    <field name="contact_id" widget='many2one_avatar' />
+                </xpath>
+                <xpath expr="//tree/field[@name='contact_id']" position="after">
+                    <field name="user_ids" widget='many2many_tags_avatar' />
+                </xpath>
+
+            </field>
+        </record>
+        <record id="product_template_form_inherit" model="ir.ui.view">
+            <field name="name">product.template.form</field>
+            <field name="model">product.template</field>
+            <field name="inherit_id" ref="product.product_template_only_form_view" />
+            <field name="arch" type="xml">
+                <xpath expr="//form/sheet/div[@class='oe_title']/label" position="attributes">
+                    <attribute name="string">Biển Số</attribute>
+                </xpath>
+                <xpath expr="//form/sheet/div[@class='oe_title']/h1/div/field[@name='name']"
+                    position="attributes">
+                    <attribute name="placeholder">e.g. 54A12123</attribute>
+                </xpath>
+                <xpath expr="//form/sheet/div[@name='options']" position="attributes">
+                    <attribute name="invisible">1</attribute>
+                </xpath>
+                <xpath expr="//form/sheet/notebook" position="attributes">
+                    <attribute name="invisible">1</attribute>
+                </xpath>
+
+                <xpath expr="//form/sheet/div[@class='oe_title']" position="after">
+                    <label for="contact_id" string="Chủ sở hữu" />
+                    <field name="contact_id" widget="many2one_avatar" can_create="true"
+                        can_write="true" />
+                </xpath>
+            </field>
+        </record>
+
+        <record id="product_template_kanban_inherit" model="ir.ui.view">
+            <field name="name">product.template.kanban</field>
+            <field name="model">product.template</field>
+            <field name="inherit_id" ref="product.product_template_kanban_view" />
+            <field name="arch" type="xml">
+                <xpath expr="//strong[@class='o_kanban_record_title']" position="before">
+                    Biển số:
+                </xpath>
+                <xpath expr="//field[@name='priority']" position="replace"> </xpath>
+                <xpath expr="//t[@t-if='record.default_code.value']" position="replace"></xpath>
+                <xpath expr="//div[@t-if='record.product_variant_count.value &gt; 1']"
+                    position="replace"></xpath>
+                <xpath expr="//div[@name='product_lst_price']" position="replace">
+                </xpath>
+                <xpath expr="//div[@t-if='record.show_on_hand_qty_status_button.raw_value']"
+                    position="replace">
+                </xpath>
+                <xpath expr="//div[@t-if='record.show_on_hand_qty_status_button.raw_value']"
+                    position="replace">
+                </xpath>
+
+                <xpath expr="//div[@class='o_kanban_record_top mb-0']"
+                    position="after">
+                    <div class="mt-1"><field name='contact_id' widget='many2one_avatar'></field></div>
+                </xpath>
+            </field>
+        </record>
+    </data>
+</odoo>

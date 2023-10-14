@@ -1,0 +1,1007 @@
+<!-- 
+    <form string="Partners">
+    <div class="alert alert-warning oe_edit_only" role="alert"
+        modifiers="{&quot;invisible&quot;: [[&quot;same_vat_partner_id&quot;, &quot;=&quot;, false]]}">
+        A partner with the same <span>
+            <span class="o_vat_label">Tax ID</span>
+        </span> already exists (<field
+            name="same_vat_partner_id" modifiers="{&quot;readonly&quot;: true}" />
+    <field
+            name="partner_gid" modifiers="{&quot;invisible&quot;: true}" />
+    <field
+            name="additional_info" modifiers="{&quot;invisible&quot;: true}" />), are you sure to
+        create a new one? </div>
+    <div class="alert alert-warning oe_edit_only" role="alert"
+        modifiers="{&quot;invisible&quot;: [[&quot;same_company_registry_partner_id&quot;, &quot;=&quot;, false]]}">
+        A partner with the same <span>
+            <span class="o_vat_label">Company Registry</span>
+        </span> already exists (<field
+            name="same_company_registry_partner_id" modifiers="{&quot;readonly&quot;: true}" />),
+        are you sure to create a new one? </div>
+    <div class="alert alert-warning" role="alert" style="margin-bottom:0px;"
+        modifiers="{&quot;invisible&quot;: [[&quot;duplicated_bank_account_partners_count&quot;, &quot;=&quot;, 0]]}">
+        One or more Bank Accounts set on this partner are also used by other <bold>
+            <button class="alert-link" type="object" name="action_view_partner_with_same_bank"
+                role="button" string="Partners" style="padding: 0;vertical-align: baseline;" />
+        </bold>.
+        Please make sure that this is a wanted behavior. </div>
+    <sheet>
+        <div class="oe_button_box" name="button_box">
+            <button class="oe_stat_button" type="object" name="action_view_sale_order" icon="fa-usd">
+                <field string="Sales" name="sale_order_count" widget="statinfo"
+                    modifiers="{&quot;readonly&quot;: true}" />
+            </button>
+            <button class="oe_stat_button" name="366" type="action" icon="fa-credit-card">
+                <field string="Purchases" name="purchase_order_count" widget="statinfo"
+                    modifiers="{&quot;readonly&quot;: true}" />
+            </button>
+            <button class="oe_stat_button" name="371" type="action" icon="fa-truck"
+                context="{'search_default_partner_id': id}">
+                <div class="o_form_field o_stat_info">
+                    <div class="o_row"
+                        modifiers="{&quot;invisible&quot;: [[&quot;on_time_rate&quot;, &quot;&lt;&quot;, 0]]}">
+                        <span class="o_stat_value">
+                            <field string="On-time Rate" name="on_time_rate" widget="integer"
+                                modifiers="{&quot;readonly&quot;: true}" />
+                        </span>
+                        <span class="o_stat_value">%</span>
+                    </div>
+                    <div class="o_stat_value"
+                        modifiers="{&quot;invisible&quot;: [[&quot;on_time_rate&quot;, &quot;&gt;=&quot;, 0]]}">
+                        No data yet
+                    </div>
+                    <span class="o_stat_text">On-time Rate</span>
+                </div>
+            </button>
+            <button type="object" class="oe_stat_button" icon="fa-pencil-square-o"
+                name="action_view_partner_invoices" context="{'default_partner_id': active_id}">
+                <div class="o_form_field o_stat_info">
+                    <span class="o_stat_value">
+                        <field name="currency_id"
+                            modifiers="{&quot;invisible&quot;: true, &quot;readonly&quot;: true}" />
+                        <field name="total_invoiced" widget="monetary"
+                            options="{'currency_field': 'currency_id'}"
+                            modifiers="{&quot;readonly&quot;: true}" />
+                    </span>
+                    <span class="o_stat_text">Invoiced</span>
+                </div>
+            </button>
+            <button class="oe_stat_button" name="367" type="action" icon="fa-pencil-square-o"
+                help="Vendor Bills">
+                <field string="Vendor Bills" name="supplier_invoice_count" widget="statinfo"
+                    modifiers="{&quot;readonly&quot;: true}" />
+            </button>
+            <button type="action" class="oe_stat_button" icon="fa-credit-card-alt" name="278"
+                context="{'search_default_partner_id': active_id, 'create': False, 'edit': False}"
+                modifiers="{&quot;invisible&quot;: [[&quot;payment_token_count&quot;, &quot;=&quot;, 0]]}">
+                <div class="o_form_field o_stat_info">
+                    <span class="o_stat_value">
+                        <field name="payment_token_count" widget="statinfo" nolabel="1"
+                            modifiers="{&quot;readonly&quot;: true}" />
+                    </span>
+                    <span class="o_stat_text">Saved Payment Methods</span>
+                </div>
+            </button>
+        </div>
+        <widget name="web_ribbon" title="Archived" bg_color="bg-danger"
+            modifiers="{&quot;invisible&quot;: [[&quot;active&quot;, &quot;=&quot;, true]]}" />
+        <field name="avatar_128"
+            modifiers="{&quot;invisible&quot;: true, &quot;readonly&quot;: true}" />
+        <field name="image_1920" widget="image" class="oe_avatar"
+            options="{&quot;preview_image&quot;: &quot;avatar_128&quot;}" on_change="1" />
+        <div class="oe_title mb24">
+            <field name="is_company" on_change="1" modifiers="{&quot;invisible&quot;: true}" />
+            <field name="commercial_partner_id" on_change="1"
+                modifiers="{&quot;invisible&quot;: true, &quot;readonly&quot;: true}" />
+            <field name="active" on_change="1" modifiers="{&quot;invisible&quot;: true}" />
+            <field name="company_id" on_change="1" modifiers="{&quot;invisible&quot;: true}"
+                can_create="true" can_write="true" />
+            <field name="country_code"
+                modifiers="{&quot;invisible&quot;: true, &quot;readonly&quot;: true}" />
+            <field name="company_type" widget="radio" options="{'horizontal': true}" on_change="1" />
+            <h1>
+                <field id="company" class="text-break" name="name" default_focus="1"
+                    placeholder="e.g. Lumber Inc" widget="field_partner_autocomplete" on_change="1"
+                    modifiers="{&quot;invisible&quot;: [[&quot;is_company&quot;, &quot;=&quot;, false]], &quot;required&quot;: [[&quot;type&quot;, &quot;=&quot;, &quot;contact&quot;]]}" />
+                <field id="individual" class="text-break" name="name" default_focus="1"
+                    placeholder="e.g. Brandom Freeman" widget="field_partner_autocomplete"
+                    on_change="1"
+                    modifiers="{&quot;invisible&quot;: [[&quot;is_company&quot;, &quot;=&quot;, true]], &quot;required&quot;: [[&quot;type&quot;, &quot;=&quot;, &quot;contact&quot;]]}" />
+            </h1>
+            <div class="o_row">
+                <field name="parent_id" widget="res_partner_many2one" placeholder="Company Name..."
+                    domain="[('is_company', '=', True)]"
+                    context="{'default_is_company': True, 'show_vat': True, 'default_user_id': user_id, 'default_team_id': team_id}"
+                    on_change="1" modifiers="{&quot;invisible&quot;: true}" can_create="true"
+                    can_write="true" />
+                <field name="company_name" on_change="1"
+                    modifiers="{&quot;invisible&quot;: [&quot;|&quot;, &quot;|&quot;, [&quot;company_name&quot;, &quot;=&quot;, false], [&quot;company_name&quot;, &quot;=&quot;, &quot;&quot;], [&quot;is_company&quot;, &quot;=&quot;, true]]}" />
+                <button name="create_company" icon="fa-plus-square" string="Create company"
+                    type="object" class="oe_edit_only btn-link"
+                    modifiers="{&quot;invisible&quot;: [&quot;|&quot;, &quot;|&quot;, [&quot;is_company&quot;, &quot;=&quot;, true], [&quot;company_name&quot;, &quot;=&quot;, &quot;&quot;], [&quot;company_name&quot;, &quot;=&quot;, false]]}" />
+            </div>
+        </div>
+
+        <group>
+            <group>
+                <span class="o_form_label o_td_label" name="address_name"
+                    modifiers="{&quot;invisible&quot;: true}">
+                    <field name="type" class="fw-bold" on_change="1"
+                        modifiers="{&quot;invisible&quot;: [[&quot;is_company&quot;, &quot;=&quot;, true]], &quot;readonly&quot;: [[&quot;user_ids&quot;, &quot;!=&quot;, []]], &quot;required&quot;: [[&quot;is_company&quot;, &quot;!=&quot;, true]]}" />
+                    <b
+                        modifiers="{&quot;invisible&quot;: [[&quot;is_company&quot;, &quot;=&quot;, false]]}">
+                        Address</b>
+                </span>
+                <div class="o_address_format" modifiers="{&quot;invisible&quot;: true}">
+                    <field name="street" placeholder="Street..." class="o_address_street"
+                        modifiers="{&quot;readonly&quot;: [[&quot;type&quot;, &quot;=&quot;, &quot;contact&quot;], [&quot;parent_id&quot;, &quot;!=&quot;, false]]}" />
+                    <field name="street2" placeholder="Street 2..." class="o_address_street"
+                        modifiers="{&quot;readonly&quot;: [[&quot;type&quot;, &quot;=&quot;, &quot;contact&quot;], [&quot;parent_id&quot;, &quot;!=&quot;, false]]}" />
+                    <field name="city" placeholder="City" class="o_address_city"
+                        modifiers="{&quot;readonly&quot;: [[&quot;type&quot;, &quot;=&quot;, &quot;contact&quot;], [&quot;parent_id&quot;, &quot;!=&quot;, false]]}" />
+                    <field name="state_id" class="o_address_state" placeholder="State"
+                        options="{'no_open': True, 'no_quick_create': True}"
+                        context="{'country_id': country_id, 'default_country_id': country_id, 'zip': zip}"
+                        on_change="1"
+                        modifiers="{&quot;readonly&quot;: [[&quot;type&quot;, &quot;=&quot;, &quot;contact&quot;], [&quot;parent_id&quot;, &quot;!=&quot;, false]]}"
+                        can_create="true" can_write="true" />
+                    <field name="zip" placeholder="ZIP" class="o_address_zip" on_change="1"
+                        modifiers="{&quot;readonly&quot;: [[&quot;type&quot;, &quot;=&quot;, &quot;contact&quot;], [&quot;parent_id&quot;, &quot;!=&quot;, false]]}" />
+                    <div name="partner_address_country" class="d-flex justify-content-between">
+                        <field name="country_id" placeholder="Country" class="o_address_country"
+                            options="{&quot;no_open&quot;: True, &quot;no_create&quot;: True}"
+                            on_change="1"
+                            modifiers="{&quot;readonly&quot;: [[&quot;type&quot;, &quot;=&quot;, &quot;contact&quot;], [&quot;parent_id&quot;, &quot;!=&quot;, false]]}"
+                            can_create="true" can_write="true" />
+                    </div>
+                </div>
+                <field name="vat" placeholder="e.g. BE0477472701"
+                    widget="field_partner_autocomplete" on_change="1"
+                    modifiers="{&quot;readonly&quot;: [[&quot;parent_id&quot;, &quot;!=&quot;, false]], &quot;required&quot;: true}" />
+            </group>
+            <group>
+                <field name="function" placeholder="e.g. Sales Director"
+                    modifiers="{&quot;invisible&quot;: true}" />
+                <field name="phone_blacklisted"
+                    modifiers="{&quot;invisible&quot;: true, &quot;readonly&quot;: true}" />
+                <field name="mobile_blacklisted"
+                    modifiers="{&quot;invisible&quot;: true, &quot;readonly&quot;: true}" />
+                <label for="phone" class="oe_inline" />
+                <div class="o_row o_row_readonly">
+                    <button name="phone_action_blacklist_remove" class="fa fa-ban text-danger"
+                        title="This phone number is blacklisted for SMS Marketing. Click to unblacklist."
+                        type="object" context="{'default_phone': phone}"
+                        modifiers="{&quot;invisible&quot;: [[&quot;phone_blacklisted&quot;, &quot;=&quot;, false]]}" />
+                    <field name="phone" widget="phone" on_change="1"
+                        modifiers="{&quot;required&quot;: true}" />
+                </div>
+                <field name="phone_blacklisted"
+                    modifiers="{&quot;invisible&quot;: true, &quot;readonly&quot;: true}" />
+                <field name="mobile_blacklisted"
+                    modifiers="{&quot;invisible&quot;: true, &quot;readonly&quot;: true}" />
+                <label for="mobile" class="oe_inline" />
+                <div class="o_row o_row_readonly">
+                    <button name="phone_action_blacklist_remove" class="fa fa-ban text-danger"
+                        title="This phone number is blacklisted for SMS Marketing. Click to unblacklist."
+                        type="object" context="{'default_phone': mobile}"
+                        modifiers="{&quot;invisible&quot;: [[&quot;mobile_blacklisted&quot;, &quot;=&quot;, false]]}" />
+                    <field name="mobile" widget="phone" on_change="1"
+                        modifiers="{&quot;invisible&quot;: true}" />
+                </div>
+                <field name="phone_sanitized" on_change="1"
+                    modifiers="{&quot;invisible&quot;: true, &quot;readonly&quot;: true}" />
+                <field name="user_ids" on_change="1" modifiers="{&quot;invisible&quot;: true}" />
+                <field name="is_blacklisted"
+                    modifiers="{&quot;invisible&quot;: true, &quot;readonly&quot;: true}" />
+                <label for="email" class="oe_inline" />
+                <div class="o_row o_row_readonly">
+                    <button name="mail_action_blacklist_remove" class="fa fa-ban text-danger"
+                        title="This email is blacklisted for mass mailings. Click to unblacklist."
+                        type="object" context="{'default_email': email}"
+                        modifiers="{&quot;invisible&quot;: [[&quot;is_blacklisted&quot;, &quot;=&quot;, false]]}" />
+                    <field name="email" widget="email" context="{'gravatar_image': True}"
+                        on_change="1"
+                        modifiers="{&quot;required&quot;: [[&quot;user_ids&quot;, &quot;!=&quot;, []]]}" />
+                </div>
+                <field name="website" string="Website" widget="url"
+                    placeholder="e.g. https://www.odoo.com"
+                    modifiers="{&quot;invisible&quot;: true}" />
+                <field name="title" options="{&quot;no_open&quot;: True}" placeholder="e.g. Mister"
+                    modifiers="{&quot;invisible&quot;: true}" can_create="true" can_write="true" />
+                <field name="active_lang_count"
+                    modifiers="{&quot;invisible&quot;: true, &quot;readonly&quot;: true}" />
+                <field name="lang" on_change="1" modifiers="{&quot;invisible&quot;: true}" />
+                <field name="category_id" widget="many2many_tags"
+                    options="{'color_field': 'color', 'no_create_edit': True}"
+                    placeholder="e.g. &quot;B2B&quot;, &quot;VIP&quot;, &quot;Consulting&quot;, ..."
+                    modifiers="{&quot;invisible&quot;: true}" can_create="true" can_write="true" />
+            </group>
+        </group>
+
+        <notebook colspan="4" modifiers="{&quot;invisible&quot;: true}">
+            <page string="Contacts &amp; Addresses" name="contact_addresses" autofocus="autofocus">
+                <field name="child_ids" mode="kanban"
+                    context="{'default_parent_id': active_id, 'default_street': street, 'default_street2': street2, 'default_city': city, 'default_state_id': state_id, 'default_zip': zip, 'default_country_id': country_id, 'default_lang': lang, 'default_user_id': user_id, 'default_type': 'other'}">
+                    <kanban>
+                        <field name="id" modifiers="{&quot;readonly&quot;: true}" />
+                        <field name="color" />
+                        <field name="name" on_change="1" />
+                        <field name="title" />
+                        <field name="type" on_change="1" />
+                        <field name="email" on_change="1" modifiers="{&quot;required&quot;: true}" />
+                        <field name="parent_id" on_change="1" />
+                        <field name="is_company" on_change="1" />
+                        <field name="function" />
+                        <field name="phone" on_change="1" modifiers="{&quot;required&quot;: true}" />
+                        <field name="street" />
+                        <field name="street2" />
+                        <field name="zip" on_change="1" />
+                        <field name="city" />
+                        <field name="country_id" on_change="1" />
+                        <field name="mobile" on_change="1" />
+                        <field name="state_id" on_change="1" />
+                        <field name="image_128" on_change="1"
+                            modifiers="{&quot;readonly&quot;: true}" />
+                        <field name="avatar_128" modifiers="{&quot;readonly&quot;: true}" />
+                        <field name="lang" on_change="1" />
+                        <field name="comment" />
+                        <field name="display_name" on_change="1"
+                            modifiers="{&quot;readonly&quot;: true, &quot;required&quot;: true}" />
+                        <templates>
+                            <t t-name="kanban-box">
+                                <t t-set="color" t-value="kanban_color(record.color.raw_value)" />
+                                <div
+                                    t-att-class="color + (record.title.raw_value == 1 ? ' oe_kanban_color_alert' : '') + ' oe_kanban_global_click'">
+                                    <div class="o_kanban_image">
+                                        <img alt="Contact image"
+                                            t-att-src="kanban_image('res.partner', 'avatar_128', record.id.raw_value)" />
+                                    </div>
+                                    <div class="oe_kanban_details">
+                                        <field name="name" on_change="1" />
+                                        <div t-if="record.function.raw_value">
+                                            <field name="function" />
+                                        </div>
+                                        <div t-if="record.email.raw_value">
+                                            <field name="email" widget="email" on_change="1"
+                                                modifiers="{&quot;required&quot;: true}" />
+                                        </div>
+                                        <div t-if="record.type.raw_value != 'contact'">
+                                            <div>
+                                                <field name="zip" on_change="1" />
+                                                <t t-if="record.city"> </t>
+                                                <field name="city" />
+                                            </div>
+                                            <field t-if="record.state_id.raw_value" name="state_id"
+                                                on_change="1" />
+                                            <t t-if="record.country_id"> </t>
+                                            <field name="country_id" on_change="1" />
+                                        </div>
+                                        <div t-if="record.phone.raw_value">Phone: <t
+                                                t-esc="record.phone.value" /></div>
+                                        <div t-if="record.mobile.raw_value">Mobile: <t
+                                                t-esc="record.mobile.value" /></div>
+                                    </div>
+                                </div>
+                            </t>
+                        </templates>
+                    </kanban>
+                    <form string="Contact / Address">
+                        <sheet>
+                            <field name="type" widget="radio" options="{'horizontal': true}"
+                                on_change="1" modifiers="{&quot;required&quot;: true}" />
+                            <field name="parent_id" on_change="1"
+                                modifiers="{&quot;invisible&quot;: true}" can_create="true"
+                                can_write="true" />
+                            <div class="text-muted oe_edit_only">
+                                <p class="mb-0"
+                                    modifiers="{&quot;invisible&quot;: [[&quot;type&quot;, &quot;!=&quot;, &quot;contact&quot;]]}">
+                                    <span>Use this to organize the contact details of employees of a
+                                        given company (e.g. CEO, CFO, ...).</span>
+                                </p>
+                                <p class="mb-0"
+                                    modifiers="{&quot;invisible&quot;: [[&quot;type&quot;, &quot;!=&quot;, &quot;invoice&quot;]]}">
+                                    <span>Preferred address for all invoices. Selected by default
+                                        when you invoice an order that belongs to this company.</span>
+                                </p>
+                                <p class="mb-0"
+                                    modifiers="{&quot;invisible&quot;: [[&quot;type&quot;, &quot;!=&quot;, &quot;delivery&quot;]]}">
+                                    <span>Preferred address for all deliveries. Selected by default
+                                        when you deliver an order that belongs to this company.</span>
+                                </p>
+                                <p class="mb-0"
+                                    modifiers="{&quot;invisible&quot;: [[&quot;type&quot;, &quot;!=&quot;, &quot;private&quot;]]}">
+                                    <span>Private addresses are only visible by authorized users and
+                                        contain sensitive data (employee home addresses, ...).</span>
+                                </p>
+                                <p class="mb-0"
+                                    modifiers="{&quot;invisible&quot;: [[&quot;type&quot;, &quot;!=&quot;, &quot;other&quot;]]}">
+                                    <span>Other address for the company (e.g. subsidiary, ...)</span>
+                                </p>
+                            </div>
+                            <hr />
+                            <group>
+                                <group>
+                                    <field name="name" string="Contact Name" on_change="1"
+                                        modifiers="{&quot;required&quot;: [[&quot;type&quot;, &quot;=&quot;, &quot;contact&quot;]]}" />
+                                    <field name="title" options="{'no_open': True}"
+                                        placeholder="e.g. Mr."
+                                        modifiers="{&quot;invisible&quot;: [[&quot;type&quot;, &quot;!=&quot;, &quot;contact&quot;]]}"
+                                        can_create="true" can_write="true" />
+                                    <field name="function" placeholder="e.g. Sales Director"
+                                        modifiers="{&quot;invisible&quot;: [[&quot;type&quot;, &quot;!=&quot;, &quot;contact&quot;]]}" />
+                                    <label for="street" string="Address"
+                                        modifiers="{&quot;invisible&quot;: [[&quot;type&quot;, &quot;=&quot;, &quot;contact&quot;]]}" />
+                                    <div
+                                        modifiers="{&quot;invisible&quot;: [[&quot;type&quot;, &quot;=&quot;, &quot;contact&quot;]]}">
+                                        <div class="o_address_format" name="div_address">
+                                            <field name="street" placeholder="Street..."
+                                                class="o_address_street" />
+                                            <field name="street2" placeholder="Street 2..."
+                                                class="o_address_street" />
+                                            <field name="city" placeholder="City"
+                                                class="o_address_city" />
+                                            <field name="state_id" class="o_address_state"
+                                                placeholder="State"
+                                                options="{'no_open': True, 'no_quick_create': True}"
+                                                context="{'country_id': country_id, 'default_country_id': country_id, 'zip': zip}"
+                                                on_change="1" can_create="true" can_write="true" />
+                                            <field name="zip" placeholder="ZIP"
+                                                class="o_address_zip" on_change="1" />
+                                            <field name="country_id" placeholder="Country"
+                                                class="o_address_country"
+                                                options="{&quot;no_open&quot;: True, &quot;no_create&quot;: True}"
+                                                on_change="1" can_create="true" can_write="true" />
+                                        </div>
+                                    </div>
+                                </group>
+                                <group>
+                                    <field name="email" widget="email" on_change="1"
+                                        modifiers="{&quot;required&quot;: true}" />
+                                    <field name="phone" widget="phone" on_change="1"
+                                        modifiers="{&quot;required&quot;: true}" />
+                                    <field name="mobile" widget="phone" on_change="1" />
+                                    <field name="company_id" on_change="1"
+                                        modifiers="{&quot;invisible&quot;: true}" can_create="true"
+                                        can_write="true" />
+                                </group>
+                            </group>
+                            <group>
+                                <field name="comment" placeholder="Internal notes..." nolabel="1"
+                                    colspan="2" />
+                            </group>
+                            <field name="lang" on_change="1"
+                                modifiers="{&quot;invisible&quot;: true}" />
+                            <field name="user_id" modifiers="{&quot;invisible&quot;: true}"
+                                can_create="true" can_write="true" />
+                        </sheet>
+                    </form>
+                </field>
+            </page>
+            <page name="sales_purchases" string="Sales &amp; Purchase">
+                <group name="container_row_2">
+                    <group string="Sales" name="sale" priority="1">
+                        <field name="user_id" widget="many2one_avatar_user"
+                            domain="[('share', '=', False)]" can_create="true" can_write="true" />
+                        <field name="team_id" modifiers="{&quot;invisible&quot;: true}"
+                            can_create="true" can_write="true" />
+                        <field name="team_id" can_create="true" can_write="true" />
+                        <field string="Payment Terms" name="property_payment_term_id"
+                            options="{'no_open': True, 'no_create': True}" can_create="true"
+                            can_write="true" />
+                    </group>
+                    <group string="Purchase" name="purchase" priority="2">
+                        <field string="Payment Terms" name="property_supplier_payment_term_id"
+                            options="{'no_open': True, 'no_create': True}" can_create="true"
+                            can_write="true" />
+                        <div name="receipt_reminder" colspan="2" class="o_checkbox_optional_field">
+                            <label for="receipt_reminder_email" />
+                            <field name="receipt_reminder_email" />
+                            <div
+                                modifiers="{&quot;invisible&quot;: [[&quot;receipt_reminder_email&quot;, &quot;=&quot;, false]]}">
+                                <field name="reminder_date_before_receipt" class="oe_inline" />
+                                <span> day(s) before</span>
+                            </div>
+                        </div>
+                    </group>
+                    <group string="Fiscal Information" name="fiscal_information" priority="5">
+                        <field name="property_account_position_id"
+                            options="{'no_create': True, 'no_open': True}" can_create="true"
+                            can_write="true" />
+                    </group>
+                    <group name="misc" string="Misc">
+                        <field name="company_registry" on_change="1"
+                            modifiers="{&quot;invisible&quot;: [[&quot;parent_id&quot;, &quot;!=&quot;, false]]}" />
+                        <field name="ref" string="Reference" />
+                        <field name="website_id" can_create="true" can_write="true" />
+                        <field name="industry_id" options="{'no_create': True}"
+                            modifiers="{&quot;invisible&quot;: [[&quot;is_company&quot;, &quot;=&quot;, false]]}"
+                            can_create="true" can_write="true" />
+                    </group>
+                    <group name="container_row_stock" priority="6">
+                        <group string="Inventory" name="inventory" colspan="2">
+                            <field name="property_stock_customer" can_create="true" can_write="true" />
+                            <field name="property_stock_supplier" can_create="true" can_write="true" />
+                        </group>
+                    </group>
+                </group>
+            </page>
+            <page string="Invoicing" name="accounting"
+                modifiers="{&quot;invisible&quot;: [[&quot;is_company&quot;, &quot;=&quot;, false], [&quot;parent_id&quot;, &quot;!=&quot;, false]]}">
+                <field name="duplicated_bank_account_partners_count"
+                    modifiers="{&quot;invisible&quot;: true, &quot;readonly&quot;: true}" />
+                <field name="show_credit_limit"
+                    modifiers="{&quot;invisible&quot;: true, &quot;readonly&quot;: true}" />
+                <group>
+                    <group string="Bank Accounts" name="banks">
+                        <field name="bank_ids" nolabel="1" colspan="2"
+                            context="{'default_allow_out_payment': True}" on_change="1">
+                            <tree editable="bottom">
+                                <field name="sequence" widget="handle" />
+                                <field name="bank_id" can_create="true" can_write="true" />
+                                <field name="acc_number" modifiers="{&quot;required&quot;: true}" />
+                                <field name="allow_out_payment" widget="boolean_toggle" />
+                                <field name="acc_holder_name"
+                                    modifiers="{&quot;column_invisible&quot;: true}" />
+                            </tree>
+                        </field>
+                        <button type="action" class="btn-link" name="62"
+                            context="{'search_default_partner_id': active_id, 'default_partner_id': active_id}"
+                            string="View accounts detail" colspan="2" />
+                    </group>
+                    <group string="Credit Limits" name="credit_limits"
+                        modifiers="{&quot;invisible&quot;: [[&quot;show_credit_limit&quot;, &quot;=&quot;, false]]}">
+                        <field name="credit" modifiers="{&quot;readonly&quot;: true}" />
+                        <label for="use_partner_credit_limit" />
+                        <div class="o_row">
+                            <field name="use_partner_credit_limit" />
+                            <field name="credit_limit" class="oe_inline"
+                                modifiers="{&quot;invisible&quot;: [[&quot;use_partner_credit_limit&quot;, &quot;=&quot;, false]]}" />
+                        </div>
+                    </group>
+                </group>
+            </page>
+            <page string="Invoicing" name="accounting_disabled"
+                modifiers="{&quot;invisible&quot;: [&quot;|&quot;, [&quot;is_company&quot;, &quot;=&quot;, true], [&quot;parent_id&quot;, &quot;=&quot;, false]]}">
+                <div>
+                    <p>Accounting-related settings are managed on <button
+                            name="open_commercial_entity" type="object" string="the parent company"
+                            class="oe_link" /></p>
+                </div>
+            </page>
+            <page name="internal_notes" string="Internal Notes">
+                <field name="comment" placeholder="Internal notes..." />
+                <group>
+                </group>
+                <group>
+                </group>
+                <group>
+                </group>
+            </page>
+        </notebook>
+    </sheet>
+    <div class="oe_chatter">
+        <field name="message_follower_ids" />
+        <field name="activity_ids" />
+        <field name="message_ids" />
+    </div>
+</form> -->
+
+
+<form string="Product" name="Product Template">
+    <header>
+        <button string="Print Labels" type="object" name="action_open_label_layout"
+            modifiers="{&quot;invisible&quot;: [[&quot;detailed_type&quot;, &quot;==&quot;, &quot;service&quot;]]}" />
+        <button string="Update Quantity" type="object" name="action_update_quantity_on_hand"
+            modifiers="{&quot;invisible&quot;: [[&quot;type&quot;, &quot;!=&quot;, &quot;product&quot;]]}" />
+        <button string="Replenish" type="action" name="214"
+            context="{'default_product_tmpl_id': id}"
+            modifiers="{&quot;invisible&quot;: [[&quot;type&quot;, &quot;not in&quot;, [&quot;consu&quot;, &quot;product&quot;]]]}" />
+    </header>
+    <sheet name="product_form">
+        <field name="product_variant_count"
+            modifiers="{&quot;invisible&quot;: true, &quot;readonly&quot;: true}" />
+        <field name="service_type" widget="radio" modifiers="{&quot;invisible&quot;: true}" />
+        <field name="visible_expense_policy"
+            modifiers="{&quot;invisible&quot;: true, &quot;readonly&quot;: true}" />
+        <field name="is_product_variant"
+            modifiers="{&quot;invisible&quot;: true, &quot;readonly&quot;: true}" />
+        <field name="attribute_line_ids" modifiers="{&quot;invisible&quot;: true}" />
+        <field name="type" on_change="1" modifiers="{&quot;invisible&quot;: true}" />
+        <field name="company_id" on_change="1" modifiers="{&quot;invisible&quot;: true}"
+            can_create="true" can_write="true" />
+        <div class="oe_button_box" name="button_box">
+            <field name="is_published" widget="website_redirect_button"
+                modifiers="{&quot;invisible&quot;: [[&quot;sale_ok&quot;, &quot;=&quot;, false]]}" />
+            <button name="150" type="action" icon="fa-sitemap" class="oe_stat_button"
+                modifiers="{&quot;invisible&quot;: [[&quot;product_variant_count&quot;, &quot;&lt;=&quot;, 1]]}">
+                <field string="Variants" name="product_variant_count" widget="statinfo"
+                    modifiers="{&quot;readonly&quot;: true}" />
+            </button>
+            <field name="tracking" on_change="1"
+                modifiers="{&quot;invisible&quot;: true, &quot;required&quot;: true}" />
+            <field name="show_on_hand_qty_status_button"
+                modifiers="{&quot;invisible&quot;: true, &quot;readonly&quot;: true}" />
+            <field name="show_forecasted_qty_status_button"
+                modifiers="{&quot;invisible&quot;: true, &quot;readonly&quot;: true}" />
+            <button type="object" name="action_open_quants" class="oe_stat_button" icon="fa-cubes"
+                modifiers="{&quot;invisible&quot;: [[&quot;show_on_hand_qty_status_button&quot;, &quot;=&quot;, false]]}">
+                <div class="o_field_widget o_stat_info">
+                    <span class="o_stat_value" widget="statinfo">
+                        <field name="qty_available" widget="statinfo" nolabel="1" class="mr4"
+                            modifiers="{&quot;readonly&quot;: true}" />
+                        <field name="uom_name" on_change="1"
+                            modifiers="{&quot;readonly&quot;: true}" />
+                    </span>
+                    <span class="o_stat_text">On Hand</span>
+                </div>
+            </button>
+            <button type="object" name="action_product_tmpl_forecast_report"
+                context="{'default_product_tmpl_id': id}" class="oe_stat_button" icon="fa-cubes"
+                modifiers="{&quot;invisible&quot;: [[&quot;show_forecasted_qty_status_button&quot;, &quot;=&quot;, false]]}">
+                <div class="o_field_widget o_stat_info">
+                    <span class="o_stat_value">
+                        <field name="virtual_available" widget="statinfo" nolabel="1" class="mr4"
+                            modifiers="{&quot;readonly&quot;: true}" />
+                        <field name="uom_name" on_change="1"
+                            modifiers="{&quot;readonly&quot;: true}" />
+                    </span>
+                    <span class="o_stat_text">Forecasted</span>
+                </div>
+            </button>
+            <button type="object" name="action_view_stock_move_lines" class="oe_stat_button"
+                icon="fa-exchange"
+                modifiers="{&quot;invisible&quot;: [[&quot;type&quot;, &quot;not in&quot;, [&quot;product&quot;, &quot;consu&quot;]]]}">
+                <div class="o_field_widget o_stat_info mr4">
+                    <span class="o_stat_text">In:</span>
+                    <span class="o_stat_text">Out:</span>
+                </div>
+                <div class="o_field_widget o_stat_info">
+                    <span class="o_stat_value">
+                        <field name="nbr_moves_in" modifiers="{&quot;readonly&quot;: true}" />
+                    </span>
+                    <span class="o_stat_value">
+                        <field name="nbr_moves_out" modifiers="{&quot;readonly&quot;: true}" />
+                    </span>
+                </div>
+            </button>
+            <button type="object" name="action_view_orderpoints" class="oe_stat_button"
+                icon="fa-refresh"
+                modifiers="{&quot;invisible&quot;: [&quot;|&quot;, [&quot;type&quot;, &quot;!=&quot;, &quot;product&quot;], [&quot;nbr_reordering_rules&quot;, &quot;!=&quot;, 1]]}">
+                <div class="o_field_widget o_stat_info mr4">
+                    <span class="o_stat_text">Min:</span>
+                    <span class="o_stat_text">Max:</span>
+                </div>
+                <div class="o_field_widget o_stat_info">
+                    <span class="o_stat_value">
+                        <field name="reordering_min_qty" modifiers="{&quot;readonly&quot;: true}" />
+                    </span>
+                    <span class="o_stat_value">
+                        <field name="reordering_max_qty" modifiers="{&quot;readonly&quot;: true}" />
+                    </span>
+                </div>
+            </button>
+            <button type="object" name="action_view_orderpoints" class="oe_stat_button"
+                icon="fa-refresh"
+                modifiers="{&quot;invisible&quot;: [&quot;|&quot;, [&quot;type&quot;, &quot;!=&quot;, &quot;product&quot;], [&quot;nbr_reordering_rules&quot;, &quot;==&quot;, 1]]}">
+                <field name="nbr_reordering_rules" widget="statinfo"
+                    modifiers="{&quot;readonly&quot;: true}" />
+            </button>
+            <button string="Putaway Rules" type="object" name="action_view_related_putaway_rules"
+                class="oe_stat_button" icon="fa-random"
+                context="{                                     'invisible_handle': True,                                     'single_product': product_variant_count == 1,                                 }"
+                modifiers="{&quot;invisible&quot;: [[&quot;type&quot;, &quot;=&quot;, &quot;service&quot;]]}" />
+            <button class="oe_stat_button" name="action_view_po" type="object" icon="fa-credit-card"
+                help="Purchased in the last 365 days"
+                modifiers="{&quot;invisible&quot;: [[&quot;purchase_ok&quot;, &quot;=&quot;, false]]}">
+                <div class="o_field_widget o_stat_info">
+                    <span class="o_stat_value">
+                        <field name="purchased_product_qty" widget="statinfo" nolabel="1"
+                            class="mr4" modifiers="{&quot;readonly&quot;: true}" />
+                        <field name="uom_name" on_change="1"
+                            modifiers="{&quot;readonly&quot;: true}" />
+                    </span>
+                    <span class="o_stat_text">Purchased</span>
+                </div>
+            </button>
+            <button class="oe_stat_button" name="action_view_sales" type="object" icon="fa-signal"
+                help="Sold in the last 365 days"
+                modifiers="{&quot;invisible&quot;: [[&quot;sale_ok&quot;, &quot;=&quot;, false]]}">
+                <div class="o_field_widget o_stat_info">
+                    <span class="o_stat_value">
+                        <field name="sales_count" widget="statinfo" nolabel="1" class="mr4"
+                            modifiers="{&quot;readonly&quot;: true}" />
+                        <field name="uom_name" on_change="1"
+                            modifiers="{&quot;readonly&quot;: true}" />
+                    </span>
+                    <span class="o_stat_text">Sold</span>
+                </div>
+            </button>
+        </div>
+        <widget name="web_ribbon" title="Archived" bg_color="bg-danger"
+            modifiers="{&quot;invisible&quot;: [[&quot;active&quot;, &quot;=&quot;, true]]}" />
+        <field name="id" modifiers="{&quot;invisible&quot;: true, &quot;readonly&quot;: true}" />
+        <field name="image_1920" widget="image" class="oe_avatar"
+            options="{'preview_image': 'image_128'}" />
+        <div class="oe_title">
+            <label for="name" string="Biển Số" />
+            <h1>
+                <div class="d-flex">
+                    <field name="priority" widget="priority" class="me-3" />
+                    <field class="text-break" name="name" placeholder="e.g. 54A12123" on_change="1"
+                        modifiers="{&quot;required&quot;: true}" />
+                </div>
+            </h1>
+        </div>
+        <label for="contact_id" string="Chủ sở hữu" />
+        <field name="contact_id" widget="many2one_avatar" can_create="true" can_write="true"
+            modifiers="{&quot;required&quot;: true}" />
+        <div name="options" modifiers="{&quot;invisible&quot;: true}">
+            <span class="d-inline-block">
+                <field name="sale_ok" on_change="1" />
+                <label for="sale_ok" />
+            </span>
+            <span class="d-inline-block">
+                <field name="purchase_ok" />
+                <label for="purchase_ok" />
+            </span>
+        </div>
+        <notebook modifiers="{&quot;invisible&quot;: true}">
+            <page string="General Information" name="general_information">
+                <group>
+                    <group name="group_general">
+                        <field name="active" modifiers="{&quot;invisible&quot;: true}" />
+                        <field name="detailed_type" on_change="1"
+                            modifiers="{&quot;required&quot;: true}" />
+                        <field name="invoice_policy" modifiers="{&quot;required&quot;: true}" />
+                        <field name="expense_policy" widget="radio" on_change="1"
+                            modifiers="{&quot;invisible&quot;: [[&quot;visible_expense_policy&quot;, &quot;=&quot;, false]]}" />
+                        <field name="product_tooltip" string="" class="fst-italic text-muted"
+                            modifiers="{&quot;readonly&quot;: true}" />
+                        <label for="product_tooltip" string=""
+                            modifiers="{&quot;invisible&quot;: [&quot;|&quot;, [&quot;type&quot;, &quot;not in&quot;, [&quot;product&quot;, &quot;consu&quot;]], [&quot;invoice_policy&quot;, &quot;!=&quot;, &quot;order&quot;]]}" />
+                        <div class="fst-italic text-muted"
+                            modifiers="{&quot;invisible&quot;: [&quot;|&quot;, [&quot;type&quot;, &quot;not in&quot;, [&quot;product&quot;, &quot;consu&quot;]], [&quot;invoice_policy&quot;, &quot;!=&quot;, &quot;order&quot;]]}">
+                            You can invoice them before they are delivered.
+                        </div>
+                        <label for="product_tooltip" string=""
+                            modifiers="{&quot;invisible&quot;: [&quot;|&quot;, [&quot;type&quot;, &quot;not in&quot;, [&quot;product&quot;, &quot;consu&quot;]], [&quot;invoice_policy&quot;, &quot;!=&quot;, &quot;delivery&quot;]]}" />
+                        <div class="fst-italic text-muted"
+                            modifiers="{&quot;invisible&quot;: [&quot;|&quot;, [&quot;type&quot;, &quot;not in&quot;, [&quot;product&quot;, &quot;consu&quot;]], [&quot;invoice_policy&quot;, &quot;!=&quot;, &quot;delivery&quot;]]}">
+                            Invoice after delivery, based on quantities delivered, not ordered.
+                        </div>
+                    </group>
+                    <group name="group_standard_price">
+                        <label for="list_price" />
+                        <div name="pricing">
+                            <field name="list_price" class="oe_inline" widget="monetary"
+                                options="{'currency_field': 'currency_id', 'field_digits': True}"
+                                on_change="1" />
+                            <span class="ms-2" />
+                            <field name="tax_string" modifiers="{&quot;readonly&quot;: true}" />
+                        </div>
+                        <field name="taxes_id" widget="many2many_tags"
+                            context="{'default_type_tax_use':'sale', 'search_default_sale': 1, 'search_default_service': type == 'service', 'search_default_goods': type == 'consu'}"
+                            on_change="1" can_create="true" can_write="true" />
+                        <label for="standard_price"
+                            modifiers="{&quot;invisible&quot;: [[&quot;product_variant_count&quot;, &quot;&gt;&quot;, 1], [&quot;is_product_variant&quot;, &quot;=&quot;, false]]}" />
+                        <div name="standard_price_uom"
+                            modifiers="{&quot;invisible&quot;: [[&quot;product_variant_count&quot;, &quot;&gt;&quot;, 1], [&quot;is_product_variant&quot;, &quot;=&quot;, false]]}">
+                            <field name="standard_price" class="oe_inline" widget="monetary"
+                                options="{'currency_field': 'cost_currency_id', 'field_digits': True}" />
+                        </div>
+                        <field name="categ_id" string="Product Category" on_change="1"
+                            modifiers="{&quot;required&quot;: true}" can_create="true"
+                            can_write="true" />
+                        <field name="default_code" on_change="1"
+                            modifiers="{&quot;invisible&quot;: [[&quot;product_variant_count&quot;, &quot;&gt;&quot;, 1]]}" />
+                        <field name="barcode"
+                            modifiers="{&quot;invisible&quot;: [[&quot;product_variant_count&quot;, &quot;&gt;&quot;, 1]]}" />
+                        <field name="product_tag_ids" widget="many2many_tags"
+                            options="{'color_field': 'color'}" can_create="true" can_write="true" />
+                        <field name="currency_id"
+                            modifiers="{&quot;invisible&quot;: true, &quot;readonly&quot;: true}" />
+                        <field name="cost_currency_id"
+                            modifiers="{&quot;invisible&quot;: true, &quot;readonly&quot;: true}" />
+                        <field name="product_variant_id"
+                            modifiers="{&quot;invisible&quot;: true, &quot;readonly&quot;: true}" />
+                    </group>
+                </group>
+                <group string="Internal Notes">
+                    <field colspan="2" name="description" nolabel="1"
+                        placeholder="This note is only for internal purposes." />
+                </group>
+            </page>
+            <page name="variants" string="Attributes &amp; Variants">
+                <field name="attribute_line_ids" widget="one2many"
+                    context="{'show_attribute': False}">
+                    <tree string="Variants" editable="bottom" decoration-info="value_count &lt;= 1">
+                        <field name="value_count"
+                            modifiers="{&quot;readonly&quot;: true, &quot;column_invisible&quot;: true}" />
+                        <field name="attribute_id" on_change="1"
+                            modifiers="{&quot;readonly&quot;: [[&quot;id&quot;, &quot;!=&quot;, false]], &quot;required&quot;: true}"
+                            can_create="true" can_write="true" />
+                        <field name="value_ids" widget="many2many_tags"
+                            options="{'no_create_edit': True, 'color_field': 'color'}"
+                            context="{'default_attribute_id': attribute_id, 'show_attribute': False}"
+                            on_change="1" can_create="true" can_write="true" />
+                        <button string="Configure" class="float-end btn-secondary" type="object"
+                            name="action_open_attribute_values" />
+                    </tree>
+                </field>
+                <p class="oe_grey oe_edit_only">
+                    <strong>Warning</strong>: adding or deleting attributes will delete and recreate
+                    existing variants and lead to the loss of their possible customizations. </p>
+            </page>
+            <page string="Sales" name="sales"
+                modifiers="{&quot;invisible&quot;: [[&quot;sale_ok&quot;, &quot;=&quot;, false]]}">
+                <group name="sale">
+                    <group string="Upsell &amp; Cross-Sell" name="upsell">
+                        <field name="optional_product_ids" widget="many2many_tags"
+                            options="{'color_field': 'color'}"
+                            domain="[('id', '!=', active_id), '|', ('company_id', '=', company_id), ('company_id', '=', False)]"
+                            placeholder="Recommend when 'Adding to Cart' or quotation"
+                            can_create="true" can_write="true" />
+                        <field name="accessory_product_ids" widget="many2many_tags"
+                            placeholder="Suggested accessories in the eCommerce cart"
+                            modifiers="{&quot;invisible&quot;: [[&quot;sale_ok&quot;, &quot;=&quot;, false]]}"
+                            can_create="true" can_write="true" />
+                        <field name="alternative_product_ids" widget="many2many_tags"
+                            domain="[('id', '!=', active_id), '|', ('company_id', '=', company_id), ('company_id', '=', False)]"
+                            placeholder="Displayed in bottom of product pages"
+                            modifiers="{&quot;invisible&quot;: [[&quot;sale_ok&quot;, &quot;=&quot;, false]]}"
+                            can_create="true" can_write="true" />
+                    </group>
+                    <group string="eCommerce Shop" name="shop"
+                        modifiers="{&quot;invisible&quot;: [[&quot;sale_ok&quot;, &quot;=&quot;, false]]}">
+                        <field name="website_url"
+                            modifiers="{&quot;invisible&quot;: true, &quot;readonly&quot;: true}" />
+                        <field name="website_sequence" />
+                        <field name="public_categ_ids" widget="many2many_tags" string="Categories"
+                            can_create="true" can_write="true" />
+                        <label for="allow_out_of_stock_order" string="Out-of-Stock"
+                            modifiers="{&quot;invisible&quot;: [[&quot;type&quot;, &quot;in&quot;, [&quot;service&quot;, &quot;consu&quot;]]]}" />
+                        <div
+                            modifiers="{&quot;invisible&quot;: [[&quot;type&quot;, &quot;in&quot;, [&quot;service&quot;, &quot;consu&quot;]]]}">
+                            <field name="allow_out_of_stock_order" class="oe_inline" /> Continue
+                            Selling </div>
+
+                        <label for="show_availability" string="Show Available Qty"
+                            modifiers="{&quot;invisible&quot;: [[&quot;type&quot;, &quot;in&quot;, [&quot;service&quot;, &quot;consu&quot;]]]}" />
+                        <div
+                            modifiers="{&quot;invisible&quot;: [[&quot;type&quot;, &quot;in&quot;, [&quot;service&quot;, &quot;consu&quot;]]]}">
+                            <field name="show_availability" class="oe_inline" />
+                            <span
+                                modifiers="{&quot;invisible&quot;: [[&quot;show_availability&quot;, &quot;=&quot;, false]]}">
+                                <label for="available_threshold" string="only if below"
+                                    class="o_light_label" />
+            <field name="available_threshold"
+                                    class="oe_inline col-1" widget="integer" /> Units </span>
+                        </div>
+                        <field name="out_of_stock_message"
+                            modifiers="{&quot;invisible&quot;: [[&quot;type&quot;, &quot;in&quot;, [&quot;service&quot;, &quot;consu&quot;]]]}" />
+                        <field name="website_ribbon_id" options="{'no_quick_create': True}"
+                            can_create="true" can_write="true" />
+                    </group>
+                    <group name="product_template_images" string="Extra Product Media"
+                        modifiers="{&quot;invisible&quot;: [[&quot;sale_ok&quot;, &quot;=&quot;, false]]}">
+                        <field name="product_template_image_ids" class="o_website_sale_image_list"
+                            context="{'default_name': name}" mode="kanban" add-label="Add a Media"
+                            nolabel="1">
+                            <kanban string="Product Images" default_order="sequence">
+                                <field name="id" modifiers="{&quot;readonly&quot;: true}" />
+                                <field name="name" modifiers="{&quot;required&quot;: true}" />
+                                <field name="image_1920" />
+                                <field name="sequence" widget="handle" />
+                                <templates>
+                                    <t t-name="kanban-box">
+                                        <div class="card oe_kanban_global_click p-0">
+                                            <div class="o_squared_image">
+                                                <img class="card-img-top"
+                                                    t-att-src="kanban_image('product.image', 'image_1920', record.id.raw_value)"
+                                                    t-att-alt="record.name.value" />
+                                            </div>
+                                            <div class="card-body p-0">
+                                                <h4 class="card-title p-2 m-0 bg-200">
+                                                    <small>
+                                                        <field name="name"
+                                                            modifiers="{&quot;required&quot;: true}" />
+                                                    </small>
+                                                </h4>
+                                            </div>
+                                            <!-- below 100 Kb: good -->
+                                            <t
+                                                t-if="record.image_1920.raw_value.length &lt; 100*1000">
+                                                <t t-set="size_status" t-value="'text-bg-success'" />
+                                                <t t-set="message">Acceptable file size</t>
+                                            </t>
+                                            <!-- below 1000 Kb: decent -->
+                                            <t
+                                                t-elif="record.image_1920.raw_value.length &lt; 1000*1000">
+                                                <t t-set="size_status" t-value="'text-bg-warning'" />
+                                                <t t-set="message">Huge file size. The image should
+                                                    be optimized/reduced.</t>
+                                            </t>
+                                            <!-- above 1000 Kb: bad -->
+                                            <t t-else="1">
+                                                <t t-set="size_status" t-value="'text-bg-danger'" />
+                                                <t t-set="message">Optimization required! Reduce the
+                                                    image size or increase your compression
+                                                    settings.</t>
+                                            </t>
+                                            <span
+                                                t-attf-class="badge #{size_status} o_product_image_size"
+                                                t-esc="record.image_1920.value"
+                                                t-att-title="message" />
+                                        </div>
+                                    </t>
+                                </templates>
+                            </kanban>
+                        </field>
+                    </group>
+                </group>
+                <group>
+                    <group string="Sales Description" name="description">
+                        <field colspan="2" name="description_sale" nolabel="1"
+                            placeholder="This note is added to sales orders and invoices." />
+                    </group>
+                </group>
+            </page>
+            <page string="Purchase" name="purchase"
+                modifiers="{&quot;invisible&quot;: [[&quot;purchase_ok&quot;, &quot;=&quot;, false]]}">
+                <field name="seller_ids"
+                    context="{'default_product_tmpl_id':context.get('product_tmpl_id',active_id), 'product_template_invisible_variant': True, 'tree_view_ref':'purchase.product_supplierinfo_tree_view2'}"
+                    nolabel="1"
+                    modifiers="{&quot;invisible&quot;: [[&quot;product_variant_count&quot;, &quot;&gt;&quot;, 1]], &quot;readonly&quot;: [[&quot;product_variant_count&quot;, &quot;&gt;&quot;, 1]]}">
+                    <tree string="Vendor Information" multi_edit="1" editable="bottom">
+                        <field name="sequence" widget="handle" />
+                        <field name="partner_id" on_change="1"
+                            modifiers="{&quot;required&quot;: true}" can_create="true"
+                            can_write="true" />
+                        <field name="product_id" optional="hide"
+                            options="{'no_create': True, 'no_open': True}" can_create="true"
+                            can_write="true" />
+                        <field name="product_tmpl_id" string="Product" on_change="1"
+                            modifiers="{&quot;readonly&quot;: true, &quot;column_invisible&quot;: true}" />
+                        <field name="product_name" optional="hide" />
+                        <field name="product_code" optional="hide" />
+                        <field name="date_start" optional="hide" />
+                        <field name="date_end" optional="hide" />
+                        <field name="min_qty" optional="hide"
+                            modifiers="{&quot;required&quot;: true}" />
+                        <field name="price" string="Price" modifiers="{&quot;required&quot;: true}" />
+                        <field name="delay" optional="show" modifiers="{&quot;required&quot;: true}" />
+                        <field name="company_id" modifiers="{&quot;column_invisible&quot;: true}"
+                            can_create="true" can_write="true" />
+                    </tree>
+                </field>
+                <field name="variant_seller_ids"
+                    context="{'model': active_model, 'active_id': active_id, 'tree_view_ref':'purchase.product_supplierinfo_tree_view2'}"
+                    nolabel="1"
+                    modifiers="{&quot;invisible&quot;: [[&quot;product_variant_count&quot;, &quot;&lt;=&quot;, 1]], &quot;readonly&quot;: [[&quot;product_variant_count&quot;, &quot;&lt;=&quot;, 1]]}">
+                    <tree string="Vendor Information" multi_edit="1" editable="bottom">
+                        <field name="sequence" widget="handle" />
+                        <field name="partner_id" on_change="1"
+                            modifiers="{&quot;required&quot;: true}" can_create="true"
+                            can_write="true" />
+                        <field name="product_id" optional="hide"
+                            options="{'no_create': True, 'no_open': True}" can_create="true"
+                            can_write="true" />
+                        <field name="product_tmpl_id" string="Product" on_change="1"
+                            modifiers="{&quot;readonly&quot;: true, &quot;column_invisible&quot;: true}" />
+                        <field name="product_name" optional="hide" />
+                        <field name="product_code" optional="hide" />
+                        <field name="date_start" optional="hide" />
+                        <field name="date_end" optional="hide" />
+                        <field name="min_qty" optional="hide"
+                            modifiers="{&quot;required&quot;: true}" />
+                        <field name="price" string="Price" modifiers="{&quot;required&quot;: true}" />
+                        <field name="delay" optional="show" modifiers="{&quot;required&quot;: true}" />
+                        <field name="company_id" modifiers="{&quot;column_invisible&quot;: true}"
+                            can_create="true" can_write="true" />
+                    </tree>
+                </field>
+                <group name="purchase">
+                    <group string="Reordering"
+                        modifiers="{&quot;invisible&quot;: [[&quot;type&quot;, &quot;!=&quot;, &quot;service&quot;]]}">
+                        <div class="o_td_label d-inline-flex">
+                            <label for="service_to_purchase" />
+                            <field name="service_to_purchase" />
+                            <span class="fa fa-lg fa-building-o fa-fw" title="Service to Purchase" />
+                        </div>
+                    </group>
+                    <group string="Vendor Bills" name="bill">
+                        <field name="supplier_taxes_id" colspan="2" widget="many2many_tags"
+                            context="{'default_type_tax_use':'purchase'}"
+                            modifiers="{&quot;readonly&quot;: [[&quot;purchase_ok&quot;, &quot;=&quot;, 0]]}"
+                            can_create="true" can_write="true" />
+                        <field name="landed_cost_ok"
+                            modifiers="{&quot;invisible&quot;: [[&quot;type&quot;, &quot;!=&quot;, &quot;service&quot;]]}" />
+                        <field name="split_method_landed_cost"
+                            modifiers="{&quot;invisible&quot;: [&quot;|&quot;, [&quot;landed_cost_ok&quot;, &quot;=&quot;, false], [&quot;type&quot;, &quot;!=&quot;, &quot;service&quot;]]}" />
+                        <field name="purchase_method" widget="radio" />
+                    </group>
+                    <group col="1">
+                        <group string="Purchase Description">
+                            <field name="description_purchase" nolabel="1" colspan="2"
+                                placeholder="This note is added to purchase orders." />
+                        </group>
+                    </group>
+                </group>
+            </page>
+            <page string="Inventory" name="inventory"
+                modifiers="{&quot;invisible&quot;: [[&quot;type&quot;, &quot;=&quot;, &quot;service&quot;]]}">
+                <group name="inventory">
+                    <field name="has_available_route_ids"
+                        modifiers="{&quot;invisible&quot;: true, &quot;readonly&quot;: true}" />
+                    <group string="Operations" name="operations">
+                        <label for="route_ids"
+                            modifiers="{&quot;invisible&quot;: [[&quot;type&quot;, &quot;=&quot;, &quot;service&quot;]]}" />
+                        <div>
+                            <field name="route_ids" class="mb-0" widget="many2many_checkboxes"
+                                modifiers="{&quot;invisible&quot;: [&quot;|&quot;, [&quot;has_available_route_ids&quot;, &quot;=&quot;, false], [&quot;type&quot;, &quot;=&quot;, &quot;service&quot;]]}"
+                                can_create="true" can_write="true" />
+                            <button id="stock.view_diagram_button" string="View Diagram"
+                                type="action" name="246" icon="fa-arrow-right"
+                                class="btn btn-link pt-0" context="{'default_product_tmpl_id': id}"
+                                modifiers="{&quot;invisible&quot;: [[&quot;type&quot;, &quot;not in&quot;, [&quot;product&quot;, &quot;consu&quot;]]]}" />
+                        </div>
+                        <field name="route_from_categ_ids" widget="many2many_tags"
+                            modifiers="{&quot;invisible&quot;: [[&quot;route_from_categ_ids&quot;, &quot;=&quot;, []]], &quot;readonly&quot;: true}" />
+                    </group>
+                    <group name="group_lots_and_weight" string="Logistics"
+                        modifiers="{&quot;invisible&quot;: [[&quot;type&quot;, &quot;not in&quot;, [&quot;product&quot;, &quot;consu&quot;]]]}">
+                        <field name="responsible_id" domain="[('share', '=', False)]"
+                            widget="many2one_avatar_user" can_create="true" can_write="true" />
+                        <label for="weight"
+                            modifiers="{&quot;invisible&quot;: [[&quot;product_variant_count&quot;, &quot;&gt;&quot;, 1], [&quot;is_product_variant&quot;, &quot;=&quot;, false]]}" />
+                        <div class="o_row" name="weight"
+                            modifiers="{&quot;invisible&quot;: [[&quot;product_variant_count&quot;, &quot;&gt;&quot;, 1], [&quot;is_product_variant&quot;, &quot;=&quot;, false]]}">
+                            <field name="weight" class="oe_inline" />
+                            <field name="weight_uom_name" modifiers="{&quot;readonly&quot;: true}" />
+                        </div>
+                        <label for="volume"
+                            modifiers="{&quot;invisible&quot;: [[&quot;product_variant_count&quot;, &quot;&gt;&quot;, 1], [&quot;is_product_variant&quot;, &quot;=&quot;, false]]}" />
+                        <div class="o_row" name="volume"
+                            modifiers="{&quot;invisible&quot;: [[&quot;product_variant_count&quot;, &quot;&gt;&quot;, 1], [&quot;is_product_variant&quot;, &quot;=&quot;, false]]}">
+                            <field name="volume" string="Volume" class="oe_inline" />
+                            <field name="volume_uom_name" modifiers="{&quot;readonly&quot;: true}" />
+                        </div>
+                        <label for="sale_delay"
+                            modifiers="{&quot;invisible&quot;: [[&quot;sale_ok&quot;, &quot;=&quot;, false]]}" />
+                        <div
+                            modifiers="{&quot;invisible&quot;: [[&quot;sale_ok&quot;, &quot;=&quot;, false]]}">
+                            <field name="sale_delay" class="oe_inline"
+                                style="vertical-align:baseline" /> days </div>
+                    </group>
+                    <group string="Counterpart Locations" name="stock_property">
+                        <field name="property_stock_production" can_create="true" can_write="true" />
+                        <field name="property_stock_inventory" can_create="true" can_write="true" />
+                    </group>
+                </group>
+                <group>
+                    <group string="Description for Receipts">
+                        <field name="description_pickingin" colspan="2" nolabel="1"
+                            placeholder="This note is added to receipt orders (e.g. where to store the product in the warehouse)." />
+                    </group>
+                    <group string="Description for Delivery Orders">
+                        <field name="description_pickingout" colspan="2" nolabel="1"
+                            placeholder="This note is added to delivery orders." />
+                    </group>
+                    <group string="Description for Internal Transfers">
+                        <field name="description_picking" colspan="2"
+                            placeholder="This note is added to internal transfer orders (e.g. where to pick the product in the warehouse)."
+                            nolabel="1" />
+                    </group>
+                </group>
+            </page>
+            <page string="Accounting" name="invoicing">
+                <group name="accounting" />
+            </page>
+        </notebook>
+    </sheet>
+    <div class="oe_chatter">
+        <field name="message_follower_ids" />
+        <field name="activity_ids" />
+        <field name="message_ids" />
+    </div>
+</form>

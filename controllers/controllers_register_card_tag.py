@@ -1,14 +1,9 @@
 # -*- coding: utf-8 -*-
-from odoo import http
+from odoo import http, exceptions
 import uuid
 import base64
 import json
-import logging
-# import clr
-# clr.AddReference("ClassLibrary1.dll")
-# from ClassLibrary1 import Class1
-# obj = Class1()
-_logger = logging.getLogger(__name__)
+import os
 
 
 def create_product_move_history(state, product_id, location_id, location_dest_id, epc):
@@ -24,7 +19,7 @@ def create_product_move_history(state, product_id, location_id, location_dest_id
 
 
 def check_exist_product(sEPC, cmnd_cccd):
-    product = http.request.env['res.users'].sudo().search(
+    product = http.request.env['res.partner'].sudo().search(
         domain=["|", ('ref', '=', sEPC), ('vat', '=', cmnd_cccd)],
         limit=1)
     if not product:
@@ -36,14 +31,14 @@ def check_exist_product(sEPC, cmnd_cccd):
 
 
 def check_epc_user(ma_dinh_danh):
-    user = http.request.env['res.users'].sudo().search(
+    user = http.request.env['res.partner'].sudo().search(
         domain=[('ref', '=', ma_dinh_danh)],
         limit=1)
     return user
 
 
 def check_cmnd_cccd_product(cmnd_cccd):
-    user = http.request.env['res.users'].sudo().search(
+    user = http.request.env['res.partner'].sudo().search(
         domain=[('vat', '=', cmnd_cccd)],
         limit=1)
     return user
@@ -83,64 +78,21 @@ def contains(list, filter):
     return None
     # do stuff
 
-
 class ControllerRegisterCardTag(http.Controller):
 
     # @http.route('/parking/test', website=False, csrf=False, type='json', methods=['POST'], auth='public')
     # def test(self, **kw):
     #     return obj.SayHello(kw["name"])
-
-    @http.route('/parking/users/save', website=False, csrf=False, type='http',  auth='public', methods=['POST'])
+    @http.route('/parking/user/update/card', website=False, csrf=False, type='json',  auth='public', methods=['POST'])
     def users_save(self, **kw):
-        result = check_exist_product(kw['ma_dinh_danh'], kw['cmnd_cccd'])
-        if result == -1:
+        user = check_epc_user(kw['sEPC_card'])
+        if user:
             return "THẺ ĐÃ TỒN TẠI!"
-        if result == -2:
-            return "CMND/CCCD ĐÃ TỒN TẠI!"
-        if result == 1:  # Thẻ không tồn tại
-            hex_arr = uuid.uuid4().hex
-            if check_epc_user("0" + hex_arr[1:24]):
-                return "Không thể tạo được UUID liên hệ nhà phát triển để sử lý"
-
-            file = kw['image']
-            img_attachment = file.read()
-            product_create = http.request.env['res.users'].sudo().create({
-                'image_1920': base64.b64encode(img_attachment),
-                'name':  kw['name'],
-                'vat': kw['cmnd_cccd'],
-                'phone': kw['sdt'],
-                'ref': "0" + hex_arr[1:24],
-                'login': kw['cmnd_cccd'],
-                'barcode': hex_arr[24:],
-                'email': kw['email']
-            })
-            return json.dumps({
-                "name": product_create.name, "ma_dinh_danh": product_create.ref, "cmnd_cccd": product_create.vat, "sdt": product_create.phone, "id": product_create.id, "password": product_create.barcode
-            })
-
-    @http.route('/parking/get/user_by_cmnd_cccd', website=False, csrf=False, type='json', methods=['POST'],  auth='public')
-    def get_person_by_cmnd_cccd(self, **kw):
         user = check_cmnd_cccd_product(kw['cmnd_cccd'])
         if not user:
             return "CMND/CCCD KHÔNG TỒN TẠI!"
-        return {"id": user.id,
-                "name": user.name,
-                "sdt": user.phone,
-                "cmnd_cccd": user.vat,
-                "ma_dinh_danh": user.ref,
-                "email": user.email,
-                "image": user.image_1920}
-
-    @http.route('/parking/get/user_by_epc', website=False, csrf=False, type='json', methods=['POST'],  auth='public')
-    def get_user_by_epc(self, **kw):
-        user = check_epc_user(kw['ma_dinh_danh'])
-        if not user:
-            return "THẺ KHÔNG TỒN TẠI!"
-        return {"id": user.id,
-                "name": user.name,
-                "sdt": user.phone,
-                "cmnd_cccd": user.vat,
-                "image": user.image_1920}
+        
+        return "1"
 
     @http.route('/parking/update/person', website=False, csrf=False, type='http', methods=['POST'],  auth='public')
     def update_person(self, **kw):

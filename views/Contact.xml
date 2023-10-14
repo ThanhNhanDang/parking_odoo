@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <data>
+
+
+        <record id="hide_contact" model="ir.ui.view">
+            <field name="name">res.partner</field>
+            <field name="model">res.partner</field>
+            <field name="inherit_id" ref="base.view_partner_form" />
+            <field name="arch" type="xml">
+                <xpath expr="//widget[@name='web_ribbon']" position="after">
+                    <field name='is_published' invisible='1'></field>
+                    <widget name="web_ribbon" title="Registered" bg_color="bg-success"
+                        modifiers="{&quot;invisible&quot;: [[&quot;is_published&quot;, &quot;=&quot;, false]]}" />
+                </xpath>
+                <xpath expr="//div[@name='button_box']" position="replace"></xpath>
+                <xpath expr="//widget[@name='web_ribbon']" position="before">
+                    <div class="oe_button_box" name="button_box">
+                        <button name='quet_the'
+                            attrs="{'invisible': [('is_published', '=', True)]}"
+                            type='object'
+                            class="oe_highlight" icon="fa-credit-card-alt"> CẤP THẺ</button>
+                        <button
+                            name='action_new_product'
+                            attrs="{'invisible': [('is_published', '=', False)]}"
+                            type='object'
+                            class="btn btn-sm btn-primary" icon="fa-plus"> Đ/K XE</button>
+                        <button
+                            name='quet_the'
+                            attrs="{'invisible': [('is_published', '=', False)]}"
+                            type='object'
+                            class="btn btn-sm btn-primary" icon="fa-credit-card-alt"> ĐỔI THẺ</button>
+                    </div>
+                </xpath>
+                <field name="mobile" position="attributes">
+                    <attribute name="invisible">1</attribute>
+                </field>
+                <field name="title" position="attributes">
+                    <attribute name="invisible">1</attribute>
+                </field>
+                <field name="function" position="attributes">
+                    <attribute name="invisible">1</attribute>
+                </field>
+                <field name="website" position="attributes">
+                    <attribute name="invisible">1</attribute>
+                </field>
+                <field name="lang" position="attributes">
+                    <attribute name="invisible">1</attribute>
+                </field>
+                <field name="category_id" position="attributes">
+                    <attribute name="invisible">1</attribute>
+                </field>
+                <field name="parent_id" position="attributes">
+                    <attribute name="invisible">1</attribute>
+                </field>
+
+                <xpath expr="//field[@name='image_1920']"
+                    position="replace" />
+                <xpath expr="//label[@for='phone']"
+                    position="replace" />
+                <xpath expr="//field[@name='phone']"
+                    position="replace" />
+
+                <xpath expr="//label[@for='email']"
+                    position="replace" />
+                <xpath expr="//field[@name='email']"
+                    position="replace" />
+                <xpath expr="//field[@name='vat']" position="after">
+                    <field name="phone" widget="phone" on_change="1"
+                        modifiers="{&quot;required&quot;: true}" />
+                    <field name="email" widget="email" on_change="1"
+                        modifiers="{&quot;required&quot;: true}" />
+                    <field name="signup_token" placeholder="e.g. 31195100312"
+                        on_change="1" modifiers="{&quot;required&quot;: true}"
+                    />
+                    <field name="ref" placeholder="e.g. 31195100312"
+                        on_change="1"
+                    />
+                </xpath>
+                <xpath expr="//form/sheet/group/group" position="after">
+                    <group>
+                        <field name="image_1920" widget="image"
+                            options="{&quot;preview_image&quot;: &quot;avatar_128&quot;}"
+                            on_change="1" />
+                    </group>
+                    <group>
+                        <field name="image_1920_cmnd_cccd_truoc" widget="image"
+                            on_change="1" />
+                    </group>
+                    <group>
+                        <field name="image_1920_cmnd_cccd_sau" widget="image"
+                            on_change="1" />
+                    </group>
+                </xpath>
+
+                <xpath expr="//form/sheet/notebook"
+                    position="attributes">
+                    <attribute name="invisible">1</attribute>
+                </xpath>
+                <xpath expr="//span[@name='address_name']"
+                    position="attributes">
+                    <attribute name="invisible">1</attribute>
+                </xpath>
+                <xpath expr="//div[@class='o_address_format']"
+                    position="attributes">
+                    <attribute name="invisible">1</attribute>
+                </xpath>
+            </field>
+        </record>
+        <record id="hide_contact_tree" model="ir.ui.view">
+            <field name="name">res.partner.tree</field>
+            <field name="model">res.partner</field>
+            <field name="inherit_id" ref="base.view_partner_tree" />
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='vat']" position='after'>
+                    <field name='signup_token' />
+                </xpath>
+
+            </field>
+        </record>
+
+    </data>
+</odoo>

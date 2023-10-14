@@ -20,13 +20,14 @@
     'version': '0.1',
 
     # any module necessary for this one to work correctly
-    'depends': ['stock','product'],
+    'depends': ['stock', 'product'],
     "application": True,
 
     # always loaded
     'data': [
-      # "views/product_template.xml"
+        "views/Contact.xml",
+        "views/ProductTemplate.xml"
     ],
     # only loaded in demonstration mode
-   
+
 }
