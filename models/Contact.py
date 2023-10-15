@@ -133,29 +133,28 @@ class Contact(models.Model):
 
     def quet_the(self):
 
-        HOST = http.request.httprequest.environ['REMOTE_ADDR']
+        HOST = "wss://"+http.request.httprequest.environ['REMOTE_ADDR']
         HTTP_X_REAL_IP = http.request.httprequest.environ.get('HTTP_X_REAL_IP',HOST)
         REMOTE_PORT = http.request.httprequest.environ['REMOTE_PORT']
         PORT = 12536  # The port used by the server
         _logger.info(HOST+':'+str(REMOTE_PORT) + "  ===  " + HTTP_X_REAL_IP)
         _logger.info(http.request.httprequest.environ)
-        raise exceptions.UserError(json.dumps(http.request.httprequest.environ))
-        # s = socket.socket()
-        # try:
-        #     s.connect((HOST, PORT)) #lắng nghe ở cổng 12536
-        # except:
-        #     raise exceptions.UserError("CHƯA CÀI ĐẶT PLUGIN!!")
+        s = socket.socket()
+        try:
+            s.connect((HOST, PORT)) #lắng nghe ở cổng 12536
+        except:
+            raise exceptions.UserError("CHƯA CÀI ĐẶT PLUGIN!!")
         
-        # #Nhập vào tên file 
+        #Nhập vào tên file 
         
-        # #Gửi tên file cho server
-        # message = "HelloNhan"
-        # s.send(message.encode())
+        #Gửi tên file cho server
+        message = "HelloNhan"
+        s.send(message.encode())
 
-        # #Nhận được dữ liệu từ server gửi tới
-        # content = s.recv(1024)
-        # s.close()
-        # raise exceptions.UserError(content.decode())
+        #Nhận được dữ liệu từ server gửi tới
+        content = s.recv(1024)
+        s.close()
+        raise exceptions.UserError(content.decode())
 
 
         # global jsonLoad
