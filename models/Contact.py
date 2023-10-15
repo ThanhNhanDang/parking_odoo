@@ -133,12 +133,10 @@ class Contact(models.Model):
 
     def quet_the(self):
 
-        HOST = "wss://"+http.request.httprequest.environ['REMOTE_ADDR']
-        HTTP_X_REAL_IP = http.request.httprequest.environ.get('HTTP_X_REAL_IP',HOST)
+        HOST = http.request.httprequest.environ['REMOTE_ADDR']
         REMOTE_PORT = http.request.httprequest.environ['REMOTE_PORT']
         PORT = 12536  # The port used by the server
-        _logger.info(HOST+':'+str(REMOTE_PORT) + "  ===  " + HTTP_X_REAL_IP)
-        _logger.info(http.request.httprequest.environ)
+        _logger.info(HOST)
         s = socket.socket()
         try:
             s.connect((HOST, PORT)) #lắng nghe ở cổng 12536
