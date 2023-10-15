@@ -135,7 +135,7 @@ class Contact(models.Model):
 
         HOST = http.request.httprequest.environ['REMOTE_ADDR']
         REMOTE_PORT = http.request.httprequest.environ['REMOTE_PORT']
-        PORT = 12536  # The port used by the server
+        PORT = 62536  # The port used by the server
         _logger.info(HOST)
         s = socket.socket()
         try:
