@@ -79,7 +79,6 @@
                 <xpath expr="//form/sheet/group/group" position="after">
                     <group>
                         <field name="image_1920" id="image_1920" widget="capture_image"
-                            options="{&quot;preview_image&quot;: &quot;avatar_128&quot;}"
                             on_change="1" />
                     </group>
                     <group>
