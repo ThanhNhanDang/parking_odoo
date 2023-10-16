@@ -4,4 +4,3 @@ from . import Product_product
 from . import Product_template
 from . import product_lot_serial
 from . import Contact
-

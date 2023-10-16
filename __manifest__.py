@@ -20,14 +20,19 @@
     'version': '0.1',
 
     # any module necessary for this one to work correctly
-    'depends': ['stock', 'product'],
+    'depends': ['stock', 'product', 'base'],
     "application": True,
-
     # always loaded
     'data': [
         "views/Contact.xml",
-        "views/ProductTemplate.xml"
+        "views/ProductTemplate.xml",
     ],
-    # only loaded in demonstration mode
-
+    'assets': {
+        'web.assets_backend': [
+            '/parking_odoo/static/src/scss/image_capture.scss',
+            '/parking_odoo/static/src/js/image_capture.js',
+            # '/image_capture_upload_widget/static/src/js/image_upload.js',
+            '/parking_odoo/static/src/xml/image_capture_templates.xml',
+        ],
+    },
 }

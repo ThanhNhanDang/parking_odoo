@@ -128,7 +128,7 @@ class Contact(models.Model):
         record = super(Contact, self).write(vals)
         # Code after write: can use 'self' with the updated
         # values
-        _logger.info('Write a %s with vals %s', self._name, vals)
+        _logger.info('Write a %s', self._name)
         return record
 
     def quet_the(self):
@@ -146,13 +146,46 @@ class Contact(models.Model):
         #Nhập vào tên file 
         
         #Gửi tên file cho server
-        message = "HelloNhan"
+        message = "quet the|false" # quét thẻ người
         s.send(message.encode())
 
         #Nhận được dữ liệu từ server gửi tới
-        content = s.recv(1024)
+        content = s.recv(1024).decode()
+        if ':' in content:
+            s.close()
+            raise exceptions.UserError(content)
+
+        user = check_epc_user(content)
+        if user:
+            raise exceptions.UserError("LỖI: THẺ ĐÃ TỒN TẠI!!")
+        hex_arr = uuid.uuid4().hex
+        if check_epc_user("0" + hex_arr[1:24]):
+            raise exceptions.UserError(
+                "Không thể tạo được UUID liên hệ nhà phát triển để sử lý")
+
+        message = "ghi the|"+"0" + hex_arr[1:24] +"|"+hex_arr[24:] # quét thẻ người
+        s.send(message.encode())
+        content = s.recv(1024).decode()
+        if ':' in content:
+            s.close()
+            raise exceptions.UserError(content)
         s.close()
-        raise exceptions.UserError(content.decode())
+        self.write({
+            'ref' : "0" + hex_arr[1:24],
+            'barcode': hex_arr[24:],
+            'is_published': True
+        })
+        return {
+            'type': 'ir.actions.client',
+            'tag': 'display_notification',
+            'params': {
+                'message': content,
+                'type': 'success',
+                'sticky': False,
+            }
+        }
+
+
 
 
         # global jsonLoad
