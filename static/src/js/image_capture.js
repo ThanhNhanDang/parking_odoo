@@ -165,8 +165,8 @@ export class ImageCapture extends Component {
     save_image.classList.add("d-none");
     var camera = document.getElementById("camera");
     camera.classList.remove("d-none");
-    streams = navigator.mediaDevices.getUserMedia({ video: true, audio: false })
-    streams.getTracks().forEach(function (track) {
+    const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false })
+    stream.getTracks().forEach(function (track) {
       track.stop();
     });
   }
