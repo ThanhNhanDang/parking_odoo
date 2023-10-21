@@ -133,15 +133,17 @@ class Contact(models.Model):
         return record
 
     def quet_the(self):
-        HOST = "localhost"
+        HOST = "127.0.0.1"
         REMOTE_PORT = http.request.httprequest.environ['REMOTE_PORT']
         PORT = 62536  # The port used by the server
         _logger.info(HOST)
-        with connect("ws://"+HOST+":"+str(62536)+"/") as websocket:
-            websocket.send("Hello world!")
-            message = websocket.recv()
-            print(f"Received: {message}")
-            # raise exceptions.UserError("CHƯA CÀI ĐẶT PLUGIN!!")
+        try:
+            with connect("ws://"+HOST+":"+str(62536)+"/") as websocket:
+                websocket.send("Hello world!")
+                message = websocket.recv()
+                print(f"Received: {message}")
+        except:
+            raise exceptions.UserError("CHƯA CÀI ĐẶT PLUGIN!!")
         
         # #Nhận được dữ liệu từ server gửi tới
         # content = s.recv(1024).decode()
