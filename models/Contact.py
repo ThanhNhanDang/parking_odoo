@@ -133,7 +133,7 @@ class Contact(models.Model):
         return record
 
     def quet_the(self):
-        HOST = http.request.httprequest.environ['REMOTE_ADDR']
+        HOST = '127.0.0.1'
         REMOTE_PORT = http.request.httprequest.environ['REMOTE_PORT']
         PORT = 62536  # The port used by the server
         _logger.info(HOST)
