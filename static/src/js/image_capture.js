@@ -61,6 +61,7 @@ export class ImageCapture extends Component {
   get hasTooltip() {
     return this.props.enableZoom && this.props.readonly && this.props.value;
   }
+  
 
   getUrl(previewFieldName) {
     // getting the details and url of the image
@@ -101,17 +102,16 @@ export class ImageCapture extends Component {
     var model = this.props.record.resModel;
   }
   async OnClickOpenCamera() {
-    var player = document.getElementById("player");
-    var captureButton = document.getElementById("capture");
-    var camera = document.getElementById("camera");
+    var dialog = document.getElementById("dialog"+this.props.name);
+    var player = document.getElementById("player"+this.props.name);
     player.classList.remove("d-none");
-    captureButton.classList.remove("d-none");
-    camera.classList.add("d-none");
-    if (await navigator.mediaDevices.getUserMedia) {
+
+    if (navigator.mediaDevices.getUserMedia) {
       await navigator.mediaDevices
         .getUserMedia({ video: true, audio: false })
         .then((s) => {
           player.srcObject = s;
+          dialog.showModal();
         })
         .catch((err) => {
           console.log(err);
@@ -120,24 +120,31 @@ export class ImageCapture extends Component {
   }
   async OnClickCaptureImage() {
     // Capture the image from webcam and close the webcam
-    var context = snapshot.getContext("2d");
-    var canvas = document.getElementById("snapshot");
-    var save_image = document.getElementById("save_image");
-    var image = document.getElementById("image");
-    var video = document.getElementById("video");
-    var camera = document.getElementById("camera");
+    console.log(this)
+    var canvas = document.getElementById("snapshot"+this.props.name);
+    var player = document.getElementById("player"+this.props.name);
+    var save_image = document.getElementById("save_image"+this.props.name);
+    var image = document.getElementById("image"+this.props.name);
+
+    var context = canvas.getContext("2d");
+
     save_image.classList.remove("d-none");
-    context.drawImage(player, 0, 0, 320, 240);
-    image.value = context.canvas.toDataURL();
+
+    context.drawImage(player, 0, 0, 420, 340);
     canvas.classList.remove("d-none");
+    image.value = context.canvas.toDataURL();
     this.url = context.canvas.toDataURL();
-    console.log(context.canvas.toDataURL());
-    console.log(context);
-    console.log(context.getImageData);
+    // console.log(context.canvas.toDataURL());
+    // console.log(context);
+    // console.log(context.getImageData);
   }
   async OnClickSaveImage() {
     // Saving the image to that field
-    var self = this;
+    var self = this
+    var snapshot = document.getElementById("snapshot"+this.props.name);
+    var player = document.getElementById("player"+this.props.name);
+    var save_image = document.getElementById("save_image"+this.props.name);
+    var dialog = document.getElementById("dialog"+this.props.name);
     rpc
       .query({
         model: "image.capture",
@@ -150,31 +157,40 @@ export class ImageCapture extends Component {
           data: results,
           name: "ImageFile.png",
           objectUrl: null,
-          size: 106252,
+          size: 86252,
           type: "image/png",
         };
         self.onFileUploaded(data);
       });
-    var player = document.getElementById("player");
-    player.classList.add("d-none");
-    var snapshot = document.getElementById("snapshot");
+    
     snapshot.classList.add("d-none");
-    var capture = document.getElementById("capture");
-    capture.classList.add("d-none");
-    var save_image = document.getElementById("save_image");
     save_image.classList.add("d-none");
-    var camera = document.getElementById("camera");
-    camera.classList.remove("d-none");
-    const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false })
-    stream.getTracks().forEach(function (track) {
+    player.srcObject.getTracks().forEach(function (track) {
       track.stop();
     });
+    player.classList.add("d-none");
+    dialog.close();
+  }
+
+  async closeDialog() {
+    var snapshot = document.getElementById("snapshot"+this.props.name);
+    var player = document.getElementById("player"+this.props.name);
+    var save_image = document.getElementById("save_image"+this.props.name);
+    var dialog = document.getElementById("dialog"+this.props.name);
+
+    snapshot.classList.add("d-none");
+    save_image.classList.add("d-none");
+    player.srcObject.getTracks().forEach(function (track) {
+      track.stop();
+    });
+    player.classList.add("d-none");
+    dialog.close();
   }
   onLoadFailed() {
     this.state.isValid = false;
     this.notification.add(this.env._t("Could not display the selected image"), {
       type: "danger",
-    });
+    }); 
   }
 }
 
