@@ -125,9 +125,7 @@ export class ImageCapture extends Component {
     var player = document.getElementById("player"+this.props.name);
     var save_image = document.getElementById("save_image"+this.props.name);
     var image = document.getElementById("image"+this.props.name);
-    const wsUri = "ws://127.0.0.1:62536/";
-    console.log(wsUri)
-    const websocket = new WebSocket(wsUri);
+   
     console.log(websocket)
     websocket.onopen = (e) => {
       console.log("Da Mo")
