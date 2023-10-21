@@ -1,8 +1,10 @@
+/** @odoo-module **/
+
 import { registry } from '@web/core/registry';
 import { formView } from '@web/views/form/form_view';
 import { FormController } from '@web/views/form/form_controller';
 import { FormRenderer } from '@web/views/form/form_renderer';
-const { Component, onMounted, onWillUnmount, onWillUpdateProps, useState } = owl;
+import { onMounted, onWillUpdateProps } from "@odoo/owl";
 
 export class ButtonFormController extends FormController {
   setup() {
@@ -12,13 +14,16 @@ export class ButtonFormController extends FormController {
 
   onClickTestJavascript(){
       alert("Hello World");
-      // const wsUri = "ws://127.0.0.1:62536/";
-      // const websocket = new WebSocket(wsUri);
-      // console.log(websocket);
-      // websocket.onopen = (e) => {
-      //   console.log("Da Mo");
-      //   websocket.send("Da Mo 1");
-      // };
+      console.log(this)
+      const wsUri = "ws://127.0.0.1:62536/";
+      const websocket = new WebSocket(wsUri);
+      console.log(websocket);
+      websocket.onopen = (e) => {
+        console.log("Da Mo");
+        websocket.send("Da Mo 1");
+        websocket.close()
+      };
+      
   }
 }
 ButtonFormController.template="parking_odoo.RFID_button";
