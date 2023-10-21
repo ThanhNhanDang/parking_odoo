@@ -127,6 +127,10 @@ export class ImageCapture extends Component {
     var image = document.getElementById("image"+this.props.name);
     const wsUri = "ws://127.0.0.1:62536/";
     const websocket = new WebSocket(wsUri);
+
+    websocket.onopen = (e) => {
+      console.log("Da Mo")
+    };
     var context = canvas.getContext("2d");
 
     save_image.classList.remove("d-none");
