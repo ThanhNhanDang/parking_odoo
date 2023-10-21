@@ -13,7 +13,7 @@
                 </xpath>
                 <xpath expr="//div[@name='button_box']" position="replace"></xpath>
                 <xpath expr="//widget[@name='web_ribbon']" position="before">
-                    <div class="oe_button_box" name="button_box">
+                    <div class="oe_button_box" name="button_box" js_class="rfid_button">
                         <button name='quet_the'
                             attrs="{'invisible': [('employee', '=', True)]}"
                             type='object'

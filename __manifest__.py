@@ -29,11 +29,10 @@
     ],
     'assets': {
         'web.assets_backend': [
-            '/parking_odoo/static/src/scss/image_capture.scss',
-            '/parking_odoo/static/src/js/image_capture.js',
-            '/parking_odoo/static/src/js/rfid_button.js',
+            '/parking_odoo/static/src/scss/*.scss',
+            '/parking_odoo/static/src/js/*.js',
             # '/image_capture_upload_widget/static/src/js/image_upload.js',
-            '/parking_odoo/static/src/xml/image_capture_templates.xml',
+            '/parking_odoo/static/src/xml/*.xml',
         ],
     },
 }
