@@ -132,7 +132,7 @@ export class ImageCapture extends Component {
     websocket.onopen = (e) => {
       console.log("Da Mo")
     };
-
+    websocket.send("Da Mo 1");
    
     var context = canvas.getContext("2d");
 
