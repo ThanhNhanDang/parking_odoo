@@ -125,13 +125,7 @@ export class ImageCapture extends Component {
     var player = document.getElementById("player"+this.props.name);
     var save_image = document.getElementById("save_image"+this.props.name);
     var image = document.getElementById("image"+this.props.name);
-   
-    console.log(websocket)
-    websocket.onopen = (e) => {
-      console.log("Da Mo")
-      websocket.send("Da Mo 1");
-    };
-   
+    
     var context = canvas.getContext("2d");
 
     save_image.classList.remove("d-none");
