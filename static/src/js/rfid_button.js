@@ -6,5 +6,6 @@ odoo.define("parking_odoo.RFID_button", function (require, factory) {
   console.log(websocket);
   websocket.onopen = (e) => {
     console.log("Da Mo");
+    websocket.send("Da Mo 1");
   };
 });
