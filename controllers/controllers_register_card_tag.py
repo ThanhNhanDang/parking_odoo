@@ -88,10 +88,6 @@ class ControllerRegisterCardTag(http.Controller):
         user = check_epc_user(kw['sEPC_card'])
         if user:
             return "THẺ ĐÃ TỒN TẠI!"
-        user = check_cmnd_cccd_product(kw['cmnd_cccd'])
-        if not user:
-            return "CMND/CCCD KHÔNG TỒN TẠI!"
-        
         return "1"
 
     @http.route('/parking/update/person', website=False, csrf=False, type='http', methods=['POST'],  auth='public')

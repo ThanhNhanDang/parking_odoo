@@ -62,7 +62,6 @@ def check_cmnd_cccd_code_user(cmnd_cccd, signup_token):
     if (product.signup_token == signup_token):
         return -3
 
-
 def save_user(vals, hex_arr):
     new_record = http.request.env['res.partner'].sudo().create({
         'image_1920': vals['image_1920'],
@@ -87,7 +86,6 @@ def on_message_callback(client, userdata, msg):
 
 class Contact(models.Model):
     _inherit = 'res.partner'
-
     display_name = fields.Char(string="Họ tên", required=False)
     name = fields.Char(string="Họ tên")
     vat = fields.Char(string="Số CMND/CCCD", required=True)
@@ -102,8 +100,6 @@ class Contact(models.Model):
         string="Ảnh mặt trước CMND/CCCD", max_width=1920, max_height=1920)
     image_1920_cmnd_cccd_sau = fields.Image(
         string="Ảnh mặt sau CMND/CCCD", max_width=1920, max_height=1920)
-    
-
     @api.model
     def create(self, vals):
         result = check_cmnd_cccd_code_user(vals['vat'], vals['signup_token'])
@@ -123,67 +119,22 @@ class Contact(models.Model):
                                                       'image_1920_cmnd_cccd_sau': vals['image_1920_cmnd_cccd_sau']
                                                       })
             return new_record
-
+  
     def write(self, vals):
         # Code before write: 'self' has the old values
+        _logger.info('Write a %s', self._name)
+        _logger.info(vals)
         record = super(Contact, self).write(vals)
         # Code after write: can use 'self' with the updated
         # values
-        _logger.info('Write a %s', self._name)
         return record
 
-    def quet_the(self):
-        HOST = "127.0.0.1"
-        REMOTE_PORT = http.request.httprequest.environ['REMOTE_PORT']
-        PORT = 62536  # The port used by the server
-        _logger.info(HOST)
-        try:
-            with connect("ws://"+HOST+":"+str(62536)+"/") as websocket:
-                websocket.send("Hello world!")
-                message = websocket.recv()
-                print(f"Received: {message}")
-        except:
-            raise exceptions.UserError("CHƯA CÀI ĐẶT PLUGIN!!")
-        
-        # #Nhận được dữ liệu từ server gửi tới
-        # content = s.recv(1024).decode()
-        # if ':' in content:
-        #     s.close()
-        #     raise exceptions.UserError(content)
-
-        # user = check_epc_user(content)
-        # if user:
-        #     raise exceptions.UserError("LỖI: THẺ ĐÃ TỒN TẠI!!")
-        # hex_arr = uuid.uuid4().hex
-        # if check_epc_user("0" + hex_arr[1:24]):
-        #     raise exceptions.UserError(
-        #         "Không thể tạo được UUID liên hệ nhà phát triển để sử lý")
-
-        # message = "ghi the|"+"0" + hex_arr[1:24] +"|"+hex_arr[24:] # quét thẻ người
-        # s.send(message.encode())
-        # content = s.recv(1024).decode()
-        # if ':' in content:
-        #     s.close()
-        #     raise exceptions.UserError(content)
-        # s.close()
-        # super(Contact, self).write({
-        #     'ref' : "0" + hex_arr[1:24],
-        #     'barcode': hex_arr[24:],
-        #     'employee': True
-        # })
-
-
-
-        # return {
-        #     'type': 'ir.actions.client',
-        #     'tag': 'display_notification',
-        #     'params': {
-        #         'message': content + "| Quét thành công",
-        #         'type': 'success',
-        #         'sticky': False,
-        #     }
-        # }
-
+    def createUUID(self):
+        hex_arr = uuid.uuid4().hex
+        if check_epc_user("0" + hex_arr[1:24]):
+            return "LỖI: KHÔNG THỂ TẠO UUID LIÊN HỆ NHÀ SẢN XUẤT ĐỂ KHẮC PHỤC!!"
+        message = "ghi the|"+"0" + hex_arr[1:24] +"|"+hex_arr[24:] 
+        return message
     def doi_the(self):
 
         HOST = http.request.httprequest.environ['REMOTE_ADDR']

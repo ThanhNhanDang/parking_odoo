@@ -6,18 +6,21 @@
             <field name="model">res.partner</field>
             <field name="inherit_id" ref="base.view_partner_form" />
             <field name="arch" type="xml">
+                <xpath expr="//div[@name='button_box']" position="replace"></xpath>
                 <xpath expr="//form" position="attributes">
                     <attribute name="js_class">rfid_button</attribute>
                 </xpath>
-                <xpath expr="//widget[@name='web_ribbon']" position="after">
+                <!-- <xpath expr="//widget[@name='web_ribbon']" position="after">
                     <field name='employee' invisible='1'></field>
-                    <widget name="web_ribbon" title="Registered" bg_color="bg-success"
-                        modifiers="{&quot;invisible&quot;: [[&quot;employee&quot;, &quot;=&quot;, false]]}" />
-                </xpath>
-                <xpath expr="//div[@name='button_box']" position="replace"></xpath>
+                    <div id="registered">
+                        <widget name="web_ribbon" title="Registered"
+                            bg_color="bg-success"
+                            modifiers="{&quot;invisible&quot;: [[&quot;employee&quot;, &quot;=&quot;, false]]}" />
+                    </div>
+                </xpath> -->
                 <!-- <xpath expr="//widget[@name='web_ribbon']" position="before">
                     <div class="oe_button_box" name="button_box">
-                        <button name='quet_the'
+                        <button t-on-click="onClickTestJavascript"
                             attrs="{'invisible': [('employee', '=', True)]}"
                             type='object'
                             class="oe_highlight" icon="fa-credit-card-alt"> CẤP THẺ</button>

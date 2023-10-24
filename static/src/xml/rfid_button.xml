@@ -1,13 +1,13 @@
-<?xml version="1.0" encoding="UTF-8" ?>
+<?xml version="1.0" encoding="UTF-8"?>
 <templates xml:space="preserve">
     <t t-name="parking_odoo.RFID_button" t-inherit="web.FormView" t-inherit-mode="primary" owl="1">
         <xpath expr="//ActionMenus" position="after">
-            <button class="btn btn-info" t-if="!employee" type="button" t-on-click="onClickTestJavascript">
-                <i class="fa fa-credit-card-alt" /> CẤP THẺ
-            </button>
-            <button class="btn btn-primary" t-if="employee" type="button" t-on-click="onClickTestJavascript">
-                <i class="fa fa-credit-card-alt" /> ĐỔI THẺ
-            </button>
+                <button class="btn btn-info"  id="cap_the" t-if="!model.root.data.employee and !state.employee" type="button" t-on-click="onClickTestJavascript">
+                    <i class="fa fa-credit-card-alt" /> CẤP THẺ
+                </button>
+                <button class="btn btn-primary"  id="doi_the" type="button" t-if="model.root.data.employee or state.employee" t-on-click="onClickTestJavascript">
+                    <i class="fa fa-credit-card-alt" /> ĐỔI THẺ
+                </button>
         </xpath>
     </t>
 </templates>

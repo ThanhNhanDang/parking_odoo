@@ -120,7 +120,6 @@ export class ImageCapture extends Component {
   }
   async OnClickCaptureImage() {
     // Capture the image from webcam and close the webcam
-    console.log(this)
     var canvas = document.getElementById("snapshot"+this.props.name);
     var player = document.getElementById("player"+this.props.name);
     var save_image = document.getElementById("save_image"+this.props.name);
