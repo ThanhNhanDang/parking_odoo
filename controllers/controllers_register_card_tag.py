@@ -78,6 +78,7 @@ def contains(list, filter):
     return None
     # do stuff
 
+
 class ControllerRegisterCardTag(http.Controller):
 
     # @http.route('/parking/test', website=False, csrf=False, type='json', methods=['POST'], auth='public')
@@ -175,6 +176,7 @@ class ControllerRegisterCardTag(http.Controller):
             "images": images,
             "image": user.image_1920
         }
+
     @http.route('/parking/update/car', website=False, csrf=False, type='http', methods=['POST'],  auth='public')
     def update_car(self, **kw):
         xe = check_exist_xe(kw['bien_so'], kw['ma_dinh_danh'])
@@ -216,8 +218,11 @@ class ControllerRegisterCardTag(http.Controller):
         xe = check_epc_xe(kw['ma_dinh_danh_xe'])
         if not xe:
             return "XE KHÔNG TỒN TẠI!!"
-        user = contains(xe.user_ids, lambda user: user.ref ==
-                        kw['ma_dinh_danh_ng'])
+        if (xe.contact_id.ref == kw['ma_dinh_danh_ng']):
+            user = xe.contact_id
+        else:
+            user = contains(xe.user_ids, lambda user: user.ref ==
+                            kw['ma_dinh_danh_ng'])
         if not user:
             return "BIỂN SỐ ["+xe.name+"] KHÔNG TRÙNG VỚI THẺ NGƯỜI!!"
         return {

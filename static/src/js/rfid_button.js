@@ -8,35 +8,144 @@ import { FormRenderer } from "@web/views/form/form_renderer";
 import { onMounted, onWillUpdateProps, useState } from "@odoo/owl";
 import rpc from "web.rpc";
 import Dialog from "web.Dialog";
+var websocket;
+var checkWebsocket = true;
+function connect() {
+  const wsUri = "ws://127.0.0.1:62536/";
+  websocket = new WebSocket(wsUri);
+  websocket.onopen = function () {
+    // subscribe to some channels
+    checkWebsocket = true;
+    websocket.send("hello");
+  };
 
-const wsUri = "ws://127.0.0.1:62536/";
+  websocket.onclose = function (e) {
+    checkWebsocket = false;
+    console.log(
+      "Socket is closed. Reconnect will be attempted in 1 second.",
+      e.reason
+    );
+    setTimeout(function () {
+      connect();
+    }, 1000);
+  };
 
-const websocket = new WebSocket(wsUri);
-websocket.onopen = async (e) => {
-  websocket.send("hello");
-};
+  websocket.onerror = function (err) {
+    console.error("Socket encountered error: ", err.message, "Closing socket");
+    checkWebsocket = false;
+    websocket.close();
+  };
+}
+
+connect();
+console.log("load");
 
 // confirm_callback: function () {
-//   titles = titles || [];
-//   if (titles.length > 0) {
-//     var url = "/parking_odoo/static/file/";
-//     var len = titles.length;
-//     for (var ii = 0; ii < len; ii++) {
-//       url = url + "titles=" + titles[ii];
-//       if (ii < len - 1) {
-//         url = url + "&";
-//       }
-//     }
-//     document.window.open(url);
-//   }
+//
 // },
 
 export class ButtonFormController extends FormController {
   setup() {
     super.setup();
-    this.state = useState({ ...this.state, employee: false });
+    this.state = useState({
+      ...this.state,
+      employee: false,
+    });
   }
+  onClickXeJavascript() {
+    if (!checkWebsocket) {
+      this.showConfirmDialogDownloadPlugin(
+        "THÔNG BÁO",
+        "Vui lòng kiểm tra service [ Window_nsp_service ] có đang chạy hay không, nếu chưa cài đặt service hãy nhấn vào nút [ OK ] bên dưới để cài đặt!"
+      );
+      return;
+    }
+    //Gửi lệnh quét thẻ
+    websocket.send("quet the|false");
+
+    var self = this;
+    websocket.onmessage = async (e) => {
+      const message = e.data;
+      console.log(message);
+      //Kiểm tra lỗi nếu ký tự đầu là L
+      if (message.charAt(0) === "L") {
+        //In thông báo lỗi ra màn hình
+        self.showAlerDialog("THÔNG BÁO", message);
+        return;
+      }
+      //Cấp thẻ thành công
+      if (message.charAt(0) === "C") {
+        self.state.employee = true;
+        self.showNotification(message, "THÔNG BÁO", "success");
+        return;
+      }
+      //Mã thẻ trả về
+      if (message.charAt(0) === ".") {
+        self
+          .rpcQuery("product.template", "search", [
+            [["default_code", "=", message.split(".")[1]]],
+          ])
+          .then(function (results) {
+            //Nếu không có lỗi thì tìm kiếm xem đã có thẻ hay chưa
+            if (results.length !== 0) {
+              self.showAlerDialog("THÔNG BÁO", "THẺ ĐÃ TỒN TẠI!!");
+              return;
+            }
+            //Nếu không có thẻ thì random mã EPC và password tại hàm createUUID của module Contact.py
+            self
+              .rpcQuery("product.template", "createUUID", [[]])
+              .then(function (results) {
+                //Nếu không random được mã thẻ
+                if (results.charAt(0) === "L") {
+                  self.showAlerDialog("THÔNG BÁO", results);
+                  return;
+                }
+                const messageSend = results;
+                const result = results.split("|");
+                //Nếu random được thì lưu vào cơ sở dữ liệu và ghi mã thẻ và mật khẩu random vào thẻ
+                // results = "ghi the|"+"0" + hex_arr[1:24] +"|"+hex_arr[24:]
+                self
+                  .rpcQuery("product.template", "write", [
+                    [self.model.root.data.id],
+                    {
+                      default_code: result[1],
+                      barcode: result[2],
+                      check_doi_the: true,
+                    },
+                  ])
+                  .then(function (results) {
+                    if (results) websocket.send(messageSend);
+                  });
+              });
+          });
+      }
+    };
+  }
+
+  onClickDKxe() {
+    const self = this;
+    const action = self.env.services.action;
+    action.doAction({
+      type: "ir.actions.act_window",
+      name: "Action service",
+      res_model: "product.template",
+      domain: [],
+      context: { default_contact_id: self.model.root.data.id },
+      view_type: "form",
+      views: [[false, "form"]],
+      view_mode: "list,form",
+      target: "current",
+    });
+  }
+
   onClickTestJavascript() {
+    if (!checkWebsocket) {
+      this.showConfirmDialogDownloadPlugin(
+        "THÔNG BÁO",
+        "Vui lòng kiểm tra service [ Window_nsp_service ] có đang chạy hay không, nếu chưa cài đặt service hãy nhấn vào nút [ OK ] bên dưới để cài đặt!"
+      );
+      return;
+    }
     //Gửi lệnh quét thẻ
     websocket.send("quet the|false");
     var self = this;
@@ -58,7 +167,9 @@ export class ButtonFormController extends FormController {
       //Mã thẻ trả về
       if (message.charAt(0) === ".") {
         self
-          .rpcQuery("search", [[["ref", "=", message.split(".")[1]]]])
+          .rpcQuery("res.partner", "search", [
+            [["ref", "=", message.split(".")[1]]],
+          ])
           .then(function (results) {
             //Nếu không có lỗi thì tìm kiếm xem đã có thẻ hay chưa
             if (results.length !== 0) {
@@ -66,25 +177,27 @@ export class ButtonFormController extends FormController {
               return;
             }
             //Nếu không có thẻ thì random mã EPC và password tại hàm createUUID của module Contact.py
-            self.rpcQuery("createUUID", [[]]).then(function (results) {
-              //Nếu không random được mã thẻ
-              if (results.charAt(0) === "L") {
-                self.showAlerDialog("THÔNG BÁO", results);
-                return;
-              }
-              const messageSend = results;
-              const result = results.split("|");
-              //Nếu random được thì lưu vào cơ sở dữ liệu và ghi mã thẻ và mật khẩu random vào thẻ
-              // results = "ghi the|"+"0" + hex_arr[1:24] +"|"+hex_arr[24:]
-              self
-                .rpcQuery("write", [
-                  [self.model.root.data.id],
-                  { ref: result[1], barcode: result[2], employee: true },
-                ])
-                .then(function (results) {
-                  if (results) websocket.send(messageSend);
-                });
-            });
+            self
+              .rpcQuery("res.partner", "createUUID", [[]])
+              .then(function (results) {
+                //Nếu không random được mã thẻ
+                if (results.charAt(0) === "L") {
+                  self.showAlerDialog("THÔNG BÁO", results);
+                  return;
+                }
+                const messageSend = results;
+                const result = results.split("|");
+                //Nếu random được thì lưu vào cơ sở dữ liệu và ghi mã thẻ và mật khẩu random vào thẻ
+                // results = "ghi the|"+"0" + hex_arr[1:24] +"|"+hex_arr[24:]
+                self
+                  .rpcQuery("res.partner", "write", [
+                    [self.model.root.data.id],
+                    { ref: result[1], barcode: result[2], employee: true },
+                  ])
+                  .then(function (results) {
+                    if (results) websocket.send(messageSend);
+                  });
+              });
           });
       }
     };
@@ -98,7 +211,8 @@ export class ButtonFormController extends FormController {
   }
 
   showConfirmDialogDownloadPlugin(title, body) {
-    const dialog = this.env.services.dialog;
+    const self = this;
+    const dialog = self.env.services.dialog;
     dialog.add(
       ConfirmationDialog,
       {
@@ -106,6 +220,7 @@ export class ButtonFormController extends FormController {
         body: body,
         confirm: () => {
           console.log("confirm");
+          window.open("/parking_odoo/static/file/setup.exe");
         },
         cancel: () => {
           console.log("cancel");
@@ -128,10 +243,10 @@ export class ButtonFormController extends FormController {
     });
   }
   //args: [this.model.root.data.id, { ref: "12122", employee: true }]
-  rpcQuery(method, args) {
+  rpcQuery(model, method, args) {
     return rpc
       .query({
-        model: "res.partner",
+        model: model,
         method: method,
         args: args,
       })

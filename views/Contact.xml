@@ -1,23 +1,26 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <odoo>
     <data>
+        <record id="contacts.action_contacts" model="ir.actions.act_window">
+            <field name="context">{'default_is_company': False}</field>
+        </record>
         <record id="hide_contact" model="ir.ui.view">
             <field name="name">res.partner</field>
             <field name="model">res.partner</field>
             <field name="inherit_id" ref="base.view_partner_form" />
             <field name="arch" type="xml">
-                <xpath expr="//div[@name='button_box']" position="replace"></xpath>
+                <!-- <xpath expr="//div[@name='button_box']" position="replace"></xpath> -->
                 <xpath expr="//form" position="attributes">
                     <attribute name="js_class">rfid_button</attribute>
                 </xpath>
-                <!-- <xpath expr="//widget[@name='web_ribbon']" position="after">
+                <xpath expr="//widget[@name='web_ribbon']" position="after">
                     <field name='employee' invisible='1'></field>
-                    <div id="registered">
+                    <!-- <div id="registered">
                         <widget name="web_ribbon" title="Registered"
                             bg_color="bg-success"
                             modifiers="{&quot;invisible&quot;: [[&quot;employee&quot;, &quot;=&quot;, false]]}" />
-                    </div>
-                </xpath> -->
+                    </div> -->
+                </xpath>
                 <!-- <xpath expr="//widget[@name='web_ribbon']" position="before">
                     <div class="oe_button_box" name="button_box">
                         <button t-on-click="onClickTestJavascript"
@@ -77,6 +80,7 @@
                     <field name="signup_token" placeholder="e.g. 31195100312"
                         on_change="1" modifiers="{&quot;required&quot;: true}"
                     />
+
                     <!-- <field name="ref" placeholder="e.g. 31195100312"
                         on_change="1"
                     /> -->
@@ -117,6 +121,7 @@
             <field name="arch" type="xml">
                 <xpath expr="//field[@name='vat']" position='after'>
                     <field name='signup_token' />
+                    <field name='employee' />
                 </xpath>
 
             </field>

@@ -5,6 +5,8 @@ import time
 import json
 import os
 from websockets.sync.client import connect
+import urllib.request
+
 
 _logger = logging.getLogger(__name__)
 
@@ -62,6 +64,7 @@ def check_cmnd_cccd_code_user(cmnd_cccd, signup_token):
     if (product.signup_token == signup_token):
         return -3
 
+
 def save_user(vals, hex_arr):
     new_record = http.request.env['res.partner'].sudo().create({
         'image_1920': vals['image_1920'],
@@ -100,6 +103,7 @@ class Contact(models.Model):
         string="Ảnh mặt trước CMND/CCCD", max_width=1920, max_height=1920)
     image_1920_cmnd_cccd_sau = fields.Image(
         string="Ảnh mặt sau CMND/CCCD", max_width=1920, max_height=1920)
+
     @api.model
     def create(self, vals):
         result = check_cmnd_cccd_code_user(vals['vat'], vals['signup_token'])
@@ -119,7 +123,7 @@ class Contact(models.Model):
                                                       'image_1920_cmnd_cccd_sau': vals['image_1920_cmnd_cccd_sau']
                                                       })
             return new_record
-  
+
     def write(self, vals):
         # Code before write: 'self' has the old values
         _logger.info('Write a %s', self._name)
@@ -133,8 +137,9 @@ class Contact(models.Model):
         hex_arr = uuid.uuid4().hex
         if check_epc_user("0" + hex_arr[1:24]):
             return "LỖI: KHÔNG THỂ TẠO UUID LIÊN HỆ NHÀ SẢN XUẤT ĐỂ KHẮC PHỤC!!"
-        message = "ghi the|"+"0" + hex_arr[1:24] +"|"+hex_arr[24:] 
+        message = "ghi the|"+"0" + hex_arr[1:24] + "|"+hex_arr[24:]
         return message
+
     def doi_the(self):
 
         HOST = http.request.httprequest.environ['REMOTE_ADDR']
@@ -143,17 +148,17 @@ class Contact(models.Model):
         _logger.info(HOST)
         s = socket.socket()
         try:
-            s.connect((HOST, PORT)) #lắng nghe ở cổng 12536
+            s.connect((HOST, PORT))  # lắng nghe ở cổng 12536
         except:
             raise exceptions.UserError("CHƯA CÀI ĐẶT PLUGIN!!")
-        
-        #Nhập vào tên file 
-        
-        #Gửi tên file cho server
-        message = "quet the|false" # quét thẻ người
+
+        # Nhập vào tên file
+
+        # Gửi tên file cho server
+        message = "quet the|false"  # quét thẻ người
         s.send(message.encode())
 
-        #Nhận được dữ liệu từ server gửi tới
+        # Nhận được dữ liệu từ server gửi tới
         content = s.recv(1024).decode()
         if ':' in content:
             s.close()
@@ -167,7 +172,8 @@ class Contact(models.Model):
             raise exceptions.UserError(
                 "Không thể tạo được UUID liên hệ nhà phát triển để sử lý")
 
-        message = "ghi the|"+"0" + hex_arr[1:24] +"|"+hex_arr[24:] # quét thẻ người
+        message = "ghi the|"+"0" + \
+            hex_arr[1:24] + "|"+hex_arr[24:]  # quét thẻ người
         s.send(message.encode())
         content = s.recv(1024).decode()
         if ':' in content:
@@ -175,7 +181,7 @@ class Contact(models.Model):
             raise exceptions.UserError(content)
         s.close()
         super(Contact, self).write({
-            'ref' : "0" + hex_arr[1:24],
+            'ref': "0" + hex_arr[1:24],
             'barcode': hex_arr[24:],
             'employee': True
         })
@@ -188,9 +194,6 @@ class Contact(models.Model):
                 'sticky': False,
             }
         }
-
-
-
 
         # global jsonLoad
         # hex_arr = uuid.uuid4().hex
@@ -222,7 +225,7 @@ class Contact(models.Model):
         #             "employee": True
         #         })
 
-        #         return 
+        #         return
         # while (jsonLoad['uid'] == -1):
         #     if (jsonLoad['uid'] == self.env.uid):
         #         mes = jsonLoad['mes']
@@ -237,7 +240,7 @@ class Contact(models.Model):
         #                 "employee": True
         #             })
 
-        #             return 
+        #             return
         #         break
 
     def action_new_product(self):

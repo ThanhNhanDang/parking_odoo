@@ -49,10 +49,10 @@
                     t-att-data-tooltip-template="hasTooltip and tooltipAttributes.template"
                     t-att-data-tooltip-info="hasTooltip and tooltipAttributes.info"
                     t-att-data-tooltip-delay="hasTooltip and props.zoomDelay"/>
-                    <dialog id="dialogimage_1920" t-if="props.name === 'image_1920'">
+                    <dialog t-attf-id="dialog#{props.name}">
                         <button autofocus="true" t-on-click="closeDialog" class="btn btn-primary">Close</button>
                         <video
-                          autoplay="true" class="d-none" id="playerimage_1920" style="width:420px;height:auto;padding: 20px;"/>
+                          autoplay="true" class="d-none"  t-attf-id="player#{props.name}" style="width:420px;height:auto;padding: 20px;"/>
                         <button class="btn btn-primary"
                                      t-on-click="OnClickCaptureImage"
                                      data-tooltip="Capture"
@@ -61,7 +61,7 @@
                             Capture
                         </button>
                         <button 
-                            id="save_imageimage_1920"
+                            t-attf-id="save_image#{props.name}"
                             class="btn btn-success d-none" 
                             data-tooltip="Save Image"
                             aria-label="Save Image"
@@ -69,58 +69,11 @@
                             <i class="fa fa-floppy-o fa-fw"/>
                             Save Image 
                         </button>
-                        <canvas class="d-none" id="snapshotimage_1920" height="340" width="420"
+                        <canvas class="d-none" t-attf-id="snapshot#{props.name}"  height="340" width="420"
                         style="padding: 20px;"/>
-                        <input type="hidden" name="image" id="imageimage_1920"/>
+                        <input type="hidden" name="image"  t-attf-id="image#{props.name}"/>
                     </dialog>
-                    <dialog id="dialogimage_1920_cmnd_cccd_truoc" t-if="props.name === 'image_1920_cmnd_cccd_truoc'">
-                        <button autofocus="true" t-on-click="closeDialog" class="btn btn-primary">Close</button>
-                        <video
-                          autoplay="true" class="d-none" id="playerimage_1920_cmnd_cccd_truoc" style="width:420px;height:auto;padding: 20px;"/>
-                        <button class="btn btn-primary"
-                                     t-on-click="OnClickCaptureImage"
-                                     data-tooltip="Capture"
-                            aria-label="Capture"  style="margin: 20px;">
-                            <i class="fa fa-camera fa-fw"/>
-                            Capture
-                        </button>
-                        <button 
-                            id="save_imageimage_1920_cmnd_cccd_truoc"
-                            class="btn btn-success d-none" 
-                            data-tooltip="Save Image"
-                            aria-label="Save Image"
-                            t-on-click="OnClickSaveImage">
-                            <i class="fa fa-floppy-o fa-fw"/>
-                            Save Image 
-                        </button>
-                        <canvas class="d-none" id="snapshotimage_1920_cmnd_cccd_truoc" height="340" width="420"
-                        style="padding: 20px;"/>
-                        <input type="hidden" name="image" id="imageimage_1920_cmnd_cccd_truoc"/>
-                    </dialog>
-                    <dialog id="dialogimage_1920_cmnd_cccd_sau" t-if="props.name === 'image_1920_cmnd_cccd_sau'">
-                        <button autofocus="true" t-on-click="closeDialog" class="btn btn-primary">Close</button>
-                        <video
-                          autoplay="true" class="d-none" id="playerimage_1920_cmnd_cccd_sau" style="width:420px;height:auto;padding: 20px;"/>
-                        <button class="btn btn-primary"
-                                     t-on-click="OnClickCaptureImage"
-                                     data-tooltip="Capture"
-                            aria-label="Capture"  style="margin: 20px;">
-                            <i class="fa fa-camera fa-fw"/>
-                            Capture
-                        </button>
-                        <button 
-                            id="save_imageimage_1920_cmnd_cccd_sau"
-                            class="btn btn-success d-none" 
-                            data-tooltip="Save Image"
-                            aria-label="Save Image"
-                            t-on-click="OnClickSaveImage">
-                            <i class="fa fa-floppy-o fa-fw"/>
-                            Save Image 
-                        </button>
-                        <canvas class="d-none" id="snapshotimage_1920_cmnd_cccd_sau" height="340" width="420"
-                        style="padding: 20px;"/>
-                        <input type="hidden" name="image" id="imageimage_1920_cmnd_cccd_sau"/>
-                    </dialog>
+                   
         </div>
     </t>
 </templates>

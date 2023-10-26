@@ -2,6 +2,7 @@
 from odoo import http
 import uuid
 from datetime import date
+import os
 
 
 def create_product_move_history(state, product_id, location_id, location_dest_id, epc):
@@ -103,7 +104,7 @@ class ControllerProduct(http.Controller):
             }
 
             return json
-            
+
     @http.route('/parking/post/in/move_history', website=False, csrf=False, type='json', methods=['POST'],  auth='public')
     def post_in_move_history(self, **kw):
         location_empty_id = find_location_empty()
@@ -173,7 +174,7 @@ class ControllerProduct(http.Controller):
         product_product = http.request.env['product.template'].sudo().search_read(
             domain=[('ma_dinh_danh', '!=', ""), ('phone', '!=', False)],
             fields=['name', 'sdt',
-                    'ma_dinh_danh', 'id',"cmnd_cccd"],
+                    'ma_dinh_danh', 'id', "cmnd_cccd"],
             order="id desc")
         return product_product
 
@@ -195,3 +196,18 @@ class ControllerProduct(http.Controller):
                     ],
             order="id desc")
         return stock_location
+
+    @http.route('/web/binary/download_file', type='http', auth='public')
+    def download_file(self, filename):
+        file_path = os.path.join('/parking_odoo/static/file', filename)
+        if os.path.exists(file_path):
+            with open(file_path, 'rb') as file:
+                file_data = file.read()
+            headers = [
+                ('Content-Disposition', 'attachment; filename=%s' % filename),
+                ('Content-Type', 'application/octet-stream'),
+                ('Content-Length', len(file_data))
+            ]
+            return http.request.make_response(file_data, headers=headers)
+        else:
+            return 'File not found'

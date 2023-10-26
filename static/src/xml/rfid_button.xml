@@ -2,12 +2,26 @@
 <templates xml:space="preserve">
     <t t-name="parking_odoo.RFID_button" t-inherit="web.FormView" t-inherit-mode="primary" owl="1">
         <xpath expr="//ActionMenus" position="after">
-                <button class="btn btn-info"  id="cap_the" t-if="!model.root.data.employee and !state.employee" type="button" t-on-click="onClickTestJavascript">
+            <div t-if="props.resModel == 'res.partner'">
+                <button class="btn btn-info" t-if="!model.root.data.employee and !state.employee" type="button" t-on-click="onClickTestJavascript">
                     <i class="fa fa-credit-card-alt" /> CẤP THẺ
                 </button>
-                <button class="btn btn-primary"  id="doi_the" type="button" t-if="model.root.data.employee or state.employee" t-on-click="onClickTestJavascript">
+                <button class="btn btn-primary" type="button" t-if="model.root.data.employee or state.employee" t-on-click="onClickDKxe">
+                    <i class="fa fa-plus-circle" /> Đ/K XE
+                </button>
+                <button class="btn btn-primary ms-1" type="button" t-if="model.root.data.employee or state.employee" t-on-click="onClickTestJavascript">
                     <i class="fa fa-credit-card-alt" /> ĐỔI THẺ
                 </button>
+            </div>
+
+            <div t-if="props.resModel == 'product.template'">
+                <button class="btn btn-info" t-if="!model.root.data.check_doi_the and !state.employee" type="button" t-on-click="onClickXeJavascript">
+                    <i class="fa fa-credit-card-alt" /> CẤP THẺ
+                </button>
+                <button class="btn btn-primary" type="button" t-if="model.root.data.check_doi_the or state.employee" t-on-click="onClickXeJavascript">
+                    <i class="fa fa-credit-card-alt" /> ĐỔI THẺ
+                </button>
+            </div>
         </xpath>
     </t>
 </templates>
