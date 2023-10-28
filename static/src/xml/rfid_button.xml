@@ -6,7 +6,10 @@
                 <button class="btn btn-info" t-if="!model.root.data.employee and !state.employee" type="button" t-on-click="onClickTestJavascript">
                     <i class="fa fa-credit-card-alt" /> CẤP THẺ
                 </button>
-                <button class="btn btn-primary" type="button" t-if="model.root.data.employee or state.employee" t-on-click="onClickDKxe">
+                <button class="btn btn-info" type="button" t-if="model.root.data.employee or state.employee" t-on-click="onDSxe">
+                    <i class="fa fa-plus-circle" /> D/S XE
+                </button>
+                <button class="btn btn-primary ms-1" type="button" t-if="model.root.data.employee or state.employee" t-on-click="onClickDKxe">
                     <i class="fa fa-plus-circle" /> Đ/K XE
                 </button>
                 <button class="btn btn-primary ms-1" type="button" t-if="model.root.data.employee or state.employee" t-on-click="onClickTestJavascript">

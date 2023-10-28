@@ -43,7 +43,13 @@ def check_epc_xe(ma_dinh_danh):
 
 class Product_template(models.Model):
     _inherit = 'product.template'
+    _sql_constraints = [
+        ('field_unique',
+         'unique(name)',
+         'BIỂN SỐ ĐÃ TỒN TẠI!!')
+    ]
     name = fields.Char(string="Biển số")
+
     contact_id = fields.Many2one(
         'res.partner', string='Chủ sở hữu', required=True)
     barcode = fields.Char(string="Mật khẩu", readonly=False)
@@ -51,7 +57,7 @@ class Product_template(models.Model):
     user_ids = fields.Many2many(
         'res.partner', string="Danh sách người dùng")
     check_doi_the = fields.Boolean(string="Đã đổi thẻ", default=False)
-    activity_summary = fields.Char(string="Hãng xe")
+    activity_summary = fields.Char(string="Hãng xe", store=True)
     image_1920 = fields.Image(
         string="Ảnh xe", max_width=1920, max_height=1920)
     image_1920_bien_so = fields.Image(
@@ -63,6 +69,7 @@ class Product_template(models.Model):
 
     @api.model
     def create(self, vals):
+        vals["tracking"] = "serial"
         new_record = super(Product_template, self).create(vals)
         # result = check_exist_xe(vals['name'], "123")
         # if result == -1:
@@ -82,10 +89,10 @@ class Product_template(models.Model):
         #     'user_ids': [(4, vals['contact_id'])],
         #     'detailed_type': 'product'
         # })
-        # new_record.product_variant_id.write({
-        #     'name':  vals['name'],
-        #     'responsible_id': vals['contact_id'],
-        # })
+        new_record.product_variant_id.write({
+            'name':  vals['name'],
+            'responsible_id': vals['contact_id'],
+        })
         # create_product_move_history(
         #     "BX/OUT", new_record.product_variant_id.id, 4, 5, "123")
         return new_record

@@ -29,22 +29,6 @@ def create_product_move_history(state, product_id, location_id, location_dest_id
             'qty_done': 1.0,
             'company_id': 1})
 
-
-def check_exit_user(sEPC, cmnd_cccd, signup_token):
-    product = http.request.env['res.partner'].sudo().search(
-        domain=["|", ('ref', '=', sEPC), ('vat', '=', cmnd_cccd),
-                ('signup_token', '=', signup_token)],
-        limit=1)
-    if not product:
-        return 1
-    if (product.ref == sEPC):
-        return -1
-    if (product.vat == cmnd_cccd):
-        return -2
-    if (product.signup_token == signup_token):
-        return -3
-
-
 def check_epc_user(sEPC):
     user = http.request.env['res.partner'].sudo().search(
         domain=[('ref', '=', sEPC)],
@@ -89,6 +73,15 @@ def on_message_callback(client, userdata, msg):
 
 class Contact(models.Model):
     _inherit = 'res.partner'
+    _sql_constraints = [
+        ('field_unique',
+         'unique(vat)',
+         'CMND/CCCD ĐÃ TỒN TẠI!!'),
+        ('field_unique',
+         'unique(signup_token)',
+         'MÃ ĐỊNH DANH ĐÃ TỒN TẠI!')
+    ]
+
     display_name = fields.Char(string="Họ tên", required=False)
     name = fields.Char(string="Họ tên")
     vat = fields.Char(string="Số CMND/CCCD", required=True)
@@ -106,23 +99,17 @@ class Contact(models.Model):
 
     @api.model
     def create(self, vals):
-        result = check_cmnd_cccd_code_user(vals['vat'], vals['signup_token'])
-        if result == -2:
-            raise exceptions.UserError("CMND/CCCD ĐÃ TỒN TẠI!")
-        if result == -3:
-            raise exceptions.UserError("MÃ ĐỊNH DANH ĐÃ TỒN TẠI!")
-        if result == 1:  # Thẻ không tồn tại
-            new_record = super(Contact, self).create({'image_1920': vals['image_1920'],
-                                                      'name':  vals['name'],
-                                                      'vat': vals['vat'],
-                                                      'phone': vals['phone'],
-                                                      'signup_token': vals['signup_token'],
-                                                      'display_name': vals['name'],
-                                                      'email': vals['email'],
-                                                      'image_1920_cmnd_cccd_truoc': vals['image_1920_cmnd_cccd_truoc'],
-                                                      'image_1920_cmnd_cccd_sau': vals['image_1920_cmnd_cccd_sau']
-                                                      })
-            return new_record
+        new_record = super(Contact, self).create({'image_1920': vals['image_1920'],
+                                                  'name':  vals['name'],
+                                                  'vat': vals['vat'],
+                                                  'phone': vals['phone'],
+                                                  'signup_token': vals['signup_token'],
+                                                  'display_name': vals['name'],
+                                                  'email': vals['email'],
+                                                  'image_1920_cmnd_cccd_truoc': vals['image_1920_cmnd_cccd_truoc'],
+                                                  'image_1920_cmnd_cccd_sau': vals['image_1920_cmnd_cccd_sau']
+                                                  })
+        return new_record
 
     def write(self, vals):
         # Code before write: 'self' has the old values

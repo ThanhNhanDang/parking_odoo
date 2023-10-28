@@ -53,73 +53,83 @@ export class ButtonFormController extends FormController {
     });
   }
   onClickXeJavascript() {
-    if (!checkWebsocket) {
-      this.showConfirmDialogDownloadPlugin(
-        "THÔNG BÁO",
-        "Vui lòng kiểm tra service [ Window_nsp_service ] có đang chạy hay không, nếu chưa cài đặt service hãy nhấn vào nút [ OK ] bên dưới để cài đặt!"
-      );
-      return;
-    }
-    //Gửi lệnh quét thẻ
-    websocket.send("quet the|false");
+    this.rpcQuery("stock.move.line", "write", [
+      [4],
+      {
+        picking_code: "incoming",
+      },
+    ]).then(function (results) {
+      console.log(results);
+      if (results) return;
+    });
 
-    var self = this;
-    websocket.onmessage = async (e) => {
-      const message = e.data;
-      console.log(message);
-      //Kiểm tra lỗi nếu ký tự đầu là L
-      if (message.charAt(0) === "L") {
-        //In thông báo lỗi ra màn hình
-        self.showAlerDialog("THÔNG BÁO", message);
-        return;
-      }
-      //Cấp thẻ thành công
-      if (message.charAt(0) === "C") {
-        self.state.employee = true;
-        self.showNotification(message, "THÔNG BÁO", "success");
-        return;
-      }
-      //Mã thẻ trả về
-      if (message.charAt(0) === ".") {
-        self
-          .rpcQuery("product.template", "search", [
-            [["default_code", "=", message.split(".")[1]]],
-          ])
-          .then(function (results) {
-            //Nếu không có lỗi thì tìm kiếm xem đã có thẻ hay chưa
-            if (results.length !== 0) {
-              self.showAlerDialog("THÔNG BÁO", "THẺ ĐÃ TỒN TẠI!!");
-              return;
-            }
-            //Nếu không có thẻ thì random mã EPC và password tại hàm createUUID của module Contact.py
-            self
-              .rpcQuery("product.template", "createUUID", [[]])
-              .then(function (results) {
-                //Nếu không random được mã thẻ
-                if (results.charAt(0) === "L") {
-                  self.showAlerDialog("THÔNG BÁO", results);
-                  return;
-                }
-                const messageSend = results;
-                const result = results.split("|");
-                //Nếu random được thì lưu vào cơ sở dữ liệu và ghi mã thẻ và mật khẩu random vào thẻ
-                // results = "ghi the|"+"0" + hex_arr[1:24] +"|"+hex_arr[24:]
-                self
-                  .rpcQuery("product.template", "write", [
-                    [self.model.root.data.id],
-                    {
-                      default_code: result[1],
-                      barcode: result[2],
-                      check_doi_the: true,
-                    },
-                  ])
-                  .then(function (results) {
-                    if (results) websocket.send(messageSend);
-                  });
-              });
-          });
-      }
-    };
+    // if (!checkWebsocket) {
+    //   this.showConfirmDialogDownloadPlugin(
+    //     "THÔNG BÁO",
+    //     "Vui lòng kiểm tra service [ Window_nsp_service ] có đang chạy hay không, nếu chưa cài đặt service hãy nhấn vào nút [ OK ] bên dưới để cài đặt!"
+    //   );
+    //   return;
+    // }
+    // //Gửi lệnh quét thẻ
+    // websocket.send("quet the|false");
+
+    // var self = this;
+    // websocket.onmessage = async (e) => {
+    //   const message = e.data;
+    //   console.log(message);
+    //   //Kiểm tra lỗi nếu ký tự đầu là L
+    //   if (message.charAt(0) === "L") {
+    //     //In thông báo lỗi ra màn hình
+    //     self.showAlerDialog("THÔNG BÁO", message);
+    //     return;
+    //   }
+    //   //Cấp thẻ thành công
+    //   if (message.charAt(0) === "C") {
+    //     self.state.employee = true;
+    //     self.showNotification(message, "THÔNG BÁO", "success");
+    //     return;
+    //   }
+    //   //Mã thẻ trả về
+    //   if (message.charAt(0) === ".") {
+    //     self
+    //       .rpcQuery("product.template", "search", [
+    //         [["default_code", "=", message.split(".")[1]]],
+    //       ])
+    //       .then(function (results) {
+    //         //Nếu không có lỗi thì tìm kiếm xem đã có thẻ hay chưa
+    //         if (results.length !== 0) {
+    //           self.showAlerDialog("THÔNG BÁO", "THẺ ĐÃ TỒN TẠI!!");
+    //           return;
+    //         }
+    //         //Nếu không có thẻ thì random mã EPC và password tại hàm createUUID của module Contact.py
+    //         self
+    //           .rpcQuery("product.template", "createUUID", [[]])
+    //           .then(function (results) {
+    //             //Nếu không random được mã thẻ
+    //             if (results.charAt(0) === "L") {
+    //               self.showAlerDialog("THÔNG BÁO", results);
+    //               return;
+    //             }
+    //             const messageSend = results;
+    //             const result = results.split("|");
+    //             //Nếu random được thì lưu vào cơ sở dữ liệu và ghi mã thẻ và mật khẩu random vào thẻ
+    //             // results = "ghi the|"+"0" + hex_arr[1:24] +"|"+hex_arr[24:]
+    //             self
+    //               .rpcQuery("product.template", "write", [
+    //                 [self.model.root.data.id],
+    //                 {
+    //                   default_code: result[1],
+    //                   barcode: result[2],
+    //                   check_doi_the: true,
+    //                 },
+    //               ])
+    //               .then(function (results) {
+    //                 if (results) websocket.send(messageSend);
+    //               });
+    //           });
+    //       });
+    //   }
+    // };
   }
 
   onClickDKxe() {
@@ -133,6 +143,37 @@ export class ButtonFormController extends FormController {
       context: { default_contact_id: self.model.root.data.id },
       view_type: "form",
       views: [[false, "form"]],
+      view_mode: "list,form",
+      target: "current",
+    });
+  }
+
+  onClickDKxe() {
+    const self = this;
+    const action = self.env.services.action;
+    action.doAction({
+      type: "ir.actions.act_window",
+      name: "ĐĂNG KÝ XE",
+      res_model: "product.template",
+      domain: [],
+      context: { default_contact_id: self.model.root.data.id },
+      view_type: "form",
+      views: [[false, "form"]],
+      view_mode: "list,form",
+      target: "current",
+    });
+  }
+  onDSxe() {
+    const self = this;
+    const action = self.env.services.action;
+    action.doAction({
+      type: "ir.actions.act_window",
+      name: "DANH SÁCH XE ĐANG SỞ HỮU",
+      res_model: "product.template",
+      domain: [["contact_id", "=", self.model.root.data.id]],
+      context: {},
+      view_type: "list",
+      views: [[false, "list"]],
       view_mode: "list,form",
       target: "current",
     });

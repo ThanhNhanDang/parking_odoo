@@ -7,6 +7,7 @@ class Product_product(models.Model):
     barcode = fields.Char(string="Mật khẩu")
     default_code = fields.Char(string="Mã định danh")
     check_doi_the = fields.Boolean(string="Đã đổi thẻ", default=False)
-    activity_summary = fields.Char(string="Hãng xe")
+    activity_summary = fields.Char(string="Hãng xe", store=True)
+
 
     

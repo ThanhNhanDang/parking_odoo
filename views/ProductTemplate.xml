@@ -13,9 +13,7 @@
                 <xpath expr="//tree/field[@name='virtual_available']" position="replace" />
                 <xpath expr="//tree/field[@name='responsible_id']" position="replace" />
                 <xpath expr="//tree/field[@name='priority']" position="replace" />
-                <xpath expr="//tree/field[@name='name']" position="attributes">
-                    <attribute name="string">Biển Số</attribute>
-                </xpath>
+                
                 <xpath expr="//tree/field[@name='name']" position="after">
                     <field name="activity_summary" />
                 </xpath>
@@ -27,6 +25,7 @@
                 </xpath>
                 <xpath expr="//tree/field[@name='contact_id']" position="after">
                     <field name="user_ids" widget='many2many_tags_avatar' />
+                    <field name="tracking" />
                 </xpath>
 
             </field>
@@ -41,8 +40,32 @@
                 <xpath expr="//form" position="attributes">
                     <attribute name="js_class">rfid_button</attribute>
                 </xpath>
-                <xpath expr="//form/sheet/div[@class='oe_title']/label" position="attributes">
-                    <attribute name="string">Biển Số</attribute>
+                <xpath expr="//div[@name='button_box']" position="replace"></xpath>
+                <xpath expr="//widget " position="before">
+                    <div name="button_box">
+                        <button type="object" name="action_view_stock_move_lines"
+                            class="oe_stat_button"
+                            icon="fa-exchange"
+                            modifiers="{&quot;invisible&quot;: [[&quot;type&quot;, &quot;not in&quot;, [&quot;product&quot;, &quot;consu&quot;]]]}">
+                            <div class="o_field_widget o_stat_info mr4">
+                                <span class="o_stat_text">In:</span>
+                                <span class="o_stat_text">Out:</span>
+                            </div>
+                            <div class="o_field_widget o_stat_info">
+                                <span class="o_stat_value">
+                                    <field name="nbr_moves_in"
+                                        modifiers="{&quot;readonly&quot;: true}" />
+                                </span>
+                                <span class="o_stat_value">
+                                    <field name="nbr_moves_out"
+                                        modifiers="{&quot;readonly&quot;: true}" />
+                                </span>
+                            </div>
+                        </button>
+                    </div>
+                </xpath>
+                <xpath expr="//label[@for='name']" position="attributes">
+                    <attribute name="string">Biển số</attribute>
                 </xpath>
                 <xpath expr="//form/sheet/div[@class='oe_title']/h1/div/field[@name='name']"
                     position="attributes">
@@ -67,6 +90,7 @@
                     <group>
                         <group>
                             <field name="user_ids" widget="many2many_tags_avatar"
+                                placeholder="Thêm người dùng"
                                 options="{'no_create':True, 'no_create_edit':True, 'no_open': True}"
                             />
                         </group>
@@ -92,7 +116,6 @@
                         </group>
                     </group>
                 </xpath>
-
             </field>
         </record>
 
@@ -119,6 +142,22 @@
                     <div class="mt-1">
                         <field name='contact_id' widget='many2one_avatar'></field>
                     </div>
+                    <div class="mt-1">
+                        <span class="o_stat_text">In: <b>
+                                <field name="nbr_moves_in"
+                                    modifiers="{&quot;readonly&quot;: true}" />
+                            </b>
+                        </span>
+                    </div>
+                    <div class="mt-1">
+                        <span class="o_stat_text">Out: <b>
+                                <field name="nbr_moves_out"
+                                    modifiers="{&quot;readonly&quot;: true}" />
+                            </b>
+                        </span>
+                    </div>
+
+
                 </xpath>
             </field>
         </record>
