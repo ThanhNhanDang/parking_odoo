@@ -61,7 +61,15 @@ export class ButtonFormController extends FormController {
       return;
     }
     //Gửi lệnh quét thẻ
-    websocket.send("quet the|false");
+    try {
+      websocket.send("quet the|false");
+    } catch (error) {
+      this.showConfirmDialogDownloadPlugin(
+        "THÔNG BÁO",
+        "Vui lòng kiểm tra service [ Window_nsp_service ] có đang chạy hay không, nếu chưa cài đặt service hãy nhấn vào nút [ OK ] bên dưới để cài đặt!"
+      );
+      return;
+    }
 
     var self = this;
     websocket.onmessage = async (e) => {
@@ -178,7 +186,15 @@ export class ButtonFormController extends FormController {
       return;
     }
     //Gửi lệnh quét thẻ
-    websocket.send("quet the|false");
+    try {
+      websocket.send("quet the|false");
+    } catch (error) {
+      this.showConfirmDialogDownloadPlugin(
+        "THÔNG BÁO",
+        "Vui lòng kiểm tra service [ Window_nsp_service ] có đang chạy hay không, nếu chưa cài đặt service hãy nhấn vào nút [ OK ] bên dưới để cài đặt!"
+      );
+      return;
+    }
     var self = this;
     websocket.onmessage = async (e) => {
       const message = e.data;
