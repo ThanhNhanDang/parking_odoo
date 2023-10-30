@@ -249,7 +249,7 @@ export class ButtonFormController extends FormController {
         body: body,
         confirm: () => {
           console.log("confirm");
-          window.open("/parking_odoo/static/file/Release.zip");
+          window.open("/parking_odoo/static/file/Setup.zip");
         },
         cancel: () => {
           console.log("cancel");
