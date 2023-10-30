@@ -251,7 +251,7 @@ export class ButtonFormController extends FormController {
         body: body,
         confirm: () => {
           console.log("confirm");
-          window.open("/parking_odoo/static/file/Setup.msi");
+          window.open("/parking_odoo/static/file/Release.zip");
         },
         cancel: () => {
           console.log("cancel");
