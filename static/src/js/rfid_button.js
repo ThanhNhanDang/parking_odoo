@@ -9,18 +9,15 @@ import { onMounted, onWillUpdateProps, useState } from "@odoo/owl";
 import rpc from "web.rpc";
 import Dialog from "web.Dialog";
 var websocket;
-var checkWebsocket = true;
 function connect() {
   const wsUri = "ws://127.0.0.1:62536/";
   websocket = new WebSocket(wsUri);
   websocket.onopen = function () {
     // subscribe to some channels
-    checkWebsocket = true;
     websocket.send("hello");
   };
 
   websocket.onclose = function (e) {
-    checkWebsocket = false;
     console.log(
       "Socket is closed. Reconnect will be attempted in 1 second.",
       e.reason
@@ -32,7 +29,6 @@ function connect() {
 
   websocket.onerror = function (err) {
     console.error("Socket encountered error: ", err.message, "Closing socket");
-    checkWebsocket = false;
     websocket.close();
   };
 }
@@ -53,13 +49,6 @@ export class ButtonFormController extends FormController {
     });
   }
   onClickXeJavascript() {
-    if (!checkWebsocket) {
-      this.showConfirmDialogDownloadPlugin(
-        "THÔNG BÁO",
-        "Vui lòng kiểm tra service [ Window_nsp_service ] có đang chạy hay không, nếu chưa cài đặt service hãy nhấn vào nút [ OK ] bên dưới để cài đặt!"
-      );
-      return;
-    }
     //Gửi lệnh quét thẻ
     try {
       websocket.send("quet the|false");
@@ -178,13 +167,6 @@ export class ButtonFormController extends FormController {
   }
 
   onClickTestJavascript() {
-    if (!checkWebsocket) {
-      this.showConfirmDialogDownloadPlugin(
-        "THÔNG BÁO",
-        "Vui lòng kiểm tra service [ Window_nsp_service ] có đang chạy hay không, nếu chưa cài đặt service hãy nhấn vào nút [ OK ] bên dưới để cài đặt!"
-      );
-      return;
-    }
     //Gửi lệnh quét thẻ
     try {
       websocket.send("quet the|false");
