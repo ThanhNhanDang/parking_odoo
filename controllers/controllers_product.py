@@ -7,7 +7,6 @@ import logging
 _logger = logging.getLogger(__name__)
 
 
-
 def create_product_move_history(state, product_id, location_id):
     stock_move_history = http.request.env["stock.move.line"].sudo().create(
         {'reference': state,
@@ -123,29 +122,7 @@ class ControllerProduct(http.Controller):
 
             return json
 
-    @http.route('/parking/post/in/move_history', website=False, csrf=False, type='http', methods=['POST'],  auth='public')
-    def post_in_move_history(self, **kw):
-        location_empty = find_location_empty()
-        if not location_empty:
-            return "-1"
-        product_template = http.request.env["product.template"].sudo().search(
-            [('ref', '=', kw['sEPC'])], limit=1)
-
-        if not product_template.location_id:
-            # Cập nhật vị trí trống
-            location_empty.write({'product_id': product_template.id})
-            stock_move_history = http.request.env["stock.move.line"].sudo().create(
-                {
-                    'picking_code': 'incoming',
-                    'product_id': product_template.id,
-                    'contact_id': kw['user_id'],
-                    'location_id': location_empty.id,
-                    'location_dest_id': location_empty.id,
-                    'company_id': 1,
-                })
-
-            return get_all_move_history_by_day(kw['sEPC'])
-        return "-3"  # Da vao roi
+    
 
     @http.route('/parking/post/out/move_history', website=False, csrf=False, type='json', methods=['POST'],  auth='public')
     def post_out_move_history(self, **kw):

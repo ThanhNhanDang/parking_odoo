@@ -9,15 +9,15 @@
             <xpath expr="//field[@name='location_dest_id']" position='replace' />
             <xpath expr="//field[@name='qty_done']" position='replace' />
             <xpath expr="//field[@name='state']" position='replace' />
-            <xpath expr="//field[@name='picking_code']" position='attributes'>
-                <attribute name="widget">badge</attribute>
-                <attribute name="decoration-muted">picking_code == 'incoming'</attribute>
-                <attribute name="decoration-success">picking_code == 'outgoing'</attribute>
-            </xpath>
+            
             <xpath expr="//field[@name='product_id']" position='attributes'>
                 <attribute name="widget">many2one_avatar</attribute>
             </xpath>
             <xpath expr="//field[@name='product_id']" position='after'>
+                <field name="picking_code" widget="badge"
+                decoration-muted="picking_code == 'incoming'"
+                decoration-success="picking_code == 'outgoing'" />
+                <field name="bien_so_realtime" />
                 <field name="contact_id" widget="many2one_avatar" />
             </xpath>
         </field>
@@ -57,6 +57,7 @@
                             <field name="product_id" on_change="1" can_create="true"
                                 can_write="true"
                             />
+                            <field name="bien_so_realtime" />
                         </group>
                         <group>
                             <field name="image_1920_ng" widget="image" />

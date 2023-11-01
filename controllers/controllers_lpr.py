@@ -1,11 +1,10 @@
-from odoo import http,modules
+from odoo import http, modules
 import cv2
 import numpy as np
 import math
 import logging
 import base64
-import os
-cwd = os.getcwd()
+import json
 
 classifications_txt_path = modules.module.get_resource_path(
     'parking_odoo',
@@ -272,13 +271,31 @@ def testImage(img):
                     first_line = first_line + strCurrentChar
                 else:
                     second_line = second_line + strCurrentChar
-           
+
             # roi = cv2.resize(roi, None, fx=0.75, fy=0.75)
             # cv2.imshow(str(n), cv2.cvtColor(roi, cv2.COLOR_BGR2RGB))
 
             # cv2.putText(img, first_line + "-" + second_line ,(topy ,topx),cv2.FONT_HERSHEY_DUPLEX, 2, (0, 255, 255), 2)
-            return first_line + "-" + second_line
+            return first_line+second_line
     # img = cv2.resize(img, None, fx=0.5, fy=0.5)
+
+
+def find_location_empty():
+    # Tìm danh sách vị trí trống trong bãi lấy danh sách tên của bãi
+    locations_empty = http.request.env["stock.location"].sudo().search([
+        ('state', '=', 'empty')])
+    # Tìm danh vị trí trống đầu tiên trong danh sách
+    for location_empty in locations_empty:
+        _logger.info(location_empty)
+        # Có nhiều bãi xe nên tìm bãi xe của mình
+        # Tìm bãi xe trống đầu tiên rồi cập nhật danh sách trống
+        location = location_empty.complete_name.split('/')
+        # Tìm BX của mình và tìm Bãi nào có định dạng là 3 phần tử
+        # BX\A\A1 or BX\B\B2
+
+        if 'BX' in location and len(location) > 2 and location_empty.state == 'empty':
+            return location_empty
+    return []
 
 
 class ControllerLPR(http.Controller):
@@ -290,3 +307,50 @@ class ControllerLPR(http.Controller):
         img = cv2.resize(img, dsize=(1920, 1080))
         result = testImage(img)
         return result
+
+    @http.route('/parking/post/in/move_history', website=False, csrf=False, type='http', methods=['POST'],  auth='public')
+    def post_in_move_history(self, **kw):
+        location_empty = find_location_empty()
+        if not location_empty:
+            return "-1"
+        product_template = http.request.env["product.template"].sudo().search(
+            [('ref', '=', kw['sEPC'])], limit=1)
+
+        if not product_template.location_id:
+            # Cập nhật vị trí trống
+            location_empty.write({'product_id': product_template.id})
+            file = kw['image_sau']
+            img_attachment = file.read()
+            image_1920_camera_sau = base64.b64encode(img_attachment)
+            arr = np.asarray(bytearray(img_attachment), dtype=np.uint8)
+            img = cv2.imdecode(arr, -1)  # 'Load it as it is'
+            img = cv2.resize(img, dsize=(1920, 1080))
+            bien_so_realtime = testImage(img)
+
+            file = kw['image_truoc']
+            img_attachment = file.read()
+            image_1920_camera_truoc = base64.b64encode(img_attachment)
+
+            stock_move_history = http.request.env["stock.move.line"].sudo().create(
+                {
+                    'picking_code': 'incoming',
+                    'product_id': product_template.id,
+                    'contact_id': kw['user_id'],
+                    'location_id': location_empty.id,
+                    'location_dest_id': location_empty.id,
+                    'company_id': 1,
+                    'image_1920_camera_sau': image_1920_camera_sau,
+                    'image_1920_camera_truoc': image_1920_camera_truoc,
+                    'bien_so_realtime': bien_so_realtime
+                })
+            return json.dumps({
+                "bien_so_realtime": bien_so_realtime,
+                "bien_so_dk": product_template.name,
+                "image_1920_ng": stock_move_history.image_1920_ng,
+                "image_1920_xe": stock_move_history.image_1920_xe,
+                "date_vao": stock_move_history.date,
+                "location_name": location_empty.name,
+                "user_name": stock_move_history.contact_id.name,
+                "ma_the": product_template.default_code
+            })
+        return "0"

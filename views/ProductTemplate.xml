@@ -92,11 +92,11 @@
                         </group>
 
                         <group>
-                            <field name="image_1920" widget="capture_image"
+                            <field name="image_1920" widget="image"
                                 on_change="1" />
                         </group>
                         <group>
-                            <field name="image_1920_bien_so" widget="capture_image"
+                            <field name="image_1920_bien_so" widget="image"
                                 on_change="1" />
                         </group>
                         <group>

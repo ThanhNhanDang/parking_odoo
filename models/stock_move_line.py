@@ -30,9 +30,9 @@ class stock_move_line(models.Model):
         help='The stock operation where the packing has been made')
     picking_code = fields.Selection(
         related='picking_id.picking_type_id.code', store=True, readonly=False)
-
+    bien_so_realtime = fields.Char(string="Biển số nhận diện được")
     location_id = fields.Many2one("stock.location", string="Vị trí")
-    product_id = fields.Many2one("product.template", string="Biển số")
+    product_id = fields.Many2one("product.template", string="Biển số đã đăng ký")
     contact_id = fields.Many2one("res.partner", string="Họ tên")
     image_1920_ng = fields.Image(string="ẢNH NGƯỜI Đ/K",
                                  max_width=1920, max_height=1920, related='contact_id.image_1920')
