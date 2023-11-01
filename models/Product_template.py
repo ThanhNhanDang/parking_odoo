@@ -1,5 +1,10 @@
 from odoo import api, fields, models, http, exceptions
 import uuid
+import logging
+from collections import defaultdict
+from dateutil.relativedelta import relativedelta
+
+_logger = logging.getLogger(__name__)
 
 
 def create_product_move_history(state, product_id, location_id, location_dest_id, epc):
@@ -22,7 +27,7 @@ def check_bien_so_xe(bien_so):
 
 
 def check_exist_xe(bien_so, ma_dinh_danh):
-    xe = http.request.env['product.product'].sudo().search(
+    xe = http.request.env['product.template'].sudo().search(
         domain=['|', ('default_code', '=', ma_dinh_danh),
                 ("name", "=", bien_so)],
         limit=1)
@@ -49,13 +54,14 @@ class Product_template(models.Model):
          'BIỂN SỐ ĐÃ TỒN TẠI!!')
     ]
     name = fields.Char(string="Biển số")
-
+    location_id = fields.Many2one(
+        "stock.location", string="Vị trí", compute="_compute_location_id")
     contact_id = fields.Many2one(
         'res.partner', string='Chủ sở hữu', required=True)
     barcode = fields.Char(string="Mật khẩu", readonly=False)
     default_code = fields.Char(string="Mã thẻ")
     user_ids = fields.Many2many(
-        'res.partner', string="Danh sách người dùng")
+        'res.partner', string="D/S người dùng", readonly=False, domain="[('id', '!=',contact_id)]")
     check_doi_the = fields.Boolean(string="Đã đổi thẻ", default=False)
     activity_summary = fields.Char(string="Hãng xe", store=True)
     image_1920 = fields.Image(
@@ -66,11 +72,55 @@ class Product_template(models.Model):
         string="Mặt trước cà vẹt xe", max_width=1920, max_height=1920)
     image_1920_cavet_truoc = fields.Image(
         string="Mặt sau cà vẹt xe", max_width=1920, max_height=1920)
+    nbr_moves_in = fields.Integer(compute='_compute_nbr_moves', compute_sudo=False,
+                                  help="Number of incoming stock moves in the past 12 months")
+    nbr_moves_out = fields.Integer(compute='_compute_nbr_moves', compute_sudo=False,
+                                   help="Number of outgoing stock moves in the past 12 months")
+
+    def _compute_nbr_moves(self):
+        res = defaultdict(lambda: {'moves_in': 0, 'moves_out': 0})
+        incoming_moves = self.env['stock.move.line']._read_group([
+            ('product_id', 'in', self.ids),
+            ('state', '=', 'done'),
+            ('picking_code', '=', 'incoming'),
+            ('date', '>=', fields.Datetime.now() - relativedelta(years=1))
+        ], ['product_id'], ['product_id'])
+        outgoing_moves = self.env['stock.move.line']._read_group([
+            ('product_id', 'in', self.ids),
+            ('state', '=', 'done'),
+            ('picking_code', '=', 'outgoing'),
+            ('date', '>=', fields.Datetime.now() - relativedelta(years=1))
+        ], ['product_id'], ['product_id'])
+        for move in incoming_moves:
+            product = self.env['product.template'].browse(
+                [move['product_id'][0]])
+            product_tmpl_id = product.id
+            res[product_tmpl_id]['moves_in'] += int(move['product_id_count'])
+        for move in outgoing_moves:
+            product = self.env['product.template'].browse(
+                [move['product_id'][0]])
+            product_tmpl_id = product.id
+            res[product_tmpl_id]['moves_out'] += int(move['product_id_count'])
+        for template in self:
+            template.nbr_moves_in = int(res[template.id]['moves_in'])
+            template.nbr_moves_out = int(res[template.id]['moves_out'])
+
+    @api.depends("location_id")
+    def _compute_location_id(self):
+        for record in self:
+            location = record.location_id.search(
+                [('product_id', '=', record.id)])
+            if not location:
+                record.location_id = None
+            else:
+                record.location_id = location.id
 
     @api.model
     def create(self, vals):
         vals["tracking"] = "serial"
         new_record = super(Product_template, self).create(vals)
+        vals['user_ids'] = vals['contact_id']
+
         # result = check_exist_xe(vals['name'], "123")
         # if result == -1:
         #     raise exceptions.UserError("THẺ ĐÃ TỒN TẠI!")

@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <record id="stock_move_line_tree" model="ir.ui.view">
+        <field name="name">stock.move.line.tree</field>
+        <field name="model">stock.move.line</field>
+        <field name="inherit_id" ref="stock.view_move_line_tree" />
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='reference']" position='replace' />
+            <xpath expr="//field[@name='location_dest_id']" position='replace' />
+            <xpath expr="//field[@name='qty_done']" position='replace' />
+            <xpath expr="//field[@name='state']" position='replace' />
+            <xpath expr="//field[@name='picking_code']" position='attributes'>
+                <attribute name="widget">badge</attribute>
+                <attribute name="decoration-muted">picking_code == 'incoming'</attribute>
+                <attribute name="decoration-success">picking_code == 'outgoing'</attribute>
+            </xpath>
+            <xpath expr="//field[@name='product_id']" position='attributes'>
+                <attribute name="widget">many2one_avatar</attribute>
+            </xpath>
+            <xpath expr="//field[@name='product_id']" position='after'>
+                <field name="contact_id" widget="many2one_avatar" />
+            </xpath>
+        </field>
+    </record>
+    <record id="stock_move_line_search" model="ir.ui.view">
+        <field name="name">stock.move.line.search</field>
+        <field name="model">stock.move.line</field>
+        <field name="inherit_id" ref="stock.stock_move_line_view_search" />
+        <field name="arch" type="xml">
+            <xpath expr="//filter[@name='done']" position='replace' />
+        </field>
+    </record>
+    <record id="stock_move_line_form" model="ir.ui.view">
+        <field name="name">stock.move.line.form</field>
+        <field name="model">stock.move.line</field>
+        <field name="inherit_id" ref="stock.view_move_line_form" />
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='state']" position='replace' />
+
+            <xpath expr="//sheet" position='replace' />
+            <xpath expr="//header" position='after'>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="company_id" invisible="1" />
+                            <field name="date" modifiers="{&quot;required&quot;: true}" />
+                            <field name="picking_code" widget="badge"
+                                decoration-muted="picking_code == 'incoming'"
+                                decoration-success="picking_code == 'outgoing'" />
+                            <field name="contact_id" on_change="1"
+                                can_create="true" can_write="true" />
+                        </group>
+                        <group>
+                            <field name="location_id" options="{'no_create': True}"
+                                modifiers="{&quot;required&quot;: true}" can_create="true"
+                                can_write="true" />
+                            <field name="product_id" on_change="1" can_create="true"
+                                can_write="true"
+                            />
+                        </group>
+                        <group>
+                            <field name="image_1920_ng" widget="image" />
+                        </group>
+                        <group>
+                            <field name="image_1920_xe" widget="image" />
+                        </group>
+                        <group>
+                            <field name="image_1920_camera_truoc" widget="image" />
+                        </group>
+                        <group>
+                            <field name="image_1920_camera_sau" widget="image" />
+                        </group>
+                    </group>
+                </sheet>
+            </xpath>
+        </field>
+    </record>
+</odoo>

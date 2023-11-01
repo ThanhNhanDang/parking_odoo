@@ -26,6 +26,8 @@
     'data': [
         "views/Contact.xml",
         "views/ProductTemplate.xml",
+        "views/StockLocation.xml",
+        "views/StockMoveLine.xml",
     ],
     'assets': {
         'web.assets_backend': [

@@ -137,6 +137,10 @@ export class ButtonFormController extends FormController {
 
   onClickDKxe() {
     const self = this;
+    if (self.model.root.data.id == undefined) {
+      this.showAlerDialog("THÔNG BÁO", "CHƯA TẠO THÔNG TIN!!");
+      return;
+    }
     const action = self.env.services.action;
     action.doAction({
       type: "ir.actions.act_window",
@@ -152,15 +156,22 @@ export class ButtonFormController extends FormController {
   }
   onDSxe() {
     const self = this;
+    if (self.model.root.data.id == undefined) {
+      this.showAlerDialog("THÔNG BÁO", "CHƯA TẠO THÔNG TIN!!");
+      return;
+    }
     const action = self.env.services.action;
     action.doAction({
       type: "ir.actions.act_window",
       name: "DANH SÁCH XE ĐANG SỞ HỮU",
       res_model: "product.template",
       domain: [["contact_id", "=", self.model.root.data.id]],
-      context: {},
+      context: { default_contact_id: self.model.root.data.id },
       view_type: "list",
-      views: [[false, "list"]],
+      views: [
+        [false, "list"],
+        [false, "form"],
+      ],
       view_mode: "list,form",
       target: "current",
     });

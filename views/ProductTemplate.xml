@@ -13,21 +13,17 @@
                 <xpath expr="//tree/field[@name='virtual_available']" position="replace" />
                 <xpath expr="//tree/field[@name='responsible_id']" position="replace" />
                 <xpath expr="//tree/field[@name='priority']" position="replace" />
-                
-                <xpath expr="//tree/field[@name='name']" position="after">
-                    <field name="activity_summary" />
+                <xpath expr="//field[@name='name']" position="attributes">
+                    <attribute name="string"></attribute>
                 </xpath>
                 <xpath expr="//tree/field[@name='default_code']" position="after">
                     <field name="barcode" string="Mật khẩu" />
-                </xpath>
-                <xpath expr="//tree/field[@name='barcode']" position="after">
                     <field name="contact_id" widget='many2one_avatar' />
-                </xpath>
-                <xpath expr="//tree/field[@name='contact_id']" position="after">
                     <field name="user_ids" widget='many2many_tags_avatar' />
+                    <field name="activity_summary" />
+                    <field name="location_id" />
                     <field name="tracking" />
                 </xpath>
-
             </field>
         </record>
         <record id="product_template_form_inherit" model="ir.ui.view">
@@ -77,25 +73,22 @@
                 <xpath expr="//form/sheet/notebook" position="attributes">
                     <attribute name="invisible">1</attribute>
                 </xpath>
-
                 <xpath expr="//form/sheet/div[@class='oe_title']" position="after">
-                    <label for="contact_id" string="Chủ sở hữu">
-                    </label>
-                    <field name="contact_id" widget="many2one_avatar"
-                        options="{'no_create':True, 'no_create_edit':True, 'no_open': True}"
-                    />
                     <field name='check_doi_the' invisible='1'></field>
-                </xpath>
-                <xpath expr="//field[@name='contact_id']" position="after">
                     <group>
                         <group>
+                            <field name="contact_id" widget="many2one_avatar"
+                                options="{'no_create':True, 'no_create_edit':True, 'no_open': True}"
+                            />
                             <field name="user_ids" widget="many2many_tags_avatar"
                                 placeholder="Thêm người dùng"
                                 options="{'no_create':True, 'no_create_edit':True, 'no_open': True}"
+                                
                             />
                         </group>
                         <group>
                             <field name='activity_summary' placeholder="e.g. Honda"></field>
+                            <field name='location_id' placeholder="e.g. vị trí" readonly='1'></field>
                         </group>
 
                         <group>

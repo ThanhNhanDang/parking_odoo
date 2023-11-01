@@ -10,9 +10,6 @@ import urllib.request
 
 _logger = logging.getLogger(__name__)
 
-topic = "t4tek/odoo/uid"
-jsonLoad = {"uid": -1, "mes": 0}
-
 
 def on_publish(client, userdata, mid):
     print("sent a message")
@@ -28,6 +25,7 @@ def create_product_move_history(state, product_id, location_id, location_dest_id
             'location_dest_id': location_dest_id,
             'qty_done': 1.0,
             'company_id': 1})
+
 
 def check_epc_user(sEPC):
     user = http.request.env['res.partner'].sudo().search(
@@ -90,6 +88,12 @@ class Contact(models.Model):
     ref = fields.Char(string="Mã thẻ")
     employee = fields.Boolean(string="Cấp thẻ", default=False)
     signup_token = fields.Char(string="Mã định danh", required=True)
+
+    product_ids = fields.One2many("product.template", "contact_id", string="D/S xe",
+                                  readonly=True)
+
+    product_ids_public = fields.Many2many("product.template", relation="product_template_res_partner_rel", column1="res_partner_id", column2="product_template_id", string="D/S xe dùng chung",
+                                          readonly=True)
     image_1920 = fields.Image(string="Ảnh đại diện",
                               max_width=1920, max_height=1920)
     image_1920_cmnd_cccd_truoc = fields.Image(
@@ -126,112 +130,3 @@ class Contact(models.Model):
             return "LỖI: KHÔNG THỂ TẠO UUID LIÊN HỆ NHÀ SẢN XUẤT ĐỂ KHẮC PHỤC!!"
         message = "ghi the|"+"0" + hex_arr[1:24] + "|"+hex_arr[24:]
         return message
-
-    def doi_the(self):
-
-        HOST = http.request.httprequest.environ['REMOTE_ADDR']
-        REMOTE_PORT = http.request.httprequest.environ['REMOTE_PORT']
-        PORT = 62536  # The port used by the server
-        _logger.info(HOST)
-        s = socket.socket()
-        try:
-            s.connect((HOST, PORT))  # lắng nghe ở cổng 12536
-        except:
-            raise exceptions.UserError("CHƯA CÀI ĐẶT PLUGIN!!")
-
-        # Nhập vào tên file
-
-        # Gửi tên file cho server
-        message = "quet the|false"  # quét thẻ người
-        s.send(message.encode())
-
-        # Nhận được dữ liệu từ server gửi tới
-        content = s.recv(1024).decode()
-        if ':' in content:
-            s.close()
-            raise exceptions.UserError(content)
-
-        user = check_epc_user(content)
-        if user:
-            raise exceptions.UserError("LỖI: THẺ ĐÃ TỒN TẠI!!")
-        hex_arr = uuid.uuid4().hex
-        if check_epc_user("0" + hex_arr[1:24]):
-            raise exceptions.UserError(
-                "Không thể tạo được UUID liên hệ nhà phát triển để sử lý")
-
-        message = "ghi the|"+"0" + \
-            hex_arr[1:24] + "|"+hex_arr[24:]  # quét thẻ người
-        s.send(message.encode())
-        content = s.recv(1024).decode()
-        if ':' in content:
-            s.close()
-            raise exceptions.UserError(content)
-        s.close()
-        super(Contact, self).write({
-            'ref': "0" + hex_arr[1:24],
-            'barcode': hex_arr[24:],
-            'employee': True
-        })
-        return {
-            'type': 'ir.actions.client',
-            'tag': 'display_notification',
-            'params': {
-                'message': content,
-                'type': 'success',
-                'sticky': False,
-            }
-        }
-
-        # global jsonLoad
-        # hex_arr = uuid.uuid4().hex
-        # if check_epc_user("0" + hex_arr[1:24]):
-        #     raise exceptions.UserError(
-        #         "Không thể tạo được UUID liên hệ nhà phát triển để sử lý")
-
-        # msg = json.dumps({
-        #     'sEPC': "0" + hex_arr[1:24], 'cmnd_cccd': self.vat, 'password': hex_arr[24:], 'is_car': False
-        # })
-        # info = Contact.mqttClient.publish(
-        #     topic=topic+'/'+str(self.env.uid),
-        #     payload=msg.encode('utf-8'),
-        #     qos=0,
-        # )
-        # # Because published() is not synchronous,
-        # # it returns false while he is not aware of delivery that's why calling wait_for_publish() is mandatory.
-        # info.wait_for_publish()
-        # if (jsonLoad['uid'] == self.env.uid):
-        #     mes = jsonLoad['mes']
-        #     if (mes == 4):
-        #         raise exceptions.UserError("KHÔNG PHÁT HIỆN ĐẦU ĐỌC!")
-        #     elif (mes == 2):
-        #         raise exceptions.UserError("KHÔNG PHÁT HIỆN THẺ!")
-        #     elif (mes == 3):
-        #         self.write({
-        #             "barcode":  hex_arr[24:],
-        #             "ref": "0" + hex_arr[1:24],
-        #             "employee": True
-        #         })
-
-        #         return
-        # while (jsonLoad['uid'] == -1):
-        #     if (jsonLoad['uid'] == self.env.uid):
-        #         mes = jsonLoad['mes']
-        #         if (mes == 4):
-        #             raise exceptions.UserError("KHÔNG PHÁT HIỆN ĐẦU ĐỌC!")
-        #         elif (mes == 2):
-        #             raise exceptions.UserError("KHÔNG PHÁT HIỆN THẺ!")
-        #         elif (mes == 3):
-        #             self.write({
-        #                 "barcode":  hex_arr[24:],
-        #                 "ref": "0" + hex_arr[1:24],
-        #                 "employee": True
-        #             })
-
-        #             return
-        #         break
-
-    def action_new_product(self):
-        self.ensure_one()
-        action = self.env["ir.actions.actions"]._for_xml_id(
-            "stock.product_template_action_product")
-        return action

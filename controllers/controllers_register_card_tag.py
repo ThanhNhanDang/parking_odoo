@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from odoo import http, exceptions
+from odoo import http
 import uuid
 import base64
 import json
@@ -65,7 +65,7 @@ def check_exist_xe(bien_so, ma_dinh_danh):
 
 
 def check_epc_xe(ma_dinh_danh):
-    xe = http.request.env['product.product'].sudo().search(
+    xe = http.request.env['product.template'].sudo().search(
         domain=[('default_code', '=', ma_dinh_danh)],
         limit=1)
     return xe
@@ -215,17 +215,23 @@ class ControllerRegisterCardTag(http.Controller):
 
     @http.route('/parking/car/users/is_match', website=False, csrf=False, type='json', methods=['POST'],  auth='public')
     def car_users(self, **kw):
-        xe = check_epc_xe(kw['ma_dinh_danh_xe'])
+        xe = check_epc_xe(kw['the_xe'])
         if not xe:
             return "XE KHÔNG TỒN TẠI!!"
-        if (xe.contact_id.ref == kw['ma_dinh_danh_ng']):
+        if (xe.contact_id.ref == kw['the_ng']):
             user = xe.contact_id
         else:
             user = contains(xe.user_ids, lambda user: user.ref ==
-                            kw['ma_dinh_danh_ng'])
+                            kw['the_ng'])
         if not user:
             return "BIỂN SỐ ["+xe.name+"] KHÔNG TRÙNG VỚI THẺ NGƯỜI!!"
+        location_id = xe.location_id.id
+        if location_id == False:
+            location_id = -1
         return {
             'password_xe': xe.barcode,
             'password_ng': user.barcode,
+            'location_id': location_id,
+            'bien_so': xe.name,
+            'user_id': user.id
         }

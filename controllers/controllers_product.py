@@ -3,36 +3,55 @@ from odoo import http
 import uuid
 from datetime import date
 import os
+import logging
+_logger = logging.getLogger(__name__)
 
 
-def create_product_move_history(state, product_id, location_id, location_dest_id, epc):
+
+def create_product_move_history(state, product_id, location_id):
     stock_move_history = http.request.env["stock.move.line"].sudo().create(
         {'reference': state,
-            'product_id': product_id,
-            'reserved_uom_qty': 1.0,
-            'lot_name': epc,
-            'location_id': location_id,
-            'location_dest_id': location_dest_id,
-            'qty_done': 1.0,
-            'company_id': 1})
+         'product_id': product_id,
+         'reserved_uom_qty': 1.0,
+         'location_id': location_id,
+         'qty_done': 1.0,
+         'company_id': 1})
 
 
 def find_location_empty():
     # Tìm danh sách vị trí trống trong bãi lấy danh sách tên của bãi
     locations_empty = http.request.env["stock.location"].sudo().search([
         ('state', '=', 'empty')])
-
     # Tìm danh vị trí trống đầu tiên trong danh sách
     for location_empty in locations_empty:
+        _logger.info(location_empty)
         # Có nhiều bãi xe nên tìm bãi xe của mình
         # Tìm bãi xe trống đầu tiên rồi cập nhật danh sách trống
         location = location_empty.complete_name.split('/')
         # Tìm BX của mình và tìm Bãi nào có định dạng là 3 phần tử
         # BX\A\A1 or BX\B\B2
-        if 'BX' in location and len(location) > 2:
 
-            return location_empty.id
-    return -1
+        if 'BX' in location and len(location) > 2 and location_empty.state == 'empty':
+            return location_empty
+    return []
+
+
+def create_product_move_history2():
+    location_empty = find_location_empty()
+
+    if not location_empty:
+        return
+    location_empty.write({'product_id': 1})
+    stock_move_history = http.request.env["stock.move.line"].sudo().create(
+        {
+            'picking_code': 'incoming',
+            'product_id': 1,
+            'contact_id': 8,
+            'location_id': location_empty.id,
+            'location_dest_id': location_empty.id,
+            'company_id': 1,
+        })
+    return stock_move_history
 
 
 def get_all_move_history_by_day(epc):
@@ -90,8 +109,8 @@ class ControllerProduct(http.Controller):
 
     @http.route('/parking/post/check_xe', website=False, csrf=False, type='json', methods=['POST'], auth='public')
     def parking_check_xe(self, **kw):
-        serial_ids = http.request.env["stock.lot"].sudo().search(
-            [('name2', '=', kw['sEPC'])])
+        serial_ids = http.request.env["product.template"].sudo().search(
+            [('ref', '=', kw['sEPC'])], limit=1)
         if not serial_ids:
             return "none"
         else:
@@ -100,35 +119,31 @@ class ControllerProduct(http.Controller):
                 'password_ng': serial_ids.product_id.password,
                 'epc_ng': serial_ids.product_id.ma_dinh_danh,
                 'epc_xe': serial_ids.name,
-                'epc_first': serial_ids.name2,
             }
 
             return json
 
-    @http.route('/parking/post/in/move_history', website=False, csrf=False, type='json', methods=['POST'],  auth='public')
+    @http.route('/parking/post/in/move_history', website=False, csrf=False, type='http', methods=['POST'],  auth='public')
     def post_in_move_history(self, **kw):
-        location_empty_id = find_location_empty()
-        if location_empty_id == -1:
+        location_empty = find_location_empty()
+        if not location_empty:
             return "-1"
-        # lấy danh sách ID của thẻ trong kho move history
-        product_move_list = http.request.env["stock.move.line"].sudo().search(
-            [('lot_name', '=', kw['sEPC'])])
-        serial_ids = http.request.env["stock.lot"].sudo().search(
-            [('name', '=', kw['sEPC'])])
+        product_template = http.request.env["product.template"].sudo().search(
+            [('ref', '=', kw['sEPC'])], limit=1)
 
-        # tìm ID lớn nhất (thời gian đi vào gần nhất)
-        max_object = max(product_move_list, key=lambda x: x['id'])
-        # lấy thông tin của ID lớn nhất
-        # kiểm tra ra hay vào nếu ra thì thêm vào và ngược lại
+        if not product_template.location_id:
+            # Cập nhật vị trí trống
+            location_empty.write({'product_id': product_template.id})
+            stock_move_history = http.request.env["stock.move.line"].sudo().create(
+                {
+                    'picking_code': 'incoming',
+                    'product_id': product_template.id,
+                    'contact_id': kw['user_id'],
+                    'location_id': location_empty.id,
+                    'location_dest_id': location_empty.id,
+                    'company_id': 1,
+                })
 
-        if 'OUT' in max_object.reference:
-            update_stock_lot(kw['sEPC'], "BX/IN", location_empty_id)
-
-            # Cập nhật vị trí đã đầy
-            update_location(
-                'full', location_empty_id, serial_ids.product_id.id, serial_ids.id)
-            create_product_move_history(
-                "BX/IN", max_object.product_id.id, 4, location_empty_id, kw['sEPC'])
             return get_all_move_history_by_day(kw['sEPC'])
         return "-3"  # Da vao roi
 
@@ -197,17 +212,6 @@ class ControllerProduct(http.Controller):
             order="id desc")
         return stock_location
 
-    @http.route('/web/binary/download_file', type='http', auth='public')
-    def download_file(self, filename):
-        file_path = os.path.join('/parking_odoo/static/file', filename)
-        if os.path.exists(file_path):
-            with open(file_path, 'rb') as file:
-                file_data = file.read()
-            headers = [
-                ('Content-Disposition', 'attachment; filename=%s' % filename),
-                ('Content-Type', 'application/octet-stream'),
-                ('Content-Length', len(file_data))
-            ]
-            return http.request.make_response(file_data, headers=headers)
-        else:
-            return 'File not found'
+    @http.route('/web/test', website=False, type='json', auth='public', methods=['POST'])
+    def download_file(self, **kw):
+        create_product_move_history2()
