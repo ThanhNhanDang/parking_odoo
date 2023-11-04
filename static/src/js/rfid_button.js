@@ -9,6 +9,7 @@ import { onMounted, onWillUpdateProps, useState } from "@odoo/owl";
 import rpc from "web.rpc";
 import Dialog from "web.Dialog";
 var websocket;
+var result_split;
 function connect() {
   const wsUri = "ws://127.0.0.1:62536/";
   websocket = new WebSocket(wsUri);
@@ -18,24 +19,19 @@ function connect() {
   };
 
   websocket.onclose = function (e) {
-    console.log(
-      "Socket is closed. Reconnect will be attempted in 1 second.",
-      e.reason
-    );
+    document.getElementById("rfid_btn").disabled = false;
     setTimeout(function () {
       connect();
     }, 1000);
   };
 
   websocket.onerror = function (err) {
-    console.error("Socket encountered error: ", err.message, "Closing socket");
     websocket.close();
+    document.getElementById("rfid_btn").disabled = false;
   };
 }
 
 connect();
-console.log("load");
-
 // confirm_callback: function () {
 //
 // },
@@ -47,76 +43,6 @@ export class ButtonFormController extends FormController {
       ...this.state,
       employee: false,
     });
-  }
-  onClickXeJavascript() {
-    //Gửi lệnh quét thẻ
-    try {
-      websocket.send("quet the|false");
-    } catch (error) {
-      this.showConfirmDialogDownloadPlugin(
-        "THÔNG BÁO",
-        "Vui lòng kiểm tra service [ Window_nsp_service ] có đang chạy hay không, nếu chưa cài đặt service hãy nhấn vào nút [ OK ] bên dưới để cài đặt!"
-      );
-      return;
-    }
-
-    var self = this;
-    websocket.onmessage = async (e) => {
-      const message = e.data;
-      console.log(message);
-      //Kiểm tra lỗi nếu ký tự đầu là L
-      if (message.charAt(0) === "L") {
-        //In thông báo lỗi ra màn hình
-        self.showAlerDialog("THÔNG BÁO", message);
-        return;
-      }
-      //Cấp thẻ thành công
-      if (message.charAt(0) === "C") {
-        self.state.employee = true;
-        self.showNotification(message, "THÔNG BÁO", "success");
-        return;
-      }
-      //Mã thẻ trả về
-      if (message.charAt(0) === ".") {
-        self
-          .rpcQuery("product.template", "search", [
-            [["default_code", "=", message.split(".")[1]]],
-          ])
-          .then(function (results) {
-            //Nếu không có lỗi thì tìm kiếm xem đã có thẻ hay chưa
-            if (results.length !== 0) {
-              self.showAlerDialog("THÔNG BÁO", "THẺ ĐÃ TỒN TẠI!!");
-              return;
-            }
-            //Nếu không có thẻ thì random mã EPC và password tại hàm createUUID của module Contact.py
-            self
-              .rpcQuery("product.template", "createUUID", [[]])
-              .then(function (results) {
-                //Nếu không random được mã thẻ
-                if (results.charAt(0) === "L") {
-                  self.showAlerDialog("THÔNG BÁO", results);
-                  return;
-                }
-                const messageSend = results;
-                const result = results.split("|");
-                //Nếu random được thì lưu vào cơ sở dữ liệu và ghi mã thẻ và mật khẩu random vào thẻ
-                // results = "ghi the|"+"0" + hex_arr[1:24] +"|"+hex_arr[24:]
-                self
-                  .rpcQuery("product.template", "write", [
-                    [self.model.root.data.id],
-                    {
-                      default_code: result[1],
-                      barcode: result[2],
-                      check_doi_the: true,
-                    },
-                  ])
-                  .then(function (results) {
-                    if (results) websocket.send(messageSend);
-                  });
-              });
-          });
-      }
-    };
   }
 
   onClickDKxe() {
@@ -177,7 +103,8 @@ export class ButtonFormController extends FormController {
     });
   }
 
-  onClickTestJavascript() {
+  rfidHandler(model, field_search) {
+    document.getElementById("rfid_btn").disabled = true;
     //Gửi lệnh quét thẻ
     try {
       websocket.send("quet the|false");
@@ -191,7 +118,6 @@ export class ButtonFormController extends FormController {
     var self = this;
     websocket.onmessage = async (e) => {
       const message = e.data;
-      console.log(message);
       //Kiểm tra lỗi nếu ký tự đầu là L
       if (message.charAt(0) === "L") {
         //In thông báo lỗi ra màn hình
@@ -204,11 +130,44 @@ export class ButtonFormController extends FormController {
         self.showNotification(message, "THÔNG BÁO", "success");
         return;
       }
+      if (message === "1") {
+        // Lưu vào database và ghi mật khẩu sau khi kiểm tra xem mã thẻ đã thực sự ghi chưa
+        var vals;
+        if (field_search === "ref") {
+          vals = {
+            ref: result_split[1],
+            barcode: result_split[2],
+            employee: true,
+          };
+        } else
+          vals = {
+            default_code: result_split[1],
+            barcode: result_split[2],
+            check_doi_the: true,
+          };
+        self
+          .rpcQuery(model, "search", [[[field_search, "=", result_split[1]]]])
+          .then(function (results) {
+            if (results.length !== 0) {
+              self.showAlerDialog("THÔNG BÁO", "THẺ ĐÃ TỒN TẠI!!");
+              websocket.send("ghi pass|" + result_split[2] + "|false");
+              return;
+            }
+            self
+              .rpcQuery(model, "write", [[self.model.root.data.id], vals])
+              .then(function (results) {
+                if (results)
+                  websocket.send(
+                    "ghi pass|" + result_split[2] + "|" + results.toString()
+                  );
+              });
+          });
+      }
       //Mã thẻ trả về
       if (message.charAt(0) === ".") {
         self
-          .rpcQuery("res.partner", "search", [
-            [["ref", "=", message.split(".")[1]]],
+          .rpcQuery(model, "search", [
+            [[field_search, "=", message.split(".")[1]]],
           ])
           .then(function (results) {
             //Nếu không có lỗi thì tìm kiếm xem đã có thẻ hay chưa
@@ -217,30 +176,28 @@ export class ButtonFormController extends FormController {
               return;
             }
             //Nếu không có thẻ thì random mã EPC và password tại hàm createUUID của module Contact.py
-            self
-              .rpcQuery("res.partner", "createUUID", [[]])
-              .then(function (results) {
-                //Nếu không random được mã thẻ
-                if (results.charAt(0) === "L") {
-                  self.showAlerDialog("THÔNG BÁO", results);
-                  return;
-                }
-                const messageSend = results;
-                const result = results.split("|");
-                //Nếu random được thì lưu vào cơ sở dữ liệu và ghi mã thẻ và mật khẩu random vào thẻ
-                // results = "ghi the|"+"0" + hex_arr[1:24] +"|"+hex_arr[24:]
-                self
-                  .rpcQuery("res.partner", "write", [
-                    [self.model.root.data.id],
-                    { ref: result[1], barcode: result[2], employee: true },
-                  ])
-                  .then(function (results) {
-                    if (results) websocket.send(messageSend);
-                  });
-              });
+            self.rpcQuery(model, "createUUID", [[]]).then(function (results) {
+              //Nếu không random được mã thẻ
+              if (results.charAt(0) === "L") {
+                self.showAlerDialog("THÔNG BÁO", results);
+                return;
+              }
+              const messageSend = results;
+              result_split = results.split("|");
+              //Nếu random được thì lưu vào cơ sở dữ liệu và ghi mã thẻ random vào thẻ
+              // results = "ghi epc|"+"0" + hex_arr[1:24] +"|"+hex_arr[24:]
+              websocket.send(messageSend);
+            });
           });
       }
     };
+  }
+
+  onClickTestJavascript() {
+    this.rfidHandler("res.partner", "ref");
+  }
+  onClickXeJavascript() {
+    this.rfidHandler("product.template", "default_code");
   }
 
   showAlerDialog(title, content) {
@@ -248,6 +205,7 @@ export class ButtonFormController extends FormController {
       title: title,
       $content: $("<div/>").html(content),
     });
+    document.getElementById("rfid_btn").disabled = false;
   }
 
   showConfirmDialogDownloadPlugin(title, body) {
@@ -272,6 +230,7 @@ export class ButtonFormController extends FormController {
         },
       }
     );
+    document.getElementById("rfid_btn").disabled = false;
   }
 
   showNotification(content, title, type) {
@@ -281,6 +240,7 @@ export class ButtonFormController extends FormController {
       type: type,
       className: "p-4",
     });
+    document.getElementById("rfid_btn").disabled = false;
   }
   //args: [this.model.root.data.id, { ref: "12122", employee: true }]
   rpcQuery(model, method, args) {

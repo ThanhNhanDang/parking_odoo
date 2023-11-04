@@ -39,13 +39,6 @@ def check_exist_xe(bien_so, ma_dinh_danh):
         return -2
 
 
-def check_epc_xe(ma_dinh_danh):
-    xe = http.request.env['product.template'].sudo().search(
-        domain=[('default_code', '=', ma_dinh_danh)],
-        limit=1)
-    return xe
-
-
 class Product_template(models.Model):
     _inherit = 'product.template'
     _sql_constraints = [
@@ -76,18 +69,31 @@ class Product_template(models.Model):
                                   help="Number of incoming stock moves in the past 12 months")
     nbr_moves_out = fields.Integer(compute='_compute_nbr_moves', compute_sudo=False,
                                    help="Number of outgoing stock moves in the past 12 months")
+    date_in = fields.Date(string="T/G VÀO bãi gần nhất")
+    date_out = fields.Date(string="T/G RA bãi gần nhất")
+
+    def name_get(self):
+        # Prefetch the fields used by the `name_get`, so `browse` doesn't fetch other fields
+        self.browse(self.ids).read(['name', 'default_code'])
+        return [(template.id, '%s' % (template.name))
+                for template in self]
+
+    def action_view_stock_move_lines(self):
+        self.ensure_one()
+        action = self.env["ir.actions.actions"]._for_xml_id(
+            "stock.stock_move_line_action")
+        action['domain'] = [('product_id.id', 'in', self.ids)]
+        return action
 
     def _compute_nbr_moves(self):
         res = defaultdict(lambda: {'moves_in': 0, 'moves_out': 0})
         incoming_moves = self.env['stock.move.line']._read_group([
             ('product_id', 'in', self.ids),
-            ('state', '=', 'done'),
             ('picking_code', '=', 'incoming'),
             ('date', '>=', fields.Datetime.now() - relativedelta(years=1))
         ], ['product_id'], ['product_id'])
         outgoing_moves = self.env['stock.move.line']._read_group([
             ('product_id', 'in', self.ids),
-            ('state', '=', 'done'),
             ('picking_code', '=', 'outgoing'),
             ('date', '>=', fields.Datetime.now() - relativedelta(years=1))
         ], ['product_id'], ['product_id'])
@@ -147,9 +153,16 @@ class Product_template(models.Model):
         #     "BX/OUT", new_record.product_variant_id.id, 4, 5, "123")
         return new_record
 
+    def write(self, vals):
+        result = super(Product_template, self).write(vals)
+        return result
+
     def createUUID(self):
         hex_arr = uuid.uuid4().hex
-        if check_epc_xe("1" + hex_arr[1:24]):
-            return "LỖI: KHÔNG THỂ TẠO UUID LIÊN HỆ NHÀ SẢN XUẤT ĐỂ KHẮC PHỤC!!"
-        message = "ghi the|"+"1" + hex_arr[1:24] + "|"+hex_arr[24:]
+        check_epc_xe = self.search(
+            domain=[('default_code', '=', "1" + hex_arr[1:24])],
+            limit=1)
+        if check_epc_xe:
+            return "LỖI: KHÔNG THỂ TẠO UUID DO BỊ ĐÃ TỒN TẠI [1" + hex_arr[1:24]+"]!!"
+        message = "ghi epc|"+"1" + hex_arr[1:24] + "|"+hex_arr[24:]
         return message

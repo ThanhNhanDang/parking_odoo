@@ -1,11 +1,11 @@
 from odoo import http, modules
+import pytz
 import cv2
 import numpy as np
 import math
 import logging
 import base64
 import json
-
 classifications_txt_path = modules.module.get_resource_path(
     'parking_odoo',
     'static/file',
@@ -286,7 +286,7 @@ def find_location_empty():
         ('state', '=', 'empty')])
     # Tìm danh vị trí trống đầu tiên trong danh sách
     for location_empty in locations_empty:
-        _logger.info(location_empty)
+      
         # Có nhiều bãi xe nên tìm bãi xe của mình
         # Tìm bãi xe trống đầu tiên rồi cập nhật danh sách trống
         location = location_empty.complete_name.split('/')
@@ -297,8 +297,18 @@ def find_location_empty():
             return location_empty
     return []
 
+def changeDate(date_in):
+    user_tz = pytz.timezone(http.request.env.context.get('tz') or http.request.env.user.tz or pytz.utc)
+    # Convert the date to a Python `datetime` object
+    python_date = date_in.strptime(
+        str(date_in), "%Y-%m-%d %H:%M:%S")
+    timezone = pytz.utc.localize(python_date).astimezone(user_tz)
+    # if (timezone.date() == today):
+    display_date_result = timezone.strftime("%H:%M:%S %d/%m/%Y")
+    return display_date_result
 
-class ControllerLPR(http.Controller):
+
+class ControllerHistoryLPR(http.Controller):
     @http.route('/parking/lpr/detection', website=False, csrf=False, type='http',  auth='public', methods=['POST'])
     def product_save(self, **kw):
         file = kw['image']
@@ -314,8 +324,7 @@ class ControllerLPR(http.Controller):
         if not location_empty:
             return "-1"
         product_template = http.request.env["product.template"].sudo().search(
-            [('ref', '=', kw['sEPC'])], limit=1)
-
+            [('default_code', '=', kw['sEPC'])], limit=1)
         if not product_template.location_id:
             # Cập nhật vị trí trống
             location_empty.write({'product_id': product_template.id})
@@ -326,11 +335,14 @@ class ControllerLPR(http.Controller):
             img = cv2.imdecode(arr, -1)  # 'Load it as it is'
             img = cv2.resize(img, dsize=(1920, 1080))
             bien_so_realtime = testImage(img)
-
             file = kw['image_truoc']
             img_attachment = file.read()
             image_1920_camera_truoc = base64.b64encode(img_attachment)
-
+            user = http.request.env['res.partner'].sudo().search(
+                domain=[('id', '=', kw['user_id'])],
+                limit=1)
+            if not user:
+                return "0"
             stock_move_history = http.request.env["stock.move.line"].sudo().create(
                 {
                     'picking_code': 'incoming',
@@ -343,14 +355,73 @@ class ControllerLPR(http.Controller):
                     'image_1920_camera_truoc': image_1920_camera_truoc,
                     'bien_so_realtime': bien_so_realtime
                 })
+            product_template.write({'date_in': stock_move_history.date})
+            display_date_result = changeDate(stock_move_history.date)
             return json.dumps({
                 "bien_so_realtime": bien_so_realtime,
                 "bien_so_dk": product_template.name,
-                "image_1920_ng": stock_move_history.image_1920_ng,
-                "image_1920_xe": stock_move_history.image_1920_xe,
-                "date_vao": stock_move_history.date,
+                "image_1920_ng": str(stock_move_history.image_1920_ng),
+                "image_1920_xe": str(stock_move_history.image_1920_xe),
+                "date_vao": display_date_result,
                 "location_name": location_empty.name,
-                "user_name": stock_move_history.contact_id.name,
-                "ma_the": product_template.default_code
-            })
+                "user_name": user.name,
+                "ma_the": product_template.default_code,
+                "user_id": user.id,
+                "history_id": stock_move_history.id,
+            }, ensure_ascii=False)
+        return "0"
+
+    @http.route('/parking/post/out/move_history', website=False, csrf=False, type='http', methods=['POST'],  auth='public')
+    def post_out_move_history(self, **kw):
+        product_template = http.request.env["product.template"].sudo().search(
+            [('default_code', '=', kw['sEPC'])], limit=1)
+        # Nếu xe có vị trí tức là nó đã vào, giờ xử lý quy trình ra bãi
+        if product_template.location_id:
+            file = kw['image_sau']
+            img_attachment = file.read()
+            image_1920_camera_sau = base64.b64encode(img_attachment)
+            arr = np.asarray(bytearray(img_attachment), dtype=np.uint8)
+            img = cv2.imdecode(arr, -1)  # 'Load it as it is'
+            img = cv2.resize(img, dsize=(1920, 1080))
+            bien_so_realtime = testImage(img)
+
+            file = kw['image_truoc']
+            img_attachment = file.read()
+            image_1920_camera_truoc = base64.b64encode(img_attachment)
+            user = http.request.env['res.partner'].sudo().search(
+                domain=[('id', '=', kw['user_id'])],
+                limit=1)
+            if not user:
+                return 0
+            stock_move_history = http.request.env["stock.move.line"].sudo().create(
+                {
+                    'picking_code': 'outgoing',
+                    'product_id': product_template.id,
+                    'contact_id': kw['user_id'],
+                    'location_id': location_empty.id,
+                    'location_dest_id': location_empty.id,
+                    'company_id': 1,
+                    'image_1920_camera_sau': image_1920_camera_sau,
+                    'image_1920_camera_truoc': image_1920_camera_truoc,
+                    'bien_so_realtime': bien_so_realtime
+                })
+            ## Cập nhật thời gian ra bãi
+            product_template.write({'date_out': stock_move_history.date})
+            ## Cập nhật thời gian vào bãi cho lịch sử di chuyển
+            stock_move_history.write({'date_in': product_template.date_in})
+            display_date_result = changeDate(stock_move_history.date)
+            display_date_result2 = changeDate(stock_move_history.date_in)
+            return json.dumps({
+                "bien_so_realtime": bien_so_realtime,
+                "bien_so_dk": product_template.name,
+                "image_1920_ng": str(stock_move_history.image_1920_ng),
+                "image_1920_xe": str(stock_move_history.image_1920_xe),
+                "date_vao": display_date_result2, 
+                "date_ra": display_date_result,
+                "location_name": location_empty.name,
+                "user_name": user.name,
+                "ma_the": product_template.default_code,
+                "user_id": user.id,
+                "history_id": stock_move_history.id,
+            }, ensure_ascii=False)
         return "0"

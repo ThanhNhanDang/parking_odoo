@@ -10,19 +10,18 @@
                 <button class="btn btn-info ms-1" type="button" t-on-click="onDSxe">
                     <i class="fa fa-list" /> D/S XE
                 </button>
-                <button class="btn btn-primary ms-1" type="button" t-if="model.root.data.employee or state.employee" t-on-click="onClickTestJavascript">
+                <button class="btn btn-primary ms-1" id="rfid_btn" type="button" t-if="model.root.data.employee or state.employee" t-on-click="onClickTestJavascript">
                     <i class="fa fa-credit-card-alt" /> ĐỔI THẺ
                 </button>
-                <button class="btn btn-primary ms-1" t-if="!model.root.data.employee and !state.employee" type="button" t-on-click="onClickTestJavascript">
+                <button class="btn btn-info ms-1" id="rfid_btn" t-if="!model.root.data.employee and !state.employee" type="button" t-on-click="onClickTestJavascript">
                     <i class="fa fa-credit-card-alt" /> CẤP THẺ
                 </button>
             </div>
-
             <div t-if="props.resModel == 'product.template'">
-                <button class="btn btn-info" t-if="!model.root.data.check_doi_the and !state.employee" type="button" t-on-click="onClickXeJavascript">
+                <button class="btn btn-info" id="rfid_btn" t-if="!model.root.data.check_doi_the and !state.employee" type="button" t-on-click="onClickXeJavascript">
                     <i class="fa fa-credit-card-alt" /> CẤP THẺ
                 </button>
-                <button class="btn btn-primary" type="button" t-if="model.root.data.check_doi_the or state.employee" t-on-click="onClickXeJavascript">
+                <button class="btn btn-primary" id="rfid_btn" type="button" t-if="model.root.data.check_doi_the or state.employee" t-on-click="onClickXeJavascript">
                     <i class="fa fa-credit-card-alt" /> ĐỔI THẺ
                 </button>
             </div>

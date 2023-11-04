@@ -27,13 +27,6 @@ def create_product_move_history(state, product_id, location_id, location_dest_id
             'company_id': 1})
 
 
-def check_epc_user(sEPC):
-    user = http.request.env['res.partner'].sudo().search(
-        domain=[('ref', '=', sEPC)],
-        limit=1)
-    return user
-
-
 def check_cmnd_cccd_code_user(cmnd_cccd, signup_token):
     product = http.request.env['res.partner'].sudo().search(
         domain=["|", ('vat', '=', cmnd_cccd),
@@ -103,22 +96,11 @@ class Contact(models.Model):
 
     @api.model
     def create(self, vals):
-        new_record = super(Contact, self).create({'image_1920': vals['image_1920'],
-                                                  'name':  vals['name'],
-                                                  'vat': vals['vat'],
-                                                  'phone': vals['phone'],
-                                                  'signup_token': vals['signup_token'],
-                                                  'display_name': vals['name'],
-                                                  'email': vals['email'],
-                                                  'image_1920_cmnd_cccd_truoc': vals['image_1920_cmnd_cccd_truoc'],
-                                                  'image_1920_cmnd_cccd_sau': vals['image_1920_cmnd_cccd_sau']
-                                                  })
+        new_record = super(Contact, self).create(vals)
         return new_record
 
     def write(self, vals):
         # Code before write: 'self' has the old values
-        _logger.info('Write a %s', self._name)
-        _logger.info(vals)
         record = super(Contact, self).write(vals)
         # Code after write: can use 'self' with the updated
         # values
@@ -126,7 +108,10 @@ class Contact(models.Model):
 
     def createUUID(self):
         hex_arr = uuid.uuid4().hex
-        if check_epc_user("0" + hex_arr[1:24]):
-            return "LỖI: KHÔNG THỂ TẠO UUID LIÊN HỆ NHÀ SẢN XUẤT ĐỂ KHẮC PHỤC!!"
-        message = "ghi the|"+"0" + hex_arr[1:24] + "|"+hex_arr[24:]
+        check_epc_user = self.search(
+            domain=[('ref', '=', "0" + hex_arr[1:24])],
+            limit=1)
+        if check_epc_user:
+            return "LỖI: KHÔNG THỂ TẠO UUID DO BỊ ĐÃ TỒN TẠI [0" + hex_arr[1:24]+"]!!"
+        message = "ghi epc|"+"0" + hex_arr[1:24] + "|"+hex_arr[24:]
         return message

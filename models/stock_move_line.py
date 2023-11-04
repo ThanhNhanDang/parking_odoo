@@ -42,14 +42,11 @@ class stock_move_line(models.Model):
                                            max_width=1920, max_height=1920)
     image_1920_camera_sau = fields.Image(string="ẢNH CAMRERA SAU",
                                          max_width=1920, max_height=1920)
+    date_in = fields.Date(string="Thời gian xe vào")
 
     def create(self, vals):
-        _logger.info(vals)
         new_record = super(stock_move_line, self).create(vals)
-        _logger.info(new_record)
-
         return new_record
-
 
 class state_picking_type(models.Model):
     _inherit = 'stock.picking.type'

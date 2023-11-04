@@ -1,6 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <odoo>
     <data>
+        <record id="hide_contact_kanban" model="ir.ui.view">
+            <field name="name">res.partner_kanban</field>
+            <field name="model">res.partner</field>
+            <field name="inherit_id" ref="base.res_partner_kanban_view" />
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='activity_ids']" position="replace"></xpath>
+            </field>
+        </record>
         <record id="contacts.action_contacts" model="ir.actions.act_window">
             <field name="context">{'default_is_company': False}</field>
         </record>
@@ -139,9 +147,7 @@
                     <field name='product_ids_public' widget="many2many_tags_avatar" />
                     <field name='employee' />
                 </xpath>
-
             </field>
         </record>
-
     </data>
 </odoo>
