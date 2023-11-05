@@ -1,19 +1,13 @@
 import logging
-from odoo import api, fields, models, http, exceptions
+from odoo import api, fields, models, http
 import uuid
-import time
 import json
-import os
-from websockets.sync.client import connect
-import urllib.request
-
 
 _logger = logging.getLogger(__name__)
 
 
 def on_publish(client, userdata, mid):
     print("sent a message")
-
 
 def create_product_move_history(state, product_id, location_id, location_dest_id, epc):
     stock_move_history = http.request.env["stock.move.line"].sudo().create(

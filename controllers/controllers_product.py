@@ -18,7 +18,6 @@ def create_product_move_history(state, product_id, location_id):
          'qty_done': 1.0,
          'company_id': 1})
 
-
 def update_stock_lot(sEPC, state, location_dest_id):
     serial_ids = http.request.env["stock.lot"].sudo().search(
         [('name', '=', sEPC)])
@@ -31,7 +30,6 @@ def update_location(state, location_dest_id, product_id, product_lot_id):
         ('id', '=', location_dest_id)])
     locations_empty.write(
         {'state': state, 'product_id_name': product_id, 'lot_name': product_lot_id})
-
 
 def check_exist_xe(bien_so, ma_the):
     xe = http.request.env['product.template'].sudo().search(
@@ -59,7 +57,6 @@ def contains(list, filter):
             return x
     return None
     # do stuff
-
 
 def changeDate(date_in):
     user_tz = pytz.timezone(http.request.env.context.get(
