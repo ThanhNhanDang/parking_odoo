@@ -127,7 +127,7 @@ export class ImageCapture extends Component {
    
    
     var context = canvas.getContext("2d");
-
+    context.scale(2, 2) // Doubles size of anything draw to canvas.
     save_image.classList.remove("d-none");
 
     context.drawImage(player, 0, 0, 420, 340);
