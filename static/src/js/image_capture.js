@@ -127,7 +127,6 @@ export class ImageCapture extends Component {
     var image = document.getElementById("image" + this.props.name);
     var context = canvas.getContext("2d");
     save_image.classList.remove("d-none");
-    var dimensions = player.getVideoPlaybackDimensions();
     context.drawImage(
       player,
       0,
