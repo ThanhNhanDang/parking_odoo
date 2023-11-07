@@ -125,12 +125,10 @@ export class ImageCapture extends Component {
     var player = document.getElementById("player"+this.props.name);
     var save_image = document.getElementById("save_image"+this.props.name);
     var image = document.getElementById("image"+this.props.name);
-    var newWidth = player.width;
-    var newHeight = player.height;
     var context = canvas.getContext("2d");
     save_image.classList.remove("d-none");
-    ctx.scale(1, 1);
-    context.drawImage(player, 0, 0, 420, 420);
+    context.drawImage(player, 0, 0, player.width,    player.height,     // source rectangle
+                   0, 0, canvas.width, canvas.height); // destination rectangle
     canvas.classList.remove("d-none");
     image.value = context.canvas.toDataURL();
     this.url = context.canvas.toDataURL();
