@@ -52,7 +52,7 @@
                     <dialog t-attf-id="dialog#{props.name}">
                         <button autofocus="true" t-on-click="closeDialog" class="btn btn-primary">Close</button>
                         <video
-                          autoplay="true" class="d-none"  t-attf-id="player#{props.name}" style="width:420px;height:auto;padding: 20px;"/>
+                          autoplay="true" class="d-none" height="340"  width="420" t-attf-id="player#{props.name}" style="padding: 20px;"/>
                         <button class="btn btn-primary"
                                      t-on-click="OnClickCaptureImage"
                                      data-tooltip="Capture"

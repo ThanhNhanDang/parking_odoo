@@ -12,7 +12,9 @@ import { standardFieldProps } from "@web/views/fields/standard_field_props";
 
 import { Component, useState, onWillUpdateProps } from "@odoo/owl";
 const { DateTime } = luxon;
-
+// Lấy đối tượng camera
+const mediaDevices = navigator.mediaDevices;
+var camera;
 export const fileTypeMagicWordMap = {
   "/": "jpg",
   R: "gif",
@@ -62,7 +64,6 @@ export class ImageCapture extends Component {
   get hasTooltip() {
     return this.props.enableZoom && this.props.readonly && this.props.value;
   }
-  
 
   getUrl(previewFieldName) {
     // getting the details and url of the image
@@ -103,12 +104,12 @@ export class ImageCapture extends Component {
     var model = this.props.record.resModel;
   }
   async OnClickOpenCamera() {
-    var dialog = document.getElementById("dialog"+this.props.name);
-    var player = document.getElementById("player"+this.props.name);
+    var dialog = document.getElementById("dialog" + this.props.name);
+    var player = document.getElementById("player" + this.props.name);
     player.classList.remove("d-none");
 
-    if (navigator.mediaDevices.getUserMedia) {
-      await navigator.mediaDevices
+    if (mediaDevices.getUserMedia) {
+      await mediaDevices
         .getUserMedia({ video: true, audio: false })
         .then((s) => {
           player.srcObject = s;
@@ -121,14 +122,19 @@ export class ImageCapture extends Component {
   }
   async OnClickCaptureImage() {
     // Capture the image from webcam and close the webcam
-    var canvas = document.getElementById("snapshot"+this.props.name);
-    var player = document.getElementById("player"+this.props.name);
-    var save_image = document.getElementById("save_image"+this.props.name);
-    var image = document.getElementById("image"+this.props.name);
+    var canvas = document.getElementById("snapshot" + this.props.name);
+    var player = document.getElementById("player" + this.props.name);
+    var save_image = document.getElementById("save_image" + this.props.name);
+    var image = document.getElementById("image" + this.props.name);
     var context = canvas.getContext("2d");
     save_image.classList.remove("d-none");
-    context.drawImage(player, 0, 0, player.width,    player.height,     // source rectangle
-                   0, 0, canvas.width, canvas.height); // destination rectangle
+    context.drawImage(
+      player,
+      0,
+      0,
+      canvas.width,
+      canvas.height
+    ); // destination rectangle
     canvas.classList.remove("d-none");
     image.value = context.canvas.toDataURL();
     this.url = context.canvas.toDataURL();
@@ -138,11 +144,11 @@ export class ImageCapture extends Component {
   }
   async OnClickSaveImage() {
     // Saving the image to that field
-    var self = this
-    var snapshot = document.getElementById("snapshot"+this.props.name);
-    var player = document.getElementById("player"+this.props.name);
-    var save_image = document.getElementById("save_image"+this.props.name);
-    var dialog = document.getElementById("dialog"+this.props.name);
+    var self = this;
+    var snapshot = document.getElementById("snapshot" + this.props.name);
+    var player = document.getElementById("player" + this.props.name);
+    var save_image = document.getElementById("save_image" + this.props.name);
+    var dialog = document.getElementById("dialog" + this.props.name);
     rpc
       .query({
         model: "image.capture",
@@ -160,7 +166,7 @@ export class ImageCapture extends Component {
         };
         self.onFileUploaded(data);
       });
-    
+
     snapshot.classList.add("d-none");
     save_image.classList.add("d-none");
     player.srcObject.getTracks().forEach(function (track) {
@@ -171,10 +177,10 @@ export class ImageCapture extends Component {
   }
 
   async closeDialog() {
-    var snapshot = document.getElementById("snapshot"+this.props.name);
-    var player = document.getElementById("player"+this.props.name);
-    var save_image = document.getElementById("save_image"+this.props.name);
-    var dialog = document.getElementById("dialog"+this.props.name);
+    var snapshot = document.getElementById("snapshot" + this.props.name);
+    var player = document.getElementById("player" + this.props.name);
+    var save_image = document.getElementById("save_image" + this.props.name);
+    var dialog = document.getElementById("dialog" + this.props.name);
 
     snapshot.classList.add("d-none");
     save_image.classList.add("d-none");
@@ -188,7 +194,7 @@ export class ImageCapture extends Component {
     this.state.isValid = false;
     this.notification.add(this.env._t("Could not display the selected image"), {
       type: "danger",
-    }); 
+    });
   }
 }
 
