@@ -112,6 +112,8 @@ export class ImageCapture extends Component {
         .getUserMedia({ video: true, audio: false })
         .then((s) => {
           player.srcObject = s;
+          player.width = 420; // Replace with your desired width
+          player.height = 340; // Replace with your desired height
           dialog.showModal();
         })
         .catch((err) => {
@@ -127,7 +129,8 @@ export class ImageCapture extends Component {
     var image = document.getElementById("image" + this.props.name);
     var context = canvas.getContext("2d");
     save_image.classList.remove("d-none");
-    console.log(player.videoHeight, player.videoWidth);
+    canvas.width = player.videoWidth;
+    canvas.height = player.videoHeight;
     context.drawImage(player, 0, 0, player.videoWidth, player.videoHeight); // destination rectangle
     canvas.classList.remove("d-none");
     image.value = context.canvas.toDataURL();
