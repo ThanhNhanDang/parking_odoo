@@ -132,8 +132,8 @@ export class ImageCapture extends Component {
       player,
       0,
       0,
-      canvas.width,
-      canvas.height
+      player.width,
+      player.height
     ); // destination rectangle
     canvas.classList.remove("d-none");
     image.value = context.canvas.toDataURL();
