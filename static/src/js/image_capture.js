@@ -14,7 +14,6 @@ import { Component, useState, onWillUpdateProps } from "@odoo/owl";
 const { DateTime } = luxon;
 // Lấy đối tượng camera
 const mediaDevices = navigator.mediaDevices;
-var camera;
 export const fileTypeMagicWordMap = {
   "/": "jpg",
   R: "gif",
@@ -128,13 +127,13 @@ export class ImageCapture extends Component {
     var image = document.getElementById("image" + this.props.name);
     var context = canvas.getContext("2d");
     save_image.classList.remove("d-none");
-    var dimensions =  player.getVideoPlaybackDimensions()
+    var dimensions = player.getVideoPlaybackDimensions();
     context.drawImage(
       player,
       0,
       0,
-      dimensions.width,
-      dimensions.height
+      player.srcObject.videoWidth,
+      player.srcObject.videoHeight
     ); // destination rectangle
     canvas.classList.remove("d-none");
     image.value = context.canvas.toDataURL();
