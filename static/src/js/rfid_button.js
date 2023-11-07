@@ -19,7 +19,6 @@ function connect() {
   };
 
   websocket.onclose = function (e) {
-    document.getElementById("rfid_btn").disabled = false;
     setTimeout(function () {
       connect();
     }, 1000);
@@ -27,7 +26,6 @@ function connect() {
 
   websocket.onerror = function (err) {
     websocket.close();
-    document.getElementById("rfid_btn").disabled = false;
   };
 }
 
@@ -104,11 +102,12 @@ export class ButtonFormController extends FormController {
   }
 
   rfidHandler(model, field_search) {
-    document.getElementById("rfid_btn").disabled = true;
     //Gửi lệnh quét thẻ
     try {
+      document.getElementById("rfid_btn").disabled = true;
       websocket.send("quet the|false");
     } catch (error) {
+      document.getElementById("rfid_btn").disabled = false;
       this.showConfirmDialogDownloadPlugin(
         "THÔNG BÁO",
         "Vui lòng kiểm tra service [ Window_nsp_service ] có đang chạy hay không, nếu chưa cài đặt service hãy nhấn vào nút [ OK ] bên dưới để cài đặt!"
