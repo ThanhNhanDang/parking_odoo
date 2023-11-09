@@ -7,33 +7,33 @@ import json
 import math
 import cv2
 import numpy as np
-import torch
+# import torch
 
 ############# requeirement for LPR #############
 # for .pt: opencv-python matplotlib torchvision pyyaml pandas seaborn
 # for .onnx: onnx onnxruntime
 ############# requeirement for LPR #############
 
-LP_detector_nano_61_path = modules.module.get_resource_path(
-    'parking_odoo',
-    'static/file/model',
-    'LP_detector_nano_61.pt'
-)
+# LP_detector_nano_61_path = modules.module.get_resource_path(
+#     'parking_odoo',
+#     'static/file/model',
+#     'LP_detector_nano_61.pt'
+# )
 
-LP_ocr_nano_62_path = modules.module.get_resource_path(
-    'parking_odoo',
-    'static/file/model',
-    'LP_ocr_nano_62.pt'
-)
-yolov5_path = modules.module.get_resource_path(
-    'parking_odoo',
-    'yolov5'
-)
-yolo_LP_detect = torch.hub.load(
-    yolov5_path, 'custom', path=LP_detector_nano_61_path, force_reload=True, source='local')
-yolo_license_plate = torch.hub.load(
-    yolov5_path, 'custom', path=LP_ocr_nano_62_path, force_reload=True, source='local')
-yolo_license_plate.conf = 0.60
+# LP_ocr_nano_62_path = modules.module.get_resource_path(
+#     'parking_odoo',
+#     'static/file/model',
+#     'LP_ocr_nano_62.pt'
+# )
+# yolov5_path = modules.module.get_resource_path(
+#     'parking_odoo',
+#     'yolov5'
+# )
+# yolo_LP_detect = torch.hub.load(
+#     yolov5_path, 'custom', path=LP_detector_nano_61_path, force_reload=True, source='local')
+# yolo_license_plate = torch.hub.load(
+#     yolov5_path, 'custom', path=LP_ocr_nano_62_path, force_reload=True, source='local')
+# yolo_license_plate.conf = 0.60
 
 ######## helper ########
 # license plate type classification helper function
