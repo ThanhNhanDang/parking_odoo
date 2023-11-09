@@ -90,7 +90,8 @@
                     />
                     <field name='product_ids' widget="many2many_tags_avatar" />
                     <field name='product_ids_public' widget="many2many_tags_avatar" />
-
+                    <field name="ref"
+                    />
                     <!-- <field name="ref" placeholder="e.g. 31195100312"
                         on_change="1"
                     /> -->

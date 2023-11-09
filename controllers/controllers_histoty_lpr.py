@@ -7,7 +7,7 @@ import json
 import math
 import cv2
 import numpy as np
-# import torch
+import torch
 
 ############# requeirement for LPR #############
 # for .pt: opencv-python matplotlib torchvision pyyaml pandas seaborn
@@ -29,11 +29,11 @@ yolov5_path = modules.module.get_resource_path(
     'parking_odoo',
     'yolov5'
 )
-# yolo_LP_detect = torch.hub.load(
-#     yolov5_path, 'custom', path=LP_detector_nano_61_path, force_reload=True, source='local')
-# yolo_license_plate = torch.hub.load(
-#     yolov5_path, 'custom', path=LP_ocr_nano_62_path, force_reload=True, source='local')
-# yolo_license_plate.conf = 0.60
+yolo_LP_detect = torch.hub.load(
+    yolov5_path, 'custom', path=LP_detector_nano_61_path, force_reload=True, source='local')
+yolo_license_plate = torch.hub.load(
+    yolov5_path, 'custom', path=LP_ocr_nano_62_path, force_reload=True, source='local')
+yolo_license_plate.conf = 0.60
 
 ######## helper ########
 # license plate type classification helper function
@@ -188,7 +188,7 @@ def testImage(img):
             # cv2.putText(img, lp, (7, 70), cv2.FONT_HERSHEY_SIMPLEX,
             #             0.9, (36, 255, 12), 2)
             list_read_plates.add(lp)
-        return lp
+        return json.dumps({'lp': "unknown", 'jpg': None})
     for plate in list_plates:
         flag = 0
         x = int(plate[0])  # xmin
@@ -196,10 +196,11 @@ def testImage(img):
         w = int(plate[2] - plate[0])  # xmax - xmin
         h = int(plate[3] - plate[1])  # ymax - ymin
         crop_img = img[y:y+h, x:x+w]
-        # cv2.rectangle(img, (int(plate[0]), int(plate[1])), (int(
-        #     plate[2]), int(plate[3])), color=(0, 0, 225), thickness=2)
-        # cv2.imwrite("crop.jpg", crop_img)
-        # rc_image = cv2.imread("crop.jpg")
+        _, buffer = cv2.imencode('.jpg', crop_img)
+        jpg_as_text = base64.b64encode(buffer).decode()
+        # đánh nhãn
+        cv2.rectangle(img, (int(plate[0]), int(plate[1])), (int(
+            plate[2]), int(plate[3])), color=(0, 0, 225), thickness=2)
         lp = ""
         for cc in range(0, 2):
             for ct in range(0, 2):
@@ -212,11 +213,11 @@ def testImage(img):
                     break
             if flag == 1:
                 break
-        return lp
-    return "unknown"
+        return {'lp': lp, 'jpg': jpg_as_text}
+    return {'lp': "unknown", 'jpg': None}
+
+
 ###### test LPR image #######
-
-
 _logger = logging.getLogger(__name__)
 
 
@@ -239,8 +240,7 @@ def find_location_empty():
 
 
 def changeDate(date_in):
-    user_tz = pytz.timezone(http.request.env.context.get(
-        'tz') or http.request.env.user.tz or pytz.utc)
+    user_tz = pytz.timezone(str(http.request.env.user.tz or pytz.utc))
     # Convert the date to a Python `datetime` object
     python_date = date_in.strptime(
         str(date_in), "%Y-%m-%d %H:%M:%S")
@@ -293,22 +293,23 @@ class ControllerHistoryLPR(http.Controller):
                     'company_id': 1,
                     'image_1920_camera_sau': image_1920_camera_sau,
                     'image_1920_camera_truoc': image_1920_camera_truoc,
-                    'bien_so_realtime': bien_so_realtime
+                    'bien_so_realtime': bien_so_realtime['lp'],
                 })
             product_template.write({'date_in': stock_move_history.date})
             display_date_result = changeDate(stock_move_history.date)
             return json.dumps({
-                "bien_so_realtime": bien_so_realtime,
+                "bien_so_realtime": bien_so_realtime['lp'],
+                'bien_so_chup': bien_so_realtime['jpg'],
                 "bien_so_dk": product_template.name,
-                "image_1920_ng": str(stock_move_history.image_1920_ng),
-                "image_1920_xe": str(stock_move_history.image_1920_xe),
+                "image_1920_ng": user.image_1920.decode(),
+                "image_1920_xe": product_template.image_1920.decode(),
                 "date_vao": display_date_result,
                 "location_name": location_empty.name,
                 "user_name": user.name,
                 "ma_the": product_template.default_code,
                 "user_id": user.id,
                 "history_id": stock_move_history.id,
-            }, ensure_ascii=False)
+            })
         return "0"
 
     @http.route('/parking/post/out/move_history', website=False, csrf=False, type='http', methods=['POST'],  auth='public')

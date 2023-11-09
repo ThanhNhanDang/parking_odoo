@@ -83,7 +83,8 @@
                             <field name="user_ids" widget="many2many_tags_avatar"
                                 placeholder="Thêm người dùng"
                                 options="{'no_create':True, 'no_create_edit':True, 'no_open': True}"
-                                
+                            />
+                            <field name="default_code"
                             />
                         </group>
                         <group>

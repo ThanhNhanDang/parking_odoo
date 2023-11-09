@@ -60,6 +60,7 @@
                             <i class="fa fa-camera fa-fw"/>
                             Capture
                         </button>
+                       
                         <button 
                             t-attf-id="save_image#{props.name}"
                             class="btn btn-success d-none" 

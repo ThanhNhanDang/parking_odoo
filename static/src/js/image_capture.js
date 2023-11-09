@@ -106,14 +106,11 @@ export class ImageCapture extends Component {
     var dialog = document.getElementById("dialog" + this.props.name);
     var player = document.getElementById("player" + this.props.name);
     player.classList.remove("d-none");
-
     if (mediaDevices.getUserMedia) {
       await mediaDevices
         .getUserMedia({ video: true, audio: false })
         .then((s) => {
           player.srcObject = s;
-          player.width = 420; // Replace with your desired width
-          player.height = 340; // Replace with your desired height
           dialog.showModal();
         })
         .catch((err) => {
@@ -128,10 +125,22 @@ export class ImageCapture extends Component {
     var save_image = document.getElementById("save_image" + this.props.name);
     var image = document.getElementById("image" + this.props.name);
     var context = canvas.getContext("2d");
+    // Get the width and height of the video element.
+    const videoWidth = player.videoWidth;
+    const videoHeight = player.videoHeight;
+
+    // Calculate the scale factor to keep the original aspect ratio of the video.
+    const scaleFactor = Math.min(
+      canvas.width / videoWidth,
+      canvas.height / videoHeight
+    );
+
+    // Set the width and height of the canvas to the scaled video dimensions.
+    canvas.width = videoWidth * scaleFactor;
+    canvas.height = videoHeight * scaleFactor;
+
     save_image.classList.remove("d-none");
-    canvas.width = player.videoWidth;
-    canvas.height = player.videoHeight;
-    context.drawImage(player, 0, 0, player.videoWidth, player.videoHeight); // destination rectangle
+    context.drawImage(player, 0, 0, canvas.width, canvas.height); // destination rectangle
     canvas.classList.remove("d-none");
     image.value = context.canvas.toDataURL();
     this.url = context.canvas.toDataURL();
