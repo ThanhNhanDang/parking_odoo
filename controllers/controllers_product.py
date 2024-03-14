@@ -9,6 +9,7 @@ from datetime import date
 from dateutil.relativedelta import relativedelta
 _logger = logging.getLogger(__name__)
 
+
 def create_product_move_history(state, product_id, location_id):
     stock_move_history = http.request.env["stock.move.line"].sudo().create(
         {'reference': state,
@@ -17,6 +18,7 @@ def create_product_move_history(state, product_id, location_id):
          'location_id': location_id,
          'qty_done': 1.0,
          'company_id': 1})
+
 
 def update_stock_lot(sEPC, state, location_dest_id):
     serial_ids = http.request.env["stock.lot"].sudo().search(
@@ -30,6 +32,7 @@ def update_location(state, location_dest_id, product_id, product_lot_id):
         ('id', '=', location_dest_id)])
     locations_empty.write(
         {'state': state, 'product_id_name': product_id, 'lot_name': product_lot_id})
+
 
 def check_exist_xe(bien_so, ma_the):
     xe = http.request.env['product.template'].sudo().search(
@@ -58,9 +61,10 @@ def contains(list, filter):
     return None
     # do stuff
 
+
 def changeDate(date_in):
-    user_tz = pytz.timezone(http.request.env.context.get(
-        'tz') or http.request.env.user.tz or pytz.utc)
+    user_tz = pytz.timezone(str(http.request.env.context.get(
+        'tz') or http.request.env.user.tz or pytz.utc))
     # Convert the date to a Python `datetime` object
     python_date = date_in.strptime(
         str(date_in), "%Y-%m-%d %H:%M:%S")
@@ -78,7 +82,7 @@ class ControllerProduct(http.Controller):
             domain = [('date', '>=', date.today()), ('contact_id', '=', kw['user_id']),
                       ('picking_code', '!=', False)]
         elif kw['mode'] == 2:
-            domain = [('date', '<=', date.today()), ('date', '>=',date.today() + relativedelta(months=1)), ('contact_id', '=', kw['user_id']),
+            domain = [('date', '<=', date.today()), ('date', '>=', date.today() + relativedelta(months=1)), ('contact_id', '=', kw['user_id']),
                       ('picking_code', '!=', False)]
         move_histories = http.request.env['stock.move.line'].sudo().search_read(
             domain=domain,
@@ -121,25 +125,47 @@ class ControllerProduct(http.Controller):
 
     @http.route('/parking/car/users/is_match', website=False, csrf=False, type='json', methods=['POST'],  auth='public')
     def car_users(self, **kw):
-        xe = check_epc_xe(kw['the_xe'])
+        # _logger.info(kw['the_xe'])
+        xe = http.request.env['product.template'].sudo().search(
+            domain=[('default_code', '=', kw['the_xe'])],
+            limit=1)
         if not xe:
-            return "XE KHÔNG TỒN TẠI!!"
-        if (xe.contact_id.ref == kw['the_ng']):
-            user = xe.contact_id
-        else:
-            user = contains(xe.user_ids, lambda user: user.ref ==
-                            kw['the_ng'])
-        if not user:
-            return "BIỂN SỐ ["+xe.name+"] KHÔNG TRÙNG VỚI THẺ NGƯỜI!!"
+            return {
+                "message": "XE KHÔNG TỒN TẠI"
+            }
+        id_ng = xe.contact_id.id
         location_id = xe.location_id.id
-        if location_id == False:
+        if location_id == False:  # Xe chưa có vị trí, đã ra rồi
             location_id = -1
+        if kw['ra'] == 1:
+            the_ng_arr = []
+            pass_ng_arr = []
+            id_ng_arr = []
+            id_ng_arr.append(id_ng)
+            the_ng_arr.append(xe.contact_id.ref)
+            pass_ng_arr.append(xe.contact_id.barcode)
+            for u in xe.user_ids:
+                the_ng_arr.append(u.ref)
+                pass_ng_arr.append(u.barcode)
+                id_ng_arr.append(u.id)
+
+            return {
+                'bien_so': xe.name,
+                'the_xe': kw['the_xe'],
+                'password_xe': "00000000",
+                'the_ng_arr':the_ng_arr,
+                'pass_ng_arr': pass_ng_arr,
+                'id_ng_arr': id_ng_arr,
+                'location_id': location_id,
+                "message": "0"
+            }
         return {
-            'password_xe': xe.barcode,
-            'password_ng': user.barcode,
-            'location_id': location_id,
             'bien_so': xe.name,
-            'user_id': user.id
+            'the_xe': kw['the_xe'],
+            'password_xe': "00000000",
+            'user_id': id_ng,
+            'location_id': location_id,
+            "message": "0"
         }
 
     @http.route('/parking/get/history/by_id', website=False, csrf=False, type='json', methods=['POST'],  auth='public')

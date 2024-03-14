@@ -1,5 +1,6 @@
 from odoo import api, fields, models
 
+
 class Product_product(models.Model):
     _inherit = 'product.product'
     name = fields.Char(string="Biển số")
@@ -9,5 +10,6 @@ class Product_product(models.Model):
     check_doi_the = fields.Boolean(string="Đã đổi thẻ", default=False)
     activity_summary = fields.Char(string="Hãng xe", store=True)
 
-
-    
+    @api.constrains('barcode')
+    def _check_barcode_uniqueness(self):
+        return 0

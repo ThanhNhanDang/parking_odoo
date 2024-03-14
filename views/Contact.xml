@@ -17,36 +17,18 @@
             <field name="model">res.partner</field>
             <field name="inherit_id" ref="base.view_partner_form" />
             <field name="arch" type="xml">
-                <!-- <xpath expr="//div[@name='button_box']" position="replace"></xpath> -->
+                <xpath expr="//div[@name='button_box']" position="replace"></xpath>
                 <xpath expr="//form" position="attributes">
                     <attribute name="js_class">rfid_button</attribute>
                 </xpath>
                 <xpath expr="//widget[@name='web_ribbon']" position="after">
                     <field name='employee' invisible='1'></field>
-                    <!-- <div id="registered">
-                        <widget name="web_ribbon" title="Registered"
+                    <div id="registered">
+                        <widget name="web_ribbon" title="ĐÃ CÓ THẺ"
                             bg_color="bg-success"
                             modifiers="{&quot;invisible&quot;: [[&quot;employee&quot;, &quot;=&quot;, false]]}" />
-                    </div> -->
-                </xpath>
-                <!-- <xpath expr="//widget[@name='web_ribbon']" position="before">
-                    <div class="oe_button_box" name="button_box">
-                        <button t-on-click="onClickTestJavascript"
-                            attrs="{'invisible': [('employee', '=', True)]}"
-                            type='object'
-                            class="oe_highlight" icon="fa-credit-card-alt"> CẤP THẺ</button>
-                        <button
-                            name='action_new_product'
-                            attrs="{'invisible': [('employee', '=', False)]}"
-                            type='object'
-                            class="btn btn-sm btn-primary" icon="fa-plus"> Đ/K XE</button>
-                        <button
-                            name='doi_the'
-                            attrs="{'invisible': [('employee', '=', False)]}"
-                            type='object'
-                            class="btn btn-sm btn-primary" icon="fa-credit-card-alt"> ĐỔI THẺ</button>
                     </div>
-                </xpath> -->
+                </xpath>
                 <field name="mobile" position="attributes">
                     <attribute name="invisible">1</attribute>
                 </field>
@@ -80,21 +62,26 @@
                     position="replace" />
                 <xpath expr="//field[@name='email']"
                     position="replace" />
+                    <xpath expr="//field[@name='vat']" position="attributes">
+                    <attribute name="string">Số CMND/CCCD</attribute>
+                    </xpath>
                 <xpath expr="//field[@name='vat']" position="after">
+                    <field name='city' string="Địa chỉ"
+                        help="Địa chỉ có thể là số căn hộ, vị trí phòng làm việc hoặc học tập" />
                     <field name="phone" widget="phone" on_change="1"
                         modifiers="{&quot;required&quot;: true}" />
                     <field name="email" widget="email" on_change="1"
                         modifiers="{&quot;required&quot;: true}" />
-                    <field name="signup_token" placeholder="e.g. 31195100312"
+                    <field name="ma_dinh_danh" placeholder="e.g. 31195100312"
                         on_change="1" modifiers="{&quot;required&quot;: true}"
                     />
                     <field name='product_ids' widget="many2many_tags_avatar" />
                     <field name='product_ids_public' widget="many2many_tags_avatar" />
-                    <field name="ref"
-                    />
-                    <!-- <field name="ref" placeholder="e.g. 31195100312"
+                    <!-- <field name="ref" /> -->
+                    <field name="barcode" />
+                    <field name="ref" placeholder="e.g. 31195100312"
                         on_change="1"
-                    /> -->
+                    />
                 </xpath>
                 <xpath expr="//form/sheet/group/group" position="after">
                     <group>
@@ -110,7 +97,6 @@
                             on_change="1" />
                     </group>
                 </xpath>
-
                 <xpath expr="//form/sheet/notebook"
                     position="attributes">
                     <attribute name="invisible">1</attribute>
@@ -140,13 +126,17 @@
                     <attribute name="string"></attribute>
                 </xpath>
                 <xpath expr="//field[@name='vat']" position='after'>
+                    <field name='city' string="Địa chỉ"/>
                     <field name='phone' />
                     <field name='email' />
-                    <field name='signup_token' />
+                    <field name='vat' string="Số CMND/CCCD"/>
+                    <field name='ma_dinh_danh' />
                     <field name='ref' />
+                    <field name="barcode" />
+                    <field name='date_expiration' />
                     <field name='product_ids' widget="many2many_tags_avatar" />
                     <field name='product_ids_public' widget="many2many_tags_avatar" />
-                    <field name='employee' />
+                    <!-- <field name='employee' /> -->
                 </xpath>
             </field>
         </record>

@@ -6,3 +6,5 @@ from . import product_lot_serial
 from . import Contact
 from . import Product_template
 from . import Product_product
+from . import ResUsers
+from . import _test

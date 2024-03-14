@@ -3,8 +3,8 @@
     'name': "parking",
 
     'summary': """
-        Short (1 phrase/line) summary of the module's purpose, used as
-        subtitle on modules listing or apps.openerp.com""",
+       Ứng dụng sử dụng cho bãi giữ xe, kế thừa những chức năng của những ứng dụng liên quan đến quản lý Kho.
+       """,
 
     'description': """
         Long description of module's purpose

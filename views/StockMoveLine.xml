@@ -9,17 +9,16 @@
             <xpath expr="//field[@name='location_dest_id']" position='replace' />
             <xpath expr="//field[@name='qty_done']" position='replace' />
             <xpath expr="//field[@name='state']" position='replace' />
-            
+
             <xpath expr="//field[@name='product_id']" position='attributes'>
                 <attribute name="widget">many2one_avatar</attribute>
             </xpath>
             <xpath expr="//field[@name='date']" position='after'>
                 <field name="picking_code" widget="badge"
-                decoration-muted="picking_code == 'incoming'"
-                decoration-success="picking_code == 'outgoing'" />
+                    decoration-muted="picking_code == 'incoming'"
+                    decoration-success="picking_code == 'outgoing'" />
             </xpath>
             <xpath expr="//field[@name='product_id']" position='after'>
-               
                 <field name="bien_so_realtime" />
                 <field name="contact_id" widget="many2one_avatar" />
             </xpath>
@@ -47,13 +46,21 @@
                         <group>
                             <field name="company_id" invisible="1" />
                             <field name="date" modifiers="{&quot;required&quot;: true}" />
-                            <field name="picking_code" widget="badge"
-                                decoration-muted="picking_code == 'incoming'"
-                                decoration-success="picking_code == 'outgoing'" />
+
+                            <field attrs="{'invisible': [('picking_code', '!=', 'outgoing')]}"
+                                name="date_in" />
+                            <field attrs="{'invisible': [('picking_code', '!=', 'outgoing')]}"
+                                name="date_sub_in_out" />
+
+
                             <field name="contact_id" on_change="1"
                                 can_create="true" can_write="true" />
                         </group>
                         <group>
+                            <!-- 'no_open': True -->
+                            <field name="picking_code" widget="badge"
+                                decoration-muted="picking_code == 'incoming'"
+                                decoration-success="picking_code == 'outgoing'" />
                             <field name="location_id" options="{'no_create': True}"
                                 modifiers="{&quot;required&quot;: true}" can_create="true"
                                 can_write="true" />
@@ -73,6 +80,18 @@
                         </group>
                         <group>
                             <field name="image_1920_camera_sau" widget="image" />
+                        </group>
+                        <group>
+                            <field name="i_1920_cam_trc_before" widget="image" />
+                        </group>
+                        <group>
+                            <field name="i_1920_cam_sau_before" widget="image" />
+                        </group>
+                        <group>
+                            <field name="image_1920_bs_camera" widget="image" />
+                        </group>
+                        <group>
+                            <field name="i_1920_bs_cam_before" widget="image" />
                         </group>
                     </group>
                 </sheet>

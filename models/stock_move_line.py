@@ -23,6 +23,8 @@ def find_location_empty(self):
 
 class stock_move_line(models.Model):
     _inherit = 'stock.move.line'
+    _rec_name = 'picking_code'
+
     picking_id = fields.Many2one(
         'stock.picking', 'Transfer', auto_join=True,
         check_company=True,
@@ -31,26 +33,49 @@ class stock_move_line(models.Model):
     picking_code = fields.Selection(
         related='picking_id.picking_type_id.code', store=True, readonly=False)
     bien_so_realtime = fields.Char(string="Biển số nhận diện được")
+    move_history_id_before = fields.Many2one(
+        'stock.move.line', string="Trạng thái trước đó")
     location_id = fields.Many2one("stock.location", string="Vị trí")
-    product_id = fields.Many2one("product.template", string="Biển số đã đăng ký")
+    product_id = fields.Many2one(
+        "product.template", string="Biển số đã đăng ký")
     contact_id = fields.Many2one("res.partner", string="Họ tên")
-    image_1920_ng = fields.Image(string="ẢNH NGƯỜI Đ/K",
+    image_1920_ng = fields.Image(string="NGƯỜI Đ/K",
                                  max_width=1920, max_height=1920, related='contact_id.image_1920')
-    image_1920_xe = fields.Image(string="ẢNH XE Đ/K", related='product_id.image_1920_bien_so',
+    image_1920_xe = fields.Image(string="XE Đ/K", related='product_id.image_1920',
                                  max_width=1920, max_height=1920)
-    image_1920_camera_truoc = fields.Image(string="ẢNH CAMRERA TRƯỚC",
+    image_1920_camera_truoc = fields.Image(string="Biển số Đ/K", related='product_id.image_1920_bien_so',
                                            max_width=1920, max_height=1920)
-    image_1920_camera_sau = fields.Image(string="ẢNH CAMRERA SAU",
+    image_1920_camera_sau = fields.Image(string="Ảnh chụp",
                                          max_width=1920, max_height=1920)
-    date_in = fields.Date(string="Thời gian xe vào")
+    image_1920_bs_camera = fields.Image(string="BIỂN SỐ",
+                                         max_width=1920, max_height=1920)
+    i_1920_cam_trc_before = fields.Image(string="LƯỢT TRƯỚC ĐÓ", related='move_history_id_before.image_1920_camera_truoc',
+                                         max_width=1920, max_height=1920)
+    i_1920_cam_sau_before = fields.Image(string="LƯỢT TRƯỚC ĐÓ", related='move_history_id_before.image_1920_camera_sau',
+                                         max_width=1920, max_height=1920)
+    i_1920_bs_cam_before = fields.Image(string="BIỂN SỐ TRƯỚC ĐÓ", related='move_history_id_before.image_1920_bs_camera',
+                                         max_width=1920, max_height=1920)
+
+    date_in = fields.Datetime(string="Thời gian xe vào")
+    date_sub_in_out = fields.Char(string="Thời gian gửi xe")
 
     def create(self, vals):
         new_record = super(stock_move_line, self).create(vals)
         return new_record
 
+    def name_get(self):
+        res = []
+        for history in self:
+            if history.picking_code == 'incoming':
+                value = 'Vào bãi'
+            else:
+                value = 'Ra bãi'
+            res.append((history.id, value))
+        return res
+
+
 class state_picking_type(models.Model):
     _inherit = 'stock.picking.type'
-
     code = fields.Selection([('incoming', 'Vào bãi'), ('outgoing', 'Ra bãi'), (
         'internal', "Internal Transfer")], string="Ra/vào bãi", default="outgoing")
 

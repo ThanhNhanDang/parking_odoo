@@ -103,6 +103,13 @@ export class ImageCapture extends Component {
     var model = this.props.record.resModel;
   }
   async OnClickOpenCamera() {
+    var save_image = document.getElementById("save_image" + this.props.name);
+    save_image.disabled = true;
+    var canvas = document.getElementById("snapshot" + this.props.name);
+    var context = canvas.getContext("2d");
+    var img = context.createImageData(canvas.width, canvas.height);
+    for (var i = img.data.length; --i >= 0; ) img.data[i] = 0;
+    context.putImageData(img, 0, 0);
     var dialog = document.getElementById("dialog" + this.props.name);
     var player = document.getElementById("player" + this.props.name);
     player.classList.remove("d-none");
@@ -128,22 +135,18 @@ export class ImageCapture extends Component {
     // Get the width and height of the video element.
     const videoWidth = player.videoWidth;
     const videoHeight = player.videoHeight;
-
     // Calculate the scale factor to keep the original aspect ratio of the video.
     const scaleFactor = Math.min(
       canvas.width / videoWidth,
       canvas.height / videoHeight
     );
-
     // Set the width and height of the canvas to the scaled video dimensions.
     canvas.width = videoWidth * scaleFactor;
     canvas.height = videoHeight * scaleFactor;
-
-    save_image.classList.remove("d-none");
     context.drawImage(player, 0, 0, canvas.width, canvas.height); // destination rectangle
-    canvas.classList.remove("d-none");
     image.value = context.canvas.toDataURL();
     this.url = context.canvas.toDataURL();
+    save_image.disabled = false;
     // console.log(context.canvas.toDataURL());
     // console.log(context);
     // console.log(context.getImageData);
@@ -151,9 +154,7 @@ export class ImageCapture extends Component {
   async OnClickSaveImage() {
     // Saving the image to that field
     var self = this;
-    var snapshot = document.getElementById("snapshot" + this.props.name);
     var player = document.getElementById("player" + this.props.name);
-    var save_image = document.getElementById("save_image" + this.props.name);
     var dialog = document.getElementById("dialog" + this.props.name);
     rpc
       .query({
@@ -173,8 +174,6 @@ export class ImageCapture extends Component {
         self.onFileUploaded(data);
       });
 
-    snapshot.classList.add("d-none");
-    save_image.classList.add("d-none");
     player.srcObject.getTracks().forEach(function (track) {
       track.stop();
     });
@@ -183,13 +182,8 @@ export class ImageCapture extends Component {
   }
 
   async closeDialog() {
-    var snapshot = document.getElementById("snapshot" + this.props.name);
     var player = document.getElementById("player" + this.props.name);
-    var save_image = document.getElementById("save_image" + this.props.name);
     var dialog = document.getElementById("dialog" + this.props.name);
-
-    snapshot.classList.add("d-none");
-    save_image.classList.add("d-none");
     player.srcObject.getTracks().forEach(function (track) {
       track.stop();
     });

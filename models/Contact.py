@@ -2,83 +2,32 @@ import logging
 from odoo import api, fields, models, http
 import uuid
 import json
+from dateutil.relativedelta import relativedelta
 
 _logger = logging.getLogger(__name__)
-
-
-def on_publish(client, userdata, mid):
-    print("sent a message")
-
-def create_product_move_history(state, product_id, location_id, location_dest_id, epc):
-    stock_move_history = http.request.env["stock.move.line"].sudo().create(
-        {'reference': state,
-            'product_id': product_id,
-            'reserved_uom_qty': 1.0,
-            'lot_name': epc,
-            'location_id': location_id,
-            'location_dest_id': location_dest_id,
-            'qty_done': 1.0,
-            'company_id': 1})
-
-
-def check_cmnd_cccd_code_user(cmnd_cccd, signup_token):
-    product = http.request.env['res.partner'].sudo().search(
-        domain=["|", ('vat', '=', cmnd_cccd),
-                ('signup_token', '=', signup_token)],
-        limit=1)
-    if not product:
-        return 1
-    if (product.vat == cmnd_cccd):
-        return -2
-    if (product.signup_token == signup_token):
-        return -3
-
-
-def save_user(vals, hex_arr):
-    new_record = http.request.env['res.partner'].sudo().create({
-        'image_1920': vals['image_1920'],
-        'name':  vals['name'],
-        'vat': vals['vat'],
-        'phone': vals['phone'],
-        'ref': "0" + hex_arr[1:24],
-        'login': vals['vat'],
-        'barcode': hex_arr[24:],
-        'email': vals['email']
-    })
-    return
-
-
-def on_message_callback(client, userdata, msg):
-    global jsonLoad
-
-    jsonLoad = json.loads(msg.payload.decode('utf-8'))
-
-    _logger.info("%s", jsonLoad)
-
 
 class Contact(models.Model):
     _inherit = 'res.partner'
     _sql_constraints = [
-        ('field_unique',
+        ('vat_unique',
          'unique(vat)',
          'CMND/CCCD ĐÃ TỒN TẠI!!'),
-        ('field_unique',
-         'unique(signup_token)',
+        ('ma_dinh_danh_unique',
+         'unique(ma_dinh_danh)',
          'MÃ ĐỊNH DANH ĐÃ TỒN TẠI!')
     ]
-
     display_name = fields.Char(string="Họ tên", required=False)
     name = fields.Char(string="Họ tên")
     vat = fields.Char(string="Số CMND/CCCD", required=True)
     phone = fields.Char(string="Số điện thoại", required=True)
-    barcode = fields.Char(string="Mật khẩu")
-    ref = fields.Char(string="Mã thẻ")
+    barcode = fields.Char(string="Mật khẩu",readonly=False)
+    ref = fields.Char(string="Mã thẻ",readonly=False)
     employee = fields.Boolean(string="Cấp thẻ", default=False)
-    signup_token = fields.Char(string="Mã định danh", required=True)
-
+    ma_dinh_danh = fields.Char(string="Mã định danh", required=False, store=True)
+    city = fields.Char(string="Địa chỉ", required=True)
+    date_expiration = fields.Datetime(string="Ngày hết hạn", required=True)
     product_ids = fields.One2many("product.template", "contact_id", string="D/S xe",
                                   readonly=True)
-
     product_ids_public = fields.Many2many("product.template", relation="product_template_res_partner_rel", column1="res_partner_id", column2="product_template_id", string="D/S xe dùng chung",
                                           readonly=True)
     image_1920 = fields.Image(string="Ảnh đại diện",
@@ -90,8 +39,16 @@ class Contact(models.Model):
 
     @api.model
     def create(self, vals):
+        vals['date_expiration'] = fields.Datetime.now() + \
+            relativedelta(months=1)
         new_record = super(Contact, self).create(vals)
+        self.env["res.users"].create({'employee_ids': [], 'image_1920': vals['image_1920'], 'name': vals['name'], 'email': vals['email'],
+                                     'login': vals['email'], 'company_id': 1, 'sel_groups_1_10_11': 11, 'active': True, 'partner_id': new_record.id, 'password': vals['phone']})
         return new_record
+    
+    @api.constrains('barcode')
+    def _check_barcode_unicity(self):
+        return 0
 
     def write(self, vals):
         # Code before write: 'self' has the old values

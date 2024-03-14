@@ -1,5 +1,4 @@
 /** @odoo-module **/
-
 import { registry } from "@web/core/registry";
 import { ConfirmationDialog } from "@web/core/confirmation_dialog/confirmation_dialog";
 import { formView } from "@web/views/form/form_view";
@@ -24,9 +23,7 @@ function connect() {
     }, 1000);
   };
 
-  websocket.onerror = function (err) {
-    websocket.close();
-  };
+
 }
 
 connect();
@@ -40,22 +37,6 @@ export class ButtonFormController extends FormController {
     this.state = useState({
       ...this.state,
       employee: false,
-    });
-  }
-
-  onClickDKxe() {
-    const self = this;
-    const action = self.env.services.action;
-    action.doAction({
-      type: "ir.actions.act_window",
-      name: "Action service",
-      res_model: "product.template",
-      domain: [],
-      context: { default_contact_id: self.model.root.data.id },
-      view_type: "form",
-      views: [[false, "form"]],
-      view_mode: "list,form",
-      target: "current",
     });
   }
 
@@ -102,8 +83,12 @@ export class ButtonFormController extends FormController {
   }
 
   rfidHandler(model, field_search) {
-    //Gửi lệnh quét thẻ
+    if (this.model.root.data.id == false) {
+      this.showAlerDialog("THÔNG BÁO", "CHƯA TẠO THÔNG TIN!!");
+      return;
+    }
     try {
+      //Gửi lệnh quét thẻ
       document.getElementById("rfid_btn").disabled = true;
       websocket.send("quet the|false");
     } catch (error) {
@@ -115,6 +100,7 @@ export class ButtonFormController extends FormController {
       return;
     }
     var self = this;
+
     websocket.onmessage = async (e) => {
       const message = e.data;
       //Kiểm tra lỗi nếu ký tự đầu là L
@@ -152,14 +138,11 @@ export class ButtonFormController extends FormController {
               websocket.send("ghi pass|" + result_split[2] + "|false");
               return;
             }
-            self
-              .rpcQuery(model, "write", [[self.model.root.data.id], vals])
-              .then(function (results) {
-                if (results)
-                  websocket.send(
-                    "ghi pass|" + result_split[2] + "|" + results.toString()
-                  );
-              });
+            self.model.root.update(vals);
+            self.saveButtonClicked();
+            websocket.send(
+              "ghi pass|" + result_split[2] + "|" + results.toString()
+            );
           });
       }
       //Mã thẻ trả về
@@ -259,8 +242,8 @@ ButtonFormController.template = "parking_odoo.RFID_button";
 export class ButtonFormRenderer extends FormRenderer {
   setup() {
     super.setup();
-    onMounted(() => {});
-    onWillUpdateProps(async (nextProps) => {});
+    onMounted(() => { });
+    onWillUpdateProps(async (nextProps) => { });
   }
 }
 

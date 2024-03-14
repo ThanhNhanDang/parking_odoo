@@ -3,20 +3,9 @@ import uuid
 import logging
 from collections import defaultdict
 from dateutil.relativedelta import relativedelta
+from base64 import b64encode
 
 _logger = logging.getLogger(__name__)
-
-
-def create_product_move_history(state, product_id, location_id, location_dest_id, epc):
-    stock_move_history = http.request.env["stock.move.line"].sudo().create(
-        {'reference': state,
-            'product_id': product_id,
-            'reserved_uom_qty': 1.0,
-            'lot_name': epc,
-            'location_id': location_id,
-            'location_dest_id': location_dest_id,
-            'qty_done': 1.0,
-            'company_id': 1})
 
 
 def check_bien_so_xe(bien_so):
@@ -51,12 +40,14 @@ class Product_template(models.Model):
         "stock.location", string="Vị trí", compute="_compute_location_id")
     contact_id = fields.Many2one(
         'res.partner', string='Chủ sở hữu', required=True)
-    barcode = fields.Char(string="Mật khẩu", readonly=False)
-    default_code = fields.Char(string="Mã thẻ")
+    #barcode = fields.Char(string="Mật khẩu", readonly=False)
+    default_code = fields.Char(string="Mã thẻ", readonly=False)
     user_ids = fields.Many2many(
         'res.partner', string="D/S người dùng", readonly=False, domain="[('id', '!=',contact_id)]")
     check_doi_the = fields.Boolean(string="Đã đổi thẻ", default=False)
     activity_summary = fields.Char(string="Hãng xe", store=True)
+    avatar_128 = fields.Image(
+        "avatar 128", compute='_compute_avatar_128', max_width=128, max_height=128)
     image_1920 = fields.Image(
         string="Ảnh xe", max_width=1920, max_height=1920)
     image_1920_bien_so = fields.Image(
@@ -69,8 +60,10 @@ class Product_template(models.Model):
                                   help="Number of incoming stock moves in the past 12 months")
     nbr_moves_out = fields.Integer(compute='_compute_nbr_moves', compute_sudo=False,
                                    help="Number of outgoing stock moves in the past 12 months")
-    date_in = fields.Date(string="T/G VÀO bãi gần nhất")
-    date_out = fields.Date(string="T/G RA bãi gần nhất")
+    date_in = fields.Datetime(string="T/G VÀO bãi gần nhất")
+    date_out = fields.Datetime(string="T/G RA bãi gần nhất")
+    move_history_id = fields.Many2one(
+        'stock.move.line', string="Trạng thái", readonly=True)
 
     def name_get(self):
         # Prefetch the fields used by the `name_get`, so `browse` doesn't fetch other fields
@@ -84,6 +77,16 @@ class Product_template(models.Model):
             "stock.stock_move_line_action")
         action['domain'] = [('product_id.id', 'in', self.ids)]
         return action
+
+    def _compute_avatar_128(self):
+        for record in self:
+            avatar = record['image_1920']
+            if not avatar:
+                if record.id and record[record._avatar_name_field]:
+                    avatar = record._avatar_generate_svg()
+                else:
+                    avatar = b64encode(record._avatar_get_placeholder())
+            record['avatar_128'] = avatar
 
     def _compute_nbr_moves(self):
         res = defaultdict(lambda: {'moves_in': 0, 'moves_out': 0})
@@ -123,6 +126,7 @@ class Product_template(models.Model):
 
     @api.model
     def create(self, vals):
+        vals['name'] = vals['name'].upper()
         vals["tracking"] = "serial"
         new_record = super(Product_template, self).create(vals)
         vals['user_ids'] = vals['contact_id']
@@ -154,6 +158,8 @@ class Product_template(models.Model):
         return new_record
 
     def write(self, vals):
+        if 'name' in vals:
+            vals['name'] = vals['name'].upper()
         result = super(Product_template, self).write(vals)
         return result
 

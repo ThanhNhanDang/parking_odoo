@@ -7,7 +7,7 @@ import json
 import math
 import cv2
 import numpy as np
-# import torch
+import torch
 
 ############# requeirement for LPR #############
 # for .pt: opencv-python matplotlib torchvision pyyaml pandas seaborn
@@ -177,43 +177,48 @@ def deskew(src_img, change_cons, center_thres):
 ###### test LPR image #######
 
 
-def testImage(img):
-    plates = yolo_LP_detect(img, size=640)
-    # print(plates.pandas().xyxy[0].values.tolist())
-    list_plates = plates.pandas().xyxy[0].values.tolist()
-    list_read_plates = set()
-    if len(list_plates) == 0:
-        lp = read_plate(yolo_license_plate, img)
-        if lp != "unknown":
-            # cv2.putText(img, lp, (7, 70), cv2.FONT_HERSHEY_SIMPLEX,
-            #             0.9, (36, 255, 12), 2)
-            list_read_plates.add(lp)
-        return json.dumps({'lp': "unknown", 'jpg': None})
-    for plate in list_plates:
-        flag = 0
-        x = int(plate[0])  # xmin
-        y = int(plate[1])  # ymin
-        w = int(plate[2] - plate[0])  # xmax - xmin
-        h = int(plate[3] - plate[1])  # ymax - ymin
-        crop_img = img[y:y+h, x:x+w]
-        _, buffer = cv2.imencode('.jpg', crop_img)
-        jpg_as_text = base64.b64encode(buffer).decode()
-        # đánh nhãn
-        cv2.rectangle(img, (int(plate[0]), int(plate[1])), (int(
-            plate[2]), int(plate[3])), color=(0, 0, 225), thickness=2)
-        lp = ""
-        for cc in range(0, 2):
-            for ct in range(0, 2):
-                lp = read_plate(yolo_license_plate,
-                                deskew(crop_img, cc, ct))
-                if lp != "unknown":
-                    # list_read_plates.add(lp)
-                    # cv2.putText(img, lp, (int(plate[0]), int(plate[1]-10)), cv2.FONT_HERSHEY_SIMPLEX, 0.9, (36,255,12), 2)
-                    flag = 1
-                    break
-            if flag == 1:
-                break
-        return {'lp': lp, 'jpg': jpg_as_text}
+def testImage(img_t):
+    # _, height, _ = img_t.shape
+    # top = 12
+    # bottom = height
+    # img = img_t[top:bottom, :]
+    # plates = yolo_LP_detect(img, size=640)
+    # # print(plates.pandas().xyxy[0].values.tolist())
+    # list_plates = plates.pandas().xyxy[0].values.tolist()
+    # list_read_plates = set()
+    # if len(list_plates) == 0:
+    #     lp = read_plate(yolo_license_plate, img)
+    #     if lp != "unknown":
+    #         # cv2.putText(img, lp, (7, 70), cv2.FONT_HERSHEY_SIMPLEX,
+    #         #             0.9, (36, 255, 12), 2)
+    #         list_read_plates.add(lp)
+    #     return {'lp': "unknown", 'jpg': None}
+    # for plate in list_plates:
+    #     flag = 0
+    #     x = int(plate[0])  # xmin
+    #     y = int(plate[1])  # ymin
+    #     w = int(plate[2] - plate[0])  # xmax - xmin
+    #     h = int(plate[3] - plate[1])  # ymax - ymin
+    #     crop_img = img[y:y+h, x:x+w]
+    #     _, buffer = cv2.imencode('.jpg', crop_img)
+    #     jpg_as_text = base64.b64encode(buffer).decode()
+    #     # đánh nhãn
+    #     cv2.rectangle(img, (int(plate[0]), int(plate[1])), (int(
+    #         plate[2]), int(plate[3])), color=(0, 0, 225), thickness=2)
+    #     lp = ""
+    #     for cc in range(0, 2):
+    #         for ct in range(0, 2):
+    #             lp = read_plate(yolo_license_plate,
+    #                             deskew(crop_img, cc, ct))
+    #             if lp != "unknown":
+    #                 # list_read_plates.add(lp)
+    #                 # cv2.putText(img, lp, (int(plate[0]), int(plate[1]-10)), cv2.FONT_HERSHEY_SIMPLEX, 0.9, (36,255,12), 2)
+    #                 flag = 1
+    #                 break
+    #         if flag == 1:
+    #             break
+
+    #     return {'lp': lp, 'jpg': jpg_as_text}
     return {'lp': "unknown", 'jpg': None}
 
 
@@ -239,14 +244,17 @@ def find_location_empty():
     return []
 
 
-def changeDate(date_in):
+def changeDate(date_in, is_het_han):
     user_tz = pytz.timezone(str(http.request.env.user.tz or pytz.utc))
     # Convert the date to a Python `datetime` object
     python_date = date_in.strptime(
         str(date_in), "%Y-%m-%d %H:%M:%S")
     timezone = pytz.utc.localize(python_date).astimezone(user_tz)
     # if (timezone.date() == today):
-    display_date_result = timezone.strftime("%H:%M:%S %d/%m/%Y")
+    if is_het_han:
+        display_date_result = timezone.strftime("%d/%m/%Y")
+    else:
+        display_date_result = timezone.strftime("%H:%M:%S %d/%m/%Y")
     return display_date_result
 
 
@@ -258,33 +266,54 @@ class ControllerHistoryLPR(http.Controller):
         img = cv2.imdecode(arr, -1)  # 'Load it as it is'
         result = testImage(img)
         return result
+    
+    @http.route('/parking/post/in/edit', website=False, csrf=False, type='http', methods=['POST'],  auth='public')
+    def edit(self, **kw):
+        product_template = http.request.env["product.template"].sudo().search([('default_code', '=', kw['sEPC'])], limit=1)
+       
+        file = kw['image_capture']
+        img_attachment = file.read()
+        image_1920 = base64.b64encode(img_attachment)
+        
+        product_template.write({'name':'helo', 'image_1920': image_1920})
+
 
     @http.route('/parking/post/in/move_history', website=False, csrf=False, type='http', methods=['POST'],  auth='public')
     def post_in_move_history(self, **kw):
-        location_empty = find_location_empty()
-        if not location_empty:
-            return "-1"
         product_template = http.request.env["product.template"].sudo().search(
             [('default_code', '=', kw['sEPC'])], limit=1)
+        user = http.request.env['res.partner'].sudo().search(
+            domain=[('id', '=', kw['user_id'])],
+            limit=1)
+        if not user:
+            return "0"
+        if not product_template:
+            return "0"
+        if 'image_capture' in kw:
+            file = kw['image_capture']
+            img_attachment = file.read()
+            arr = np.asarray(bytearray(img_attachment), dtype=np.uint8)
+            image_1920_camera_sau = base64.b64encode(img_attachment)
+        else: 
+            image_1920_camera_sau = None
+        display_date_result2 = changeDate(user.date_expiration, True)
         if not product_template.location_id:
+            location_empty = find_location_empty()
+            if not location_empty:
+                return "-1"
             # Cập nhật vị trí trống
             location_empty.write({'product_id': product_template.id})
-            file = kw['image_sau']
-            img_attachment = file.read()
-            image_1920_camera_sau = base64.b64encode(img_attachment)
-            arr = np.asarray(bytearray(img_attachment), dtype=np.uint8)
-            img = cv2.imdecode(arr, -1)  # 'Load it as it is'
+            # img = cv2.imdecode(arr, -1)  # 'Load it as it is'
+            img = None
             bien_so_realtime = testImage(img)
-            file = kw['image_truoc']
-            img_attachment = file.read()
-            image_1920_camera_truoc = base64.b64encode(img_attachment)
-            user = http.request.env['res.partner'].sudo().search(
-                domain=[('id', '=', kw['user_id'])],
-                limit=1)
-            if not user:
-                return "0"
+            if bien_so_realtime['lp'] == "unknown":
+                image_1920_bs_camera = None
+            else:
+                image_1920_bs_camera = bien_so_realtime['jpg']
+            
             stock_move_history = http.request.env["stock.move.line"].sudo().create(
                 {
+                    'move_history_id_before': product_template.move_history_id.id,
                     'picking_code': 'incoming',
                     'product_id': product_template.id,
                     'contact_id': kw['user_id'],
@@ -292,76 +321,148 @@ class ControllerHistoryLPR(http.Controller):
                     'location_dest_id': location_empty.id,
                     'company_id': 1,
                     'image_1920_camera_sau': image_1920_camera_sau,
-                    'image_1920_camera_truoc': image_1920_camera_truoc,
+                    'image_1920_bs_camera': image_1920_bs_camera,
                     'bien_so_realtime': bien_so_realtime['lp'],
                 })
-            product_template.write({'date_in': stock_move_history.date})
-            display_date_result = changeDate(stock_move_history.date)
+            product_template.write(
+                {'date_in': stock_move_history.date, 'move_history_id': stock_move_history.id})
+            display_date_result = changeDate(stock_move_history.date, False)
+            if image_1920_camera_sau != None:
+                image_1920_camera_sau = image_1920_camera_sau.decode()
+            else: 
+                image_1920_camera_sau = "-1"
             return json.dumps({
                 "bien_so_realtime": bien_so_realtime['lp'],
-                'bien_so_chup': bien_so_realtime['jpg'],
+                "bien_so_chup": bien_so_realtime['jpg'],
                 "bien_so_dk": product_template.name,
                 "image_1920_ng": user.image_1920.decode(),
                 "image_1920_xe": product_template.image_1920.decode(),
+                "image_1920_camera_sau": image_1920_camera_sau,
+                "image_1920_bs_dk": product_template.image_1920_bien_so.decode(),
                 "date_vao": display_date_result,
-                "location_name": location_empty.name,
+                "date_het_han": display_date_result2,
+                "dia_chi": user.city,
                 "user_name": user.name,
-                "ma_the": product_template.default_code,
-                "user_id": user.id,
-                "history_id": stock_move_history.id,
-            })
-        return "0"
+            }, ensure_ascii=False)
+        if image_1920_camera_sau != None:
+            image_1920_camera_sau = image_1920_camera_sau.decode()
+        else: 
+            image_1920_camera_sau = "-1"
+        return json.dumps({
+            "bien_so_dk": product_template.name,
+            "bien_so_realtime": "unknown",
+            "image_1920_ng": user.image_1920.decode(),
+            "image_1920_xe": product_template.image_1920.decode(),
+            "image_1920_bs_dk": product_template.image_1920_bien_so.decode(),
+            "image_1920_camera_sau": image_1920_camera_sau,
+            "date_het_han": display_date_result2,
+            "dia_chi": user.city,
+            "user_name": user.name,
+        }, ensure_ascii=False)
 
     @http.route('/parking/post/out/move_history', website=False, csrf=False, type='http', methods=['POST'],  auth='public')
     def post_out_move_history(self, **kw):
         product_template = http.request.env["product.template"].sudo().search(
             [('default_code', '=', kw['sEPC'])], limit=1)
         # Nếu xe có vị trí tức là nó đã vào, giờ xử lý quy trình ra bãi
-        if product_template.location_id:
-            file = kw['image_sau']
+        user = http.request.env['res.partner'].sudo().search(
+            domain=[('id', '=', kw['user_id'])],
+            limit=1)
+        if not user:
+            return "0"
+        if not product_template:
+            return "0"
+        if 'image_capture' in kw:
+            file = kw['image_capture']
             img_attachment = file.read()
-            image_1920_camera_sau = base64.b64encode(img_attachment)
             arr = np.asarray(bytearray(img_attachment), dtype=np.uint8)
-            img = cv2.imdecode(arr, -1)  # 'Load it as it is'
+            image_1920_camera_sau = base64.b64encode(img_attachment)
+        else: 
+            image_1920_camera_sau = None
+        if product_template.location_id:
+            # img = cv2.imdecode(arr, -1)  # 'Load it as it is'
+            img = None
             bien_so_realtime = testImage(img)
+            if bien_so_realtime['lp'] == "unknown":
+                image_1920_bs_camera = None
+            else:
+                image_1920_bs_camera = bien_so_realtime['jpg']
 
-            file = kw['image_truoc']
-            img_attachment = file.read()
-            image_1920_camera_truoc = base64.b64encode(img_attachment)
-            user = http.request.env['res.partner'].sudo().search(
-                domain=[('id', '=', kw['user_id'])],
-                limit=1)
-            if not user:
-                return 0
             stock_move_history = http.request.env["stock.move.line"].sudo().create(
                 {
+                    'move_history_id_before': product_template.move_history_id.id,
                     'picking_code': 'outgoing',
                     'product_id': product_template.id,
                     'contact_id': kw['user_id'],
-                    'location_id': product_template.location_id,
-                    'location_dest_id': product_template.location_id,
+                    'location_id': product_template.location_id.id,
+                    'location_dest_id': product_template.location_id.id,
                     'company_id': 1,
                     'image_1920_camera_sau': image_1920_camera_sau,
-                    'image_1920_camera_truoc': image_1920_camera_truoc,
-                    'bien_so_realtime': bien_so_realtime
+                    'image_1920_bs_camera': image_1920_bs_camera,
+                    'bien_so_realtime': bien_so_realtime['lp'],
+                    'date_in': product_template.date_in,
                 })
+            stock_move_history.location_id.write({'product_id': None})
+            delta = stock_move_history.date - product_template.date_in
+            hours = delta.total_seconds() // 3600
+            minutes = (delta.total_seconds() % 3600) // 60
+            stock_move_history.write(
+                {'date_sub_in_out': f"{hours} giờ {minutes} phút"})
             # Cập nhật thời gian ra bãi
-            product_template.write({'date_out': stock_move_history.date})
+            if (product_template.move_history_id.image_1920_bs_camera == False):
+                image_1920_bs_cambefore = None
+            else:
+                image_1920_bs_cambefore = product_template.move_history_id.image_1920_bs_camera.decode()
+            product_template.write(
+                {'date_out': stock_move_history.date, 'move_history_id': stock_move_history.id})
             # Cập nhật thời gian vào bãi cho lịch sử di chuyển
-            stock_move_history.write({'date_in': product_template.date_in})
-            display_date_result = changeDate(stock_move_history.date)
-            display_date_result2 = changeDate(stock_move_history.date_in)
+            display_date_result = changeDate(stock_move_history.date, False)
+            display_date_result2 = changeDate(
+                stock_move_history.date_in, False)
+            if product_template.move_history_id.bien_so_realtime == "unknown":
+                bien_so_realtime_vao = "unknown"
+            else:
+                bien_so_realtime_vao = product_template.move_history_id.bien_so_realtime
+            if(stock_move_history.i_1920_cam_sau_before == False):
+                i_1920_cam_sau_before = None
+            else: i_1920_cam_sau_before = stock_move_history.i_1920_cam_sau_before.decode()
+        
+            if(stock_move_history.i_1920_cam_trc_before == False):
+                i_1920_cam_trc_before = None
+            else: i_1920_cam_trc_before = stock_move_history.i_1920_cam_trc_before.decode()
+
+            if image_1920_camera_sau != None:
+                image_1920_camera_sau = image_1920_camera_sau.decode()
+            else: 
+                image_1920_camera_sau = "-1"
             return json.dumps({
-                "bien_so_realtime": bien_so_realtime,
+                "bien_so_realtime": bien_so_realtime['lp'],
+                "bien_so_realtime_vao": bien_so_realtime_vao,
+                'bien_so_chup': bien_so_realtime['jpg'],
                 "bien_so_dk": product_template.name,
-                "image_1920_ng": str(stock_move_history.image_1920_ng),
-                "image_1920_xe": str(stock_move_history.image_1920_xe),
+                "image_1920_camera_sau": image_1920_camera_sau,
+                "i_1920_cam_sau_before": i_1920_cam_sau_before,
+                "i_1920_cam_trc_before": i_1920_cam_trc_before,
+                "image_1920_bs_dk": product_template.image_1920_bien_so.decode(),
+                "image_1920_ng": user.image_1920.decode(),
+                "user_name": user.name,
+                "image_1920_bs_cambefore": image_1920_bs_cambefore,
                 "date_vao": display_date_result2,
                 "date_ra": display_date_result,
-                "location_name": product_template.location_id.name,
-                "user_name": user.name,
-                "ma_the": product_template.default_code,
-                "user_id": user.id,
-                "history_id": stock_move_history.id,
+                "date_sub_in_out": stock_move_history.date_sub_in_out
             }, ensure_ascii=False)
-        return "0"
+
+        if image_1920_camera_sau != None:
+            image_1920_camera_sau = image_1920_camera_sau.decode()
+        else: 
+            image_1920_camera_sau = "-1"
+        return json.dumps({
+            "bien_so_dk": product_template.name,
+            "user_name":user.name,
+            "bien_so_realtime": "unknown",
+            "image_1920_ng": user.image_1920.decode(),
+            "image_1920_xe": product_template.image_1920.decode(),
+            "image_1920_bs_dk": product_template.image_1920_bien_so.decode(),
+            "image_1920_camera_sau": image_1920_camera_sau,
+            
+        }, ensure_ascii=False)
