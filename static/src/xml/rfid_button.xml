@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <templates xml:space="preserve">
     <t t-name="parking_odoo.RFID_button" t-inherit="web.FormView" t-inherit-mode="primary" owl="1">
-        <xpath expr="//ActionMenus" position="after">
+        <xpath expr="//CogMenu" position="after">
             <div t-if="props.resModel == 'res.partner'">
                 <button class="btn btn-primary" type="button" t-on-click="onClickDKxe">
                     <i class="fa fa-plus-circle" /> Đ/K XE

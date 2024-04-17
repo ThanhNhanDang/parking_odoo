@@ -1,14 +1,17 @@
 /** @odoo-module **/
+
 import { registry } from "@web/core/registry";
 import { ConfirmationDialog } from "@web/core/confirmation_dialog/confirmation_dialog";
 import { formView } from "@web/views/form/form_view";
 import { FormController } from "@web/views/form/form_controller";
 import { FormRenderer } from "@web/views/form/form_renderer";
 import { onMounted, onWillUpdateProps, useState } from "@odoo/owl";
-import rpc from "web.rpc";
-import Dialog from "web.Dialog";
+import { useService } from "@web/core/utils/hooks";
+
 var websocket;
 var result_split;
+
+
 function connect() {
   const wsUri = "ws://127.0.0.1:62536/";
   websocket = new WebSocket(wsUri);
@@ -34,6 +37,8 @@ connect();
 export class ButtonFormController extends FormController {
   setup() {
     super.setup();
+    this.rpc = useService("rpc")
+    this.dialog = useService("dialog")
     this.state = useState({
       ...this.state,
       employee: false,
@@ -183,7 +188,7 @@ export class ButtonFormController extends FormController {
   }
 
   showAlerDialog(title, content) {
-    Dialog.alert(this, "", {
+    this.dialog.alert(this, "", {
       title: title,
       $content: $("<div/>").html(content),
     });
@@ -226,7 +231,7 @@ export class ButtonFormController extends FormController {
   }
   //args: [this.model.root.data.id, { ref: "12122", employee: true }]
   rpcQuery(model, method, args) {
-    return rpc
+    return this.rpc
       .query({
         model: model,
         method: method,

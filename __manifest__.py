@@ -20,7 +20,7 @@
     'version': '0.1',
 
     # any module necessary for this one to work correctly
-    'depends': ['stock', 'product', 'base', 'web'],
+    'depends': ['stock', 'product', 'base'],
     "application": True,
     # always loaded
     'data': [
@@ -30,11 +30,9 @@
         "views/StockMoveLine.xml",
     ],
     'assets': {
-        'web.assets_backend': [
-            '/parking_odoo/static/src/scss/*.scss',
-            '/parking_odoo/static/src/js/*.js',
-            # '/image_capture_upload_widget/static/src/js/image_upload.js',
-            '/parking_odoo/static/src/xml/*.xml',
+        'web.assets_backend':
+        [
+            'parking_odoo/static/src/**/*',
         ],
     },
 }
