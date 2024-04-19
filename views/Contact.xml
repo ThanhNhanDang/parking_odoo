@@ -22,22 +22,15 @@
                     <attribute name="js_class">rfid_button</attribute>
                 </xpath>
                 <xpath expr="//widget[@name='web_ribbon']" position="after">
-<<<<<<< HEAD
-                    <field name='employee' invisible='1'></field>
-                    <div id="registered">
-                        <widget name="web_ribbon" title="ĐÃ CÓ THẺ"
-                            bg_color="bg-success"
-                            modifiers="{&quot;invisible&quot;: [[&quot;employee&quot;, &quot;=&quot;, false]]}" />
-=======
-                <field name="id" invisible='1'/>
+
+                    <field name="id" invisible='1' />
                     <!-- Cái này là của titile -->
                     <field name='employee' invisible='1'></field>
                     <div id="registered">
                         <widget name="web_ribbon" title="Đã Có Thẻ"
                             bg_color="bg-success"
                             invisible="employee == 0"
-                            />
->>>>>>> e38b66cf7016a3a509ad8a21558994bf6068fe05
+                        />
                     </div>
                 </xpath>
                 <field name="mobile" position="attributes">
@@ -61,17 +54,9 @@
                 <field name="parent_id" position="attributes">
                     <attribute name="invisible">1</attribute>
                 </field>
-<<<<<<< HEAD
 
                 <xpath expr="//field[@name='image_1920']"
                     position="replace" />
-=======
-                 
-
-                <xpath expr="//field[@name='image_1920']"
-                    position="replace" />
-
->>>>>>> e38b66cf7016a3a509ad8a21558994bf6068fe05
                 <xpath expr="//label[@for='phone']"
                     position="replace" />
                 <xpath expr="//field[@name='phone']"
@@ -81,16 +66,10 @@
                     position="replace" />
                 <xpath expr="//field[@name='email']"
                     position="replace" />
-<<<<<<< HEAD
-                    <xpath expr="//field[@name='vat']" position="attributes">
-                    <attribute name="string">Số CMND/CCCD</attribute>
-                    </xpath>
-=======
 
                 <xpath expr="//field[@name='vat']" position="attributes">
                     <attribute name="string">Số CMND/CCCD</attribute>
                 </xpath>
->>>>>>> e38b66cf7016a3a509ad8a21558994bf6068fe05
                 <xpath expr="//field[@name='vat']" position="after">
                     <field name='city' string="Địa chỉ"
                         help="Địa chỉ có thể là số căn hộ, vị trí phòng làm việc hoặc học tập" />
@@ -109,13 +88,10 @@
                         on_change="1"
                     />
                 </xpath>
-<<<<<<< HEAD
-                <xpath expr="//form/sheet/group/group" position="after">
-=======
 
                 <!-- Image -->
                 <!-- <xpath expr="//form/sheet/group/group" position="after">
->>>>>>> e38b66cf7016a3a509ad8a21558994bf6068fe05
+
                     <group>
                         <field name="image_1920" widget="capture_image"
                             on_change="1" />
@@ -128,17 +104,11 @@
                         <field name="image_1920_cmnd_cccd_sau" widget="capture_image"
                             on_change="1" />
                     </group>
-<<<<<<< HEAD
-                </xpath>
-                <xpath expr="//form/sheet/notebook"
-                    position="attributes">
-                    <attribute name="invisible">1</attribute>
-=======
+
                 </xpath> -->
                 <xpath expr="//form/sheet/notebook"
                     position="attributes">
                     <attribute name="invisible">0</attribute>
->>>>>>> e38b66cf7016a3a509ad8a21558994bf6068fe05
                 </xpath>
                 <xpath expr="//span[@name='address_name']"
                     position="attributes">
@@ -150,11 +120,8 @@
                 </xpath>
             </field>
         </record>
-<<<<<<< HEAD
-=======
 
         <!-- Tree View -->
->>>>>>> e38b66cf7016a3a509ad8a21558994bf6068fe05
         <record id="hide_contact_tree" model="ir.ui.view">
             <field name="name">res.partner.tree</field>
             <field name="model">res.partner</field>
@@ -170,10 +137,10 @@
                     <attribute name="string"></attribute>
                 </xpath>
                 <xpath expr="//field[@name='vat']" position='after'>
-                    <field name='city' string="Địa chỉ"/>
+                    <field name='city' string="Địa chỉ" />
                     <field name='phone' />
                     <field name='email' />
-                    <field name='vat' string="Số CMND/CCCD"/>
+                    <field name='vat' string="Số CMND/CCCD" />
                     <field name='ma_dinh_danh' />
                     <field name='ref' />
                     <field name="barcode" />
