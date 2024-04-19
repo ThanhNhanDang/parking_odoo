@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <data>
+        <record id="hide_contact_kanban" model="ir.ui.view">
+            <field name="name">res.partner_kanban</field>
+            <field name="model">res.partner</field>
+            <field name="inherit_id" ref="base.res_partner_kanban_view" />
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='activity_ids']" position="replace"></xpath>
+            </field>
+        </record>
+        <record id="contacts.action_contacts" model="ir.actions.act_window">
+            <field name="context">{'default_is_company': False}</field>
+        </record>
+        <record id="hide_contact" model="ir.ui.view">
+            <field name="name">res.partner</field>
+            <field name="model">res.partner</field>
+            <field name="inherit_id" ref="base.view_partner_form" />
+            <field name="arch" type="xml">
+                <xpath expr="//div[@name='button_box']" position="replace"></xpath>
+                <xpath expr="//form" position="attributes">
+                    <attribute name="js_class">rfid_button</attribute>
+                </xpath>
+                <xpath expr="//widget[@name='web_ribbon']" position="after">
+                <field name="id" invisible='1'/>
+                    <!-- Cái này là của titile -->
+                    <field name='employee' invisible='1'></field>
+                    <div id="registered">
+                        <widget name="web_ribbon" title="Đã Có Thẻ"
+                            bg_color="bg-success"
+                            invisible="employee == 0"
+                            />
+                    </div>
+                </xpath>
+                <field name="mobile" position="attributes">
+                    <attribute name="invisible">1</attribute>
+                </field>
+                <field name="title" position="attributes">
+                    <attribute name="invisible">1</attribute>
+                </field>
+                <field name="function" position="attributes">
+                    <attribute name="invisible">1</attribute>
+                </field>
+                <field name="website" position="attributes">
+                    <attribute name="invisible">1</attribute>
+                </field>
+                <field name="lang" position="attributes">
+                    <attribute name="invisible">1</attribute>
+                </field>
+                <field name="category_id" position="attributes">
+                    <attribute name="invisible">1</attribute>
+                </field>
+                <field name="parent_id" position="attributes">
+                    <attribute name="invisible">1</attribute>
+                </field>
+                 
+
+                <xpath expr="//field[@name='image_1920']"
+                    position="replace" />
+                <xpath expr="//label[@for='phone']"
+                    position="replace" />
+                <xpath expr="//field[@name='phone']"
+                    position="replace" />
+
+                <xpath expr="//label[@for='email']"
+                    position="replace" />
+                <xpath expr="//field[@name='email']"
+                    position="replace" />
+                    <xpath expr="//field[@name='vat']" position="attributes">
+                    <attribute name="string">Số CMND/CCCD</attribute>
+                </xpath>
+                <xpath expr="//field[@name='vat']" position="after">
+                    <field name='city' string="Địa chỉ"
+                        help="Địa chỉ có thể là số căn hộ, vị trí phòng làm việc hoặc học tập" />
+                    <field name="phone" widget="phone" on_change="1"
+                        modifiers="{&quot;required&quot;: true}" />
+                    <field name="email" widget="email" on_change="1"
+                        modifiers="{&quot;required&quot;: true}" />
+                    <field name="ma_dinh_danh" placeholder="e.g. 31195100312"
+                        on_change="1" modifiers="{&quot;required&quot;: true}"
+                    />
+                    <field name='product_ids' widget="many2many_tags_avatar" />
+                    <field name='product_ids_public' widget="many2many_tags_avatar" />
+                    <!-- <field name="ref" /> -->
+                    <field name="barcode" />
+                    <field name="ref" placeholder="e.g. 31195100312"
+                        on_change="1"
+                    />
+                </xpath>
+                <xpath expr="//form/sheet/group/group" position="after">
+                    <group>
+                        <field name="image_1920" widget="capture_image"
+                            on_change="1" />
+                    </group>
+                    <group>
+                        <field name="image_1920_cmnd_cccd_truoc" widget="capture_image"
+                            on_change="1" />
+                    </group>
+                    <group>
+                        <field name="image_1920_cmnd_cccd_sau" widget="capture_image"
+                            on_change="1" />
+                    </group>
+                </xpath>
+                <xpath expr="//form/sheet/notebook"
+                    position="attributes">
+                    <attribute name="invisible">1</attribute>
+                </xpath>
+                <xpath expr="//span[@name='address_name']"
+                    position="attributes">
+                    <attribute name="invisible">1</attribute>
+                </xpath>
+                <xpath expr="//div[@class='o_address_format']"
+                    position="attributes">
+                    <attribute name="invisible">1</attribute>
+                </xpath>
+            </field>
+        </record>
+        <record id="hide_contact_tree" model="ir.ui.view">
+            <field name="name">res.partner.tree</field>
+            <field name="model">res.partner</field>
+            <field name="inherit_id" ref="base.view_partner_tree" />
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='user_id']" position='replace' />
+                <xpath expr="//field[@name='activity_ids']" position='replace' />
+                <xpath expr="//field[@name='city']" position='replace' />
+                <xpath expr="//field[@name='country_id']" position='replace' />
+                <xpath expr="//field[@name='phone']" position='replace' />
+                <xpath expr="//field[@name='email']" position='replace' />
+                <xpath expr="//field[@name='display_name']" position='attributes'>
+                    <attribute name="string"></attribute>
+                </xpath>
+                <xpath expr="//field[@name='vat']" position='after'>
+                    <field name='city' string="Địa chỉ"/>
+                    <field name='phone' />
+                    <field name='email' />
+                    <field name='vat' string="Số CMND/CCCD"/>
+                    <field name='ma_dinh_danh' />
+                    <field name='ref' />
+                    <field name="barcode" />
+                    <field name='date_expiration' />
+                    <field name='product_ids' widget="many2many_tags_avatar" />
+                    <field name='product_ids_public' widget="many2many_tags_avatar" />
+                    <!-- <field name='employee' /> -->
+                </xpath>
+            </field>
+        </record>
+    </data>
+</odoo>

@@ -1,0 +1,118 @@
+.ja {
+	position: fixed;
+	z-index: 999;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	background: rgba(0, 0, 0, 0.2);
+	font-family: "quicksand", sans-serif;
+	font-size: 25px;
+}
+.ja-2 {
+	background: white;
+	min-width: 500px;
+	min-height: 300px;
+	border-radius: 10px;
+	position: fixed;
+	top: 50%;
+	left: 50%;
+	transition: all .4s ease-in, opacity .2s linear;
+	text-align: center;
+}
+.ja-3 {
+	display: table;
+	cursor: default;
+	margin: 35px auto 15px auto;
+	transition: all .5s ease-in, opacity .2s linear;
+}
+.ja [class*="round"] {
+	width: 90px;
+	user-select: none;
+	height: 90px;
+	border-radius: 50%;
+	position: relative;
+}
+.ja-round-success {
+	border: 5px solid rgba(164, 255, 112, 0.9);
+}
+.ja-round-success > i {
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	color: springGreen;
+	font-size: 70px;
+}
+.ja-round-error {
+	border: 5px solid #e74c3c;
+}
+.ja-round-error > i {
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	color: #c0392b;
+	font-size: 70px;
+}
+.ja-round-info, .ja-round-information {
+	border: 5px solid rgba(52, 152, 219, 0.3);
+}
+.ja-round-info > b, .ja-round-information > b {
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	color: #2980b9;
+	font-size: 70px;
+}
+.ja-round-warning, .ja-round-warn {
+	border: 5px solid rgba(230, 126, 34, 0.5);
+}
+.ja-round-warning > b, .ja-round-warn > b {
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	color: rgb(230, 126, 34);
+	font-size: 70px;
+}
+
+.ja-close {
+	position: absolute;
+	right: 0;
+	top: 0;
+	width: 30px;
+	height: 30px;
+	user-select: none;
+	cursor: pointer;
+}
+.ja-close > i {
+	position: absolute;
+	left: 50%;
+	top: 50%;
+	transform: translate(-50%, -50%);
+}
+.ja-continue {
+	padding: 10px 20px;
+	background: #2ecc71;
+	display: inline-block;
+	border-radius: 5px;
+	margin: 10px;
+	cursor: pointer;
+	user-select: none;
+	transition: all .3s ease-in-out;
+}
+.ja-close:hover {
+	transform: scale(1.1);
+}
+@media screen and (max-width: 520px) {
+	.ja-2 {
+		min-width: calc(100% - 20px);
+	}
+}
+@media screen and (max-width: 400px) {
+	.ja-continue {
+		min-width: calc(100% - 60px);
+	}
+}

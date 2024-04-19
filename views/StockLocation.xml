@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <record id="stock_location_tree" model="ir.ui.view">
+        <field name="name">stock.location.tree</field>
+        <field name="model">stock.location</field>
+        <field name="inherit_id" ref="stock.view_location_tree2" />
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='usage']" position='attributes'>
+                <attribute name="invisible">1</attribute>
+            </xpath>
+            <xpath expr="//field[@name='complete_name']" position='before'>
+                <field name="id" />
+            </xpath>
+
+            <xpath expr="//field[@name='complete_name']" position='after'>
+                <field name="state" widget="badge" optional="show"
+                    decoration-muted="state == 'full'" decoration-success="state == 'empty'" />
+                <field name="product_id" widget="many2one_avatar" />
+            </xpath>
+        </field>
+    </record>
+
+    <record id="stock_location_form" model="ir.ui.view">
+        <field name="name">stock.location.form</field>
+        <field name="model">stock.location</field>
+        <field name="inherit_id" ref="stock.view_location_form" />
+        <field name="arch" type="xml">
+            <xpath expr="//group" position='replace'>
+            </xpath>
+            <xpath expr="//field[@name='comment']" position='replace'></xpath>
+            <xpath expr="//field[@name='location_id']" position='after'>
+                <group>
+                    <group>
+                        <field name="product_id" widget="many2one_avatar" />
+                    </group>
+                </group>
+                <field name="active" modifiers="{&quot;invisible&quot;: true}" />
+            </xpath>
+        </field>
+    </record>
+
+    <record id="stock_location_search" model="ir.ui.view">
+        <field name="name">stock.location.search</field>
+        <field name="model">stock.location</field>
+        <field name="inherit_id" ref="stock.view_location_search" />
+        <field name="arch" type="xml">
+            <xpath expr="//search" position='inside'>
+                <group expand="0" string="Group By">
+                    <filter string="Vị trí cha" name="location_id"
+                        context="{'group_by': 'location_id'}" />
+                </group>
+            </xpath>
+        </field>
+    </record>
+</odoo>
