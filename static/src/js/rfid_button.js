@@ -2,15 +2,18 @@
 
 import { registry } from "@web/core/registry";
 import { ConfirmationDialog } from "@web/core/confirmation_dialog/confirmation_dialog";
+
+import { AlertDialog } from "@web/core/confirmation_dialog/confirmation_dialog";
 import { formView } from "@web/views/form/form_view";
 import { FormController } from "@web/views/form/form_controller";
 import { FormRenderer } from "@web/views/form/form_renderer";
 import { onMounted, onWillUpdateProps, useState } from "@odoo/owl";
 import { useService } from "@web/core/utils/hooks";
 
+import { _t } from "@web/core/l10n/translation";
+
 var websocket;
 var result_split;
-
 
 function connect() {
   const wsUri = "ws://127.0.0.1:62536/";
@@ -25,8 +28,6 @@ function connect() {
       connect();
     }, 1000);
   };
-
-
 }
 
 connect();
@@ -37,8 +38,8 @@ connect();
 export class ButtonFormController extends FormController {
   setup() {
     super.setup();
-    this.rpc = useService("rpc")
-    this.dialog = useService("dialog")
+    this.rpc = useService("rpc");
+    this.dialog = useService("dialog");
     this.state = useState({
       ...this.state,
       employee: false,
@@ -47,7 +48,7 @@ export class ButtonFormController extends FormController {
 
   onClickDKxe() {
     const self = this;
-    if (self.model.root.data.id == undefined) {
+    if (self.model.root.data.id == false) {
       this.showAlerDialog("THÔNG BÁO", "CHƯA TẠO THÔNG TIN!!");
       return;
     }
@@ -66,7 +67,8 @@ export class ButtonFormController extends FormController {
   }
   onDSxe() {
     const self = this;
-    if (self.model.root.data.id == undefined) {
+    console.log(self)
+    if (self.model.root.data.id == false) {
       this.showAlerDialog("THÔNG BÁO", "CHƯA TẠO THÔNG TIN!!");
       return;
     }
@@ -188,9 +190,10 @@ export class ButtonFormController extends FormController {
   }
 
   showAlerDialog(title, content) {
-    this.dialog.alert(this, "", {
+    console.log(content);
+    this.dialog.add(AlertDialog, {
       title: title,
-      $content: $("<div/>").html(content),
+      body: _t(content),
     });
     document.getElementById("rfid_btn").disabled = false;
   }
@@ -247,8 +250,8 @@ ButtonFormController.template = "parking_odoo.RFID_button";
 export class ButtonFormRenderer extends FormRenderer {
   setup() {
     super.setup();
-    onMounted(() => { });
-    onWillUpdateProps(async (nextProps) => { });
+    onMounted(() => {});
+    onWillUpdateProps(async (nextProps) => {});
   }
 }
 

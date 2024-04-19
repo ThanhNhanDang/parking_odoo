@@ -94,12 +94,12 @@ class Product_template(models.Model):
             ('product_id', 'in', self.ids),
             ('picking_code', '=', 'incoming'),
             ('date', '>=', fields.Datetime.now() - relativedelta(years=1))
-        ], ['product_id'], ['product_id'])
+        ], ['product_id'], ['__count'])
         outgoing_moves = self.env['stock.move.line']._read_group([
             ('product_id', 'in', self.ids),
             ('picking_code', '=', 'outgoing'),
             ('date', '>=', fields.Datetime.now() - relativedelta(years=1))
-        ], ['product_id'], ['product_id'])
+        ], ['product_id'], ['__count'])
         for move in incoming_moves:
             product = self.env['product.template'].browse(
                 [move['product_id'][0]])

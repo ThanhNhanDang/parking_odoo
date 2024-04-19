@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 {
     'name': "parking",
+    'sequence': 0,
 
     'summary': """
        Ứng dụng sử dụng cho bãi giữ xe, kế thừa những chức năng của những ứng dụng liên quan đến quản lý Kho.

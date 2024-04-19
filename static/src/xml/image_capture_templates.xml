@@ -9,7 +9,7 @@
                     <FileUploader
                             acceptedFileExtensions="props.acceptedFileExtensions"
                             onUploaded.bind="onFileUploaded"
-                            type="'image'">
+                            t-key="props.record.resId">
                         <t t-set-slot="toggler">
                             <button
                                     class="o_select_file_button btn btn-light border-0 rounded-circle m-1 p-1"

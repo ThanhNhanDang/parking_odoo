@@ -19,11 +19,12 @@ class Contact(models.Model):
     display_name = fields.Char(string="Họ tên", required=False)
     name = fields.Char(string="Họ tên")
     vat = fields.Char(string="Số CMND/CCCD", required=True)
-    phone = fields.Char(string="Số điện thoại", required=True)
+
+    phone = fields.Char(string="Số điện thoại", required=True)  
     barcode = fields.Char(string="Mật khẩu",readonly=False)
     ref = fields.Char(string="Mã thẻ",readonly=False)
     employee = fields.Boolean(string="Cấp thẻ", default=False)
-    ma_dinh_danh = fields.Char(string="Mã định danh", required=False, store=True)
+    ma_dinh_danh = fields.Char(string="ID nhân viên", required=False, store=True)
     city = fields.Char(string="Địa chỉ", required=True)
     date_expiration = fields.Datetime(string="Ngày hết hạn", required=True)
     product_ids = fields.One2many("product.template", "contact_id", string="D/S xe",
