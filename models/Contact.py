@@ -30,8 +30,7 @@ class Contact(models.Model):
                                   readonly=True)
     product_ids_public = fields.Many2many("product.template", relation="product_template_res_partner_rel", column1="res_partner_id", column2="product_template_id", string="D/S xe dùng chung",
                                           readonly=True)
-    image_1920 = fields.Image(string="Ảnh đại diện",
-                              max_width=1920, max_height=1920)
+    image_1920 = fields.Image(string="Ảnh đại diện", max_width=1024, max_height=768)
     image_1920_cmnd_cccd_truoc = fields.Image(
         string="Ảnh mặt trước CMND/CCCD", max_width=1920, max_height=1920)
     image_1920_cmnd_cccd_sau = fields.Image(

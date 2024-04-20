@@ -9,9 +9,13 @@
                 <xpath expr="//field[@name='activity_ids']" position="replace"></xpath>
             </field>
         </record>
+
+        <!-- View này cho phép người dùng thay đổi liên hệ công ty -->
         <record id="contacts.action_contacts" model="ir.actions.act_window">
             <field name="context">{'default_is_company': False}</field>
         </record>
+        
+        <!-- View này là bên trong contact -->
         <record id="hide_contact" model="ir.ui.view">
             <field name="name">res.partner</field>
             <field name="model">res.partner</field>
@@ -56,7 +60,7 @@
                  
 
                 <xpath expr="//field[@name='image_1920']"
-                    position="replace" />
+                    position="replace"/>
 
                 <xpath expr="//label[@for='phone']"
                     position="replace" />
@@ -81,8 +85,8 @@
                     <field name="ma_dinh_danh" placeholder="e.g. 31195100312"
                         on_change="1" modifiers="{&quot;required&quot;: true}"
                     />
-                    <field name='product_ids' widget="many2many_tags_avatar" />
-                    <field name='product_ids_public' widget="many2many_tags_avatar" />
+                    <field name='product_ids' widget="many2many_tags_avatar" invisible= "1"  />
+                    <field name='product_ids_public' widget="many2many_tags_avatar" invisible= "1" />
                     <!-- <field name="ref" /> -->
                     <field name="barcode" />
                     <field name="ref" placeholder="e.g. 31195100312"
@@ -90,24 +94,47 @@
                     />
                 </xpath>
 
-                <!-- Image -->
-                <!-- <xpath expr="//form/sheet/group/group" position="after">
+                <!-- Image Avatar -->
+                <xpath expr="//form/sheet/group/group" position="after">
                     <group>
-                        <field name="image_1920" widget="capture_image"
-                            on_change="1" />
+                    <field name="image_1920" widget="capture_image"
+                        on_change="1" class="oe_avatar" options="{'no_auto_resize': True}"
+                        />
                     </group>
-                    <group>
-                        <field name="image_1920_cmnd_cccd_truoc" widget="capture_image"
-                            on_change="1" />
-                    </group>
-                    <group>
-                        <field name="image_1920_cmnd_cccd_sau" widget="capture_image"
-                            on_change="1" />
-                    </group>
-                </xpath> -->
-                <xpath expr="//form/sheet/notebook"
+                </xpath>
+
+                <!-- Image CCCD -->
+                <xpath expr="//form/sheet/notebook/page/field"
+                    position="after">
+                     <div style="display: flex">
+                        <group>
+                            <field name="image_1920_cmnd_cccd_truoc" widget="capture_image"
+                                on_change="1" />
+                        </group>
+                        <group style="margin-left: 100px">
+                            <field name="image_1920_cmnd_cccd_sau" widget="capture_image"
+                                on_change="1" />
+                        </group>
+                     </div>
+                </xpath>
+
+                <xpath expr="//page[@name='contact_addresses']"
                     position="attributes">
-                    <attribute name="invisible">0</attribute>
+                    <attribute name="string">Image CCCD</attribute>
+                </xpath>
+
+                <!-- Ẩn các trường không cần thiết -->
+                <xpath expr="//form/sheet/notebook/page/field[@name = 'child_ids']"
+                    position="attributes">
+                    <attribute name="invisible">1</attribute>   
+                </xpath>
+                <xpath expr="//page[@name='accounting']"
+                    position="attributes">
+                    <attribute name="invisible">1</attribute>
+                </xpath>
+                <xpath expr="//page[@name='sales_purchases']"
+                    position="attributes">
+                    <attribute name="invisible">1</attribute>
                 </xpath>
                 <xpath expr="//span[@name='address_name']"
                     position="attributes">
@@ -117,6 +144,7 @@
                     position="attributes">
                     <attribute name="invisible">1</attribute>
                 </xpath>
+
             </field>
         </record>
 
