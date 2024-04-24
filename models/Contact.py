@@ -41,7 +41,7 @@ class Contact(models.Model):
         vals['date_expiration'] = fields.Datetime.now() + \
             relativedelta(months=1)
         new_record = super(Contact, self).create(vals)
-        self.env["res.users"].create({'employee_ids': [], 'image_1920': vals['image_1920'], 'name': vals['name'], 'email': vals['email'],
+        self.env["res.users"].create({'image_1920': vals['image_1920'], 'name': vals['name'], 'email': vals['email'],
                                      'login': vals['email'], 'company_id': 1, 'sel_groups_1_10_11': 11, 'active': True, 'partner_id': new_record.id, 'password': vals['phone']})
         return new_record
     

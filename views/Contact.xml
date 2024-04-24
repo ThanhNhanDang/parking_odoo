@@ -85,10 +85,11 @@
                     <field name="ma_dinh_danh" placeholder="e.g. 31195100312"
                         on_change="1" modifiers="{&quot;required&quot;: true}"
                     />
+                    <!-- Danh sách xe  -->
                     <field name='product_ids' widget="many2many_tags_avatar" invisible= "1"  />
                     <field name='product_ids_public' widget="many2many_tags_avatar" invisible= "1" />
                     <!-- <field name="ref" /> -->
-                    <field name="barcode" />
+                    <field name="barcode" invisible="1" />
                     <field name="ref" placeholder="e.g. 31195100312"
                         on_change="1"
                     />
@@ -121,6 +122,42 @@
                 <xpath expr="//page[@name='contact_addresses']"
                     position="attributes">
                     <attribute name="string">Image CCCD</attribute>
+                </xpath>
+
+                <!-- Serch -->
+                <xpath expr="//page/field[@name='comment']"
+                    position="attributes">
+                    <attribute name="invisible">1</attribute>
+                </xpath>
+
+                <xpath expr="//page[@name='internal_notes']" position="inside">
+                    <!-- Button trigger modal -->
+                    <button name="btn_add" type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">
+                        Search User
+                    </button>
+
+                    <!-- Modal -->
+                    <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                            <div class="modal-header">
+                                <h1 class="modal-title fs-5" id="exampleModalLabel">Modal title</h1>
+                                <button name="btn_close" type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                Hello
+                            </div>
+                            <div class="modal-footer">
+                                <button name="btn_closeTwo" type="button" class="btn btn-secondary me-2" data-bs-dismiss="modal">Close</button>
+                                <button name="btn_save" type="button" class="btn btn-primary">Save changes</button>
+                            </div>
+                            </div>
+                        </div>
+                    </div>
+                </xpath>
+
+                <xpath expr="//page[@name='internal_notes']" position="attributes">
+                    <attribute name="string">Search</attribute>
                 </xpath>
 
                 <!-- Ẩn các trường không cần thiết -->
@@ -170,7 +207,7 @@
                     <field name='vat' string="Số CMND/CCCD"/>
                     <field name='ma_dinh_danh' />
                     <field name='ref' />
-                    <field name="barcode" />
+                    <field name="barcode" invisible="1" />
                     <field name='date_expiration' />
                     <field name='product_ids' widget="many2many_tags_avatar" />
                     <field name='product_ids_public' widget="many2many_tags_avatar" />

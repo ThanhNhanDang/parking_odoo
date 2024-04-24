@@ -93,7 +93,7 @@
                     <div id="registered">
                         <widget name="web_ribbon" title="ĐÃ CÓ THẺ"
                             bg_color="bg-success"
-                            modifiers="{&quot;invisible&quot;: [[&quot;check_doi_the&quot;, &quot;=&quot;, false]]}" />
+                            invisible="check_doi_the == 0"/>
                     </div>
                     <group>
                         <group>
