@@ -2,12 +2,14 @@
 
 import { registry } from "@web/core/registry";
 import { ConfirmationDialog } from "@web/core/confirmation_dialog/confirmation_dialog";
+
 import { AlertDialog } from "@web/core/confirmation_dialog/confirmation_dialog";
 import { formView } from "@web/views/form/form_view";
 import { FormController } from "@web/views/form/form_controller";
 import { FormRenderer } from "@web/views/form/form_renderer";
 import { onMounted, onWillUpdateProps, useState } from "@odoo/owl";
 import { useService } from "@web/core/utils/hooks";
+
 import { _t } from "@web/core/l10n/translation";
 
 var websocket;
@@ -193,7 +195,6 @@ export class ButtonFormController extends FormController {
       title: title,
       body: _t(content),
     });
-
     document.getElementById("rfid_btn").disabled = false;
   }
 

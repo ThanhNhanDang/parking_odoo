@@ -8,3 +8,5 @@ from . import Product_template
 from . import Product_product
 from . import ResUsers
 from . import _test
+from . import product_color
+from . import product_color_values

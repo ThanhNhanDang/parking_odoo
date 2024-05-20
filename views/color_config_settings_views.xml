@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="color_setting_action" model="ir.actions.act_window">
+            <field name="name">Color</field>
+            <field name="res_model">product.color.main</field>
+            <field name="view_mode">tree,form</field>
+            <field name="target">current</field>
+        </record>
+
+        <menuitem id="parking_config_settings_menu" 
+        name="Color" 
+        parent="stock.menu_product_in_config_stock" 
+        sequence="1" 
+        action="color_setting_action" groups="base.group_system" />
+       
+   
+        <!-- groups="group_stock_manager,group_stock_user" web_icon="parking_odoo,static/description/icon2.png" -->
+        <!-- Lấy parent trong metadata của inventory/configuration -->
+    </data>
+</odoo>
+
+<!-- parent="stock.menu_stock_config_settings" groups="base.group_system"-->

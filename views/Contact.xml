@@ -14,7 +14,7 @@
         <record id="contacts.action_contacts" model="ir.actions.act_window">
             <field name="context">{'default_is_company': False}</field>
         </record>
-        
+
         <!-- View này là bên trong contact -->
         <record id="hide_contact" model="ir.ui.view">
             <field name="name">res.partner</field>
@@ -26,14 +26,11 @@
                     <attribute name="js_class">rfid_button</attribute>
                 </xpath>
                 <xpath expr="//widget[@name='web_ribbon']" position="after">
-                <field name="id" invisible='1'/>
+                    <field name="id" invisible='1'/>
                     <!-- Cái này là của titile -->
                     <field name='employee' invisible='1'></field>
                     <div id="registered">
-                        <widget name="web_ribbon" title="Đã Có Thẻ"
-                            bg_color="bg-success"
-                            invisible="employee == 0"
-                            />
+                        <widget name="web_ribbon" title="Đã Có Thẻ" bg_color="bg-success" invisible="employee == 0" />
                     </div>
                 </xpath>
                 <field name="mobile" position="attributes">
@@ -57,131 +54,178 @@
                 <field name="parent_id" position="attributes">
                     <attribute name="invisible">1</attribute>
                 </field>
-                 
 
-                <xpath expr="//field[@name='image_1920']"
-                    position="replace"/>
 
-                <xpath expr="//label[@for='phone']"
-                    position="replace" />
-                <xpath expr="//field[@name='phone']"
-                    position="replace" />
+                <xpath expr="//field[@name='image_1920']" position="replace"/>
 
-                <xpath expr="//label[@for='email']"
-                    position="replace" />
-                <xpath expr="//field[@name='email']"
-                    position="replace" />
+                <xpath expr="//label[@for='phone']" position="replace" />
+                <xpath expr="//field[@name='phone']" position="replace" />
+
+                <xpath expr="//label[@for='email']" position="replace" />
+                <xpath expr="//field[@name='email']" position="replace" />
 
                 <xpath expr="//field[@name='vat']" position="attributes">
                     <attribute name="string">Số CMND/CCCD</attribute>
                 </xpath>
                 <xpath expr="//field[@name='vat']" position="after">
-                    <field name='city' string="Địa chỉ"
-                        help="Địa chỉ có thể là số căn hộ, vị trí phòng làm việc hoặc học tập" />
-                    <field name="phone" widget="phone" on_change="1"
-                        modifiers="{&quot;required&quot;: true}" />
-                    <field name="email" widget="email" on_change="1"
-                        modifiers="{&quot;required&quot;: true}" />
-                    <field name="ma_dinh_danh" placeholder="e.g. 31195100312"
-                        on_change="1" modifiers="{&quot;required&quot;: true}"
-                    />
+                    <field name="job_position" string="Job Position"/>
+                    <field name="phone" widget="phone" on_change="1" modifiers="{&quot;required&quot;: true}" />
+                    <field name="email" widget="email" on_change="1" modifiers="{&quot;required&quot;: true}" />
                     <!-- Danh sách xe  -->
-                    <field name='product_ids' widget="many2many_tags_avatar" invisible= "1"  />
+                    <field name='product_ids' widget="many2many_tags_avatar" invisible= "1" />
                     <field name='product_ids_public' widget="many2many_tags_avatar" invisible= "1" />
-                    <!-- <field name="ref" /> -->
                     <field name="barcode" invisible="1" />
-                    <field name="ref" placeholder="e.g. 31195100312"
-                        on_change="1"
-                    />
                 </xpath>
 
                 <!-- Image Avatar -->
                 <xpath expr="//form/sheet/group/group" position="after">
                     <group>
-                    <field name="image_1920" widget="capture_image"
-                        on_change="1" class="oe_avatar" options="{'no_auto_resize': True}"
-                        />
+                        <field name="image_1920" widget="capture_image" on_change="1" class="oe_avatar" options="{'no_auto_resize': True}" />
+                        <field name="ma_dinh_danh" placeholder="e.g. 31195100312" on_change="1" modifiers="{&quot;required&quot;: true}" />
+                        <field name="ref" placeholder="e.g. 31195100312" on_change="1" />
+                        <field name="zalo" string="Zalo" />
+                        <field name="viper" string="Viper" />
+                        <field name="what_app" string="What's App" />
                     </group>
                 </xpath>
 
                 <!-- Image CCCD -->
-                <xpath expr="//form/sheet/notebook/page/field"
-                    position="after">
-                     <div style="display: flex">
+                <xpath expr="//form/sheet/notebook/page/field" position="after">
+                    <div style="display: flex">
                         <group>
-                            <field name="image_1920_cmnd_cccd_truoc" widget="capture_image"
-                                on_change="1" />
+                            <field name="image_1920_cmnd_cccd_truoc" widget="capture_image" on_change="1" />
                         </group>
                         <group style="margin-left: 100px">
-                            <field name="image_1920_cmnd_cccd_sau" widget="capture_image"
-                                on_change="1" />
+                            <field name="image_1920_cmnd_cccd_sau" widget="capture_image" on_change="1" />
                         </group>
-                     </div>
+                    </div>
                 </xpath>
 
-                <xpath expr="//page[@name='contact_addresses']"
-                    position="attributes">
+                <xpath expr="//page[@name='contact_addresses']" position="attributes">
                     <attribute name="string">Image CCCD</attribute>
                 </xpath>
 
-                <!-- Serch -->
-                <xpath expr="//page/field[@name='comment']"
-                    position="attributes">
+                <!-- Search -->
+                <xpath expr="//page/field[@name='comment']" position="attributes">
                     <attribute name="invisible">1</attribute>
                 </xpath>
 
-                <xpath expr="//page[@name='internal_notes']" position="inside">
+                <xpath expr="//page[@name='sales_purchases']" position="inside">
+                    <!-- Add id "kanban_view" to hide/show kanban initially -->
+                    <field name="partner_ids" class="ms-3">
+                        <kanban create="false" delete="false">
+                            <templates>
+                                <t t-name="kanban-box">
+                                    <!-- Display fields of each partner_id in separate card -->
+                                    <group class="o_kanban_record d-flex flex-column" style="width: 100%; height: 100%;">
+                                        <div class="row flex-grow-1">
+                                            <div class="col-6">
+                                                <div class="o_kanban_record_head h-100 d-flex align-items-center">
+                                                    <div class="o_kanban_record_head_left">
+                                                        <field name="image_1920" widget="image"/>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-6">
+                                                <div class="o_kanban_record_right h-100 d-flex flex-column justify-content-center">
+                                                    <div class="text-nowrap">
+                                                        <strong>Họ &amp; Tên: </strong>
+                                                        <field name="name"/>
+                                                    </div>
+
+                                                    <div>
+                                                        <strong>ID: </strong>
+                                                        <field name="ma_dinh_danh" attrs="{'invisible': [('ma_dinh_danh','=',False)]}"/>
+                                                    </div>
+
+                                                    <div>
+                                                        <strong>Mã thẻ: </strong>
+                                                        <field name="ref" attrs="{'invisible': [('ref','=',False)]}"/>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="delete-button text-end">
+                                                <a type="object" name="delete_button" class="fa fa-trash"/>
+                                            </div>
+                                        </div>
+                                    </group>
+
+                                    <style>
+                                        .o_kanban_record:hover .delete-button {
+                                            display: block;
+                                        }
+
+                                        .delete-button {
+                                            display: none;
+                                        }
+                                    </style>
+                                </t>
+                            </templates>
+                        </kanban>
+                    </field>
+
                     <!-- Button trigger modal -->
-                    <button name="btn_add" type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">
-                        Search User
+                    <button name="btn_addContact" type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#staticBackdrop">
+                        Add
                     </button>
 
                     <!-- Modal -->
-                    <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-                        <div class="modal-dialog">
-                            <div class="modal-content">
-                            <div class="modal-header">
-                                <h1 class="modal-title fs-5" id="exampleModalLabel">Modal title</h1>
-                                <button name="btn_close" type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                            </div>
-                            <div class="modal-body">
-                                Hello
-                            </div>
-                            <div class="modal-footer">
-                                <button name="btn_closeTwo" type="button" class="btn btn-secondary me-2" data-bs-dismiss="modal">Close</button>
-                                <button name="btn_save" type="button" class="btn btn-primary">Save changes</button>
-                            </div>
+                    <div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+                        <div class="modal-dialog modal-dialog-centered">
+                            <div class="modal-content" id="modalPartner">
+                                <div class="modal-header">
+                                    <h1 class="modal-title fs-5" id="staticBackdropLabel">Find Contact</h1>
+                                    <a name="btn_x" class="btn_close btn" data-bs-dismiss="modal" aria-label="Close">X</a>
+                                </div>
+                                <div class="modal-body">
+                                    <group>
+                                        <field name="partner_ids" widget="many2many_tags_avatar" string="D/Sách Liên Hệ" options="{'no_create': True}"/>
+                                    </group>
+                                </div>
+                                <div class="modal-footer">
+                                    <a name="btn_x" class="btn_close btn btn-primary" data-bs-dismiss="modal">Save &amp; Close</a>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </xpath>
 
+                <xpath expr="//page[@name='sales_purchases']" position="attributes">
+                    <attribute name="string">Contact &amp; Address</attribute>
+                </xpath>
+
+
+                <!-- Phương Tiện -->
                 <xpath expr="//page[@name='internal_notes']" position="attributes">
-                    <attribute name="string">Search</attribute>
+                    <attribute name="string">Vehicle</attribute>
+                </xpath>
+
+                <xpath expr="//page[@name='internal_notes']" position="inside">
+                    <field name="vehicles">
+                        <tree create="1" edit="1">
+                            <field name="contact_id"></field>
+                            <field name="bien_so_realtime" widget='image'></field>
+                            <field name="car_status"></field>
+                        </tree>
+                    </field>
                 </xpath>
 
                 <!-- Ẩn các trường không cần thiết -->
-                <xpath expr="//form/sheet/notebook/page/field[@name = 'child_ids']"
-                    position="attributes">
-                    <attribute name="invisible">1</attribute>   
-                </xpath>
-                <xpath expr="//page[@name='accounting']"
-                    position="attributes">
+                <xpath expr="//form/sheet/notebook/page/field[@name = 'child_ids']" position="attributes">
                     <attribute name="invisible">1</attribute>
                 </xpath>
-                <xpath expr="//page[@name='sales_purchases']"
-                    position="attributes">
+                <xpath expr="//page[@name='accounting']" position="attributes">
                     <attribute name="invisible">1</attribute>
                 </xpath>
-                <xpath expr="//span[@name='address_name']"
-                    position="attributes">
+                <xpath expr="//group[@name='container_row_2']" position="attributes">
                     <attribute name="invisible">1</attribute>
                 </xpath>
-                <xpath expr="//div[@class='o_address_format']"
-                    position="attributes">
-                    <attribute name="invisible">1</attribute>
+                <xpath expr="//span[@name='address_name']" position="attributes">
+                    <attribute name="invisible">0</attribute>
                 </xpath>
-
+                <xpath expr="//div[@class='o_address_format']" position="attributes">
+                    <attribute name="invisible">0</attribute>
+                </xpath>
             </field>
         </record>
 
@@ -201,17 +245,16 @@
                     <attribute name="string"></attribute>
                 </xpath>
                 <xpath expr="//field[@name='vat']" position='after'>
-                    <field name='city' string="Địa chỉ"/>
+                    <field name='job_position' />
                     <field name='phone' />
                     <field name='email' />
+                    <field name='zalo' />
+                    <field name='viper' />
+                    <field name='what_app' />
                     <field name='vat' string="Số CMND/CCCD"/>
                     <field name='ma_dinh_danh' />
                     <field name='ref' />
-                    <field name="barcode" invisible="1" />
                     <field name='date_expiration' />
-                    <field name='product_ids' widget="many2many_tags_avatar" />
-                    <field name='product_ids_public' widget="many2many_tags_avatar" />
-                    <!-- <field name='employee' /> -->
                 </xpath>
             </field>
         </record>

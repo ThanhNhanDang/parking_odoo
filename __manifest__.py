@@ -29,6 +29,8 @@
         "views/ProductTemplate.xml",
         "views/StockLocation.xml",
         "views/StockMoveLine.xml",
+        "views/product_color_main.xml",
+        "views/color_config_settings_views.xml",
     ],
     'assets': {
         'web.assets_backend':

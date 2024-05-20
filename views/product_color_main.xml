@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="product_attribute_view_form" model="ir.ui.view">
+            <field name="name">product.color.main.form</field>
+            <field name="model">product.color.main</field>
+            <field name="arch" type="xml">
+                <form string="Product color">
+                    <sheet style="border: 0px solid #ccc;
+                    margin-left: 200px;margin-right: 200px; margin-bottom: 200px;">
+                        <notebook>
+                            <page string="TẠO MÀU MỚI" name="color_values">
+                                <group>
+                                    <field name="name" string="Tên màu" placeholder="Nhập tên màu..." style="width: 200px; height: 30px;"/>
+                                </group>
+                                <group>
+                                    <group>
+                                        <field name="html_color" widget="color" string="Chọn màu" help="Chọn màu của bạn. Trỏ chuột tới vị trí màu mong muốn, hoặc nhập mã màu ở ô bên dưới."></field>
+                                    </group>
+                                    <group>
+                                        <field name="html_color" string="Mã màu" placeholder="Nhập mã màu ..." help="Nhập mã màu của bạn. Đảm bảo rằng nhập đúng định dạng mã màu ('#RRGGBB') ví dụ: #ffffff"/>
+                                    </group>
+                                </group>
+                                <group>
+                                    
+                                </group>
+                            </page>
+                        </notebook>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <record id="product_color_main_tree_view" model="ir.ui.view">
+            <field name="name">product.color.main.tree</field>
+            <field name="model">product.color.main</field>
+            <field name="arch" type="xml">
+                <tree string="Product Color">
+                    <field name="name"/>
+                    <field name="html_color" string="Mã màu"/>
+                    <field name="html_color" widget="color" string="Chọn màu"/>
+                </tree>
+            </field>
+        </record>
+
+
+    </data>
+</odoo>
+
+
+
+
+
+
+
+
+<!-- <record id="product_color_main_form" model="ir.ui.view">
+            <field name="name">product.color.main.form</field>
+            <field name="model">product.color.main</field>
+            <field name="mode">primary</field>
+            <field name="priority" eval="8"/>
+            <field name="arch" type="xml">
+                <form name="create_color" string="Tạo màu mới">
+                    <sheet style="border: 0px solid #ccc;
+                    margin-left: 100px;margin-right: 100px; margin-bottom: 200px;">
+                        <group>
+                            <field name="name" string="Tên màu" placeholder="Nhập tên màu..." style="width: 200px; height: 30px;"/>
+                        </group>
+                        <group>
+                            <field name="html_color" widget="color" string="Chọn màu"></field>
+                            <field name="html_color" string="Mã màu"></field>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <record id="product_color_main_tree" model="ir.ui.view">
+            <field name="name">product.color.main.tree</field>
+            <field name="model">product.color.main</field>
+            <field name="arch" type="xml">
+                <tree string="Màu">
+                    <field name="name"/>
+                    <field name="html_color" string="Mã màu"/>
+                    <field name="html_color" widget="color" string="Màu hiển thị"/>
+                </tree>
+            </field>
+        </record> -->
+
+
+
+<!-- <tree string="color_tree" editable="top">
+                <field name="sequence" widget="handle"/>
+                <field name="name"/>
+                <field name="html_color" string="Mã màu"/>
+                <field name="html_color" widget="color" string="Màu hiển thị"/>
+    </tree>
+-->
+
+<!-- <form>
+                <sheet style="border: 0px solid #ccc;
+                    margin-left: 100px;margin-right: 100px; margin-bottom: 200px;">
+                    <group name="color" string="Tạo màu">
+                        <group>
+                            <field name="name" widget="one2many" string="Tên màu" placeholder="Nhập tên màu..." style="width: 200px; height: 30px;"/>
+                        </group>
+                        <group>
+                            <field name="html_color" widget="color" string="Chọn màu"></field>
+                            <field name="html_color" string="Mã màu"></field>
+                        </group>
+                    </group>
+                </sheet>
+            </form> -->
+
+
+<!-- <record id="product_color_main_form" model="ir.ui.view">
+            <field name="name">product.color.main.form</field>
+            <field name="model">product.color.main</field>
+            <field name="mode">primary</field>
+            <field name="priority" eval="8"/>
+
+            <field name="arch" type="xml">
+                <form name="create_color" string="Tạo màu mới">
+                    <sheet style="border: 0px solid #ccc;
+                    margin-left: 100px;margin-right: 100px; margin-bottom: 200px;">
+                        <group>
+                            <field name="name" string="Tên màu" placeholder="Nhập tên màu..." style="width: 200px; height: 30px;"/>
+                        </group>
+                        <group>
+                            <field name="html_color" widget="color" string="Chọn màu"></field>
+                            <field name="html_color" string="Mã màu"></field>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record> -->
